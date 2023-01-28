@@ -1,8 +1,6 @@
 name: storybook_ds
 description: A new Flutter project.
 homepage: https://github.com/jheimes-silveira/storybook_ds
-publish_to: "none"
-
 version: 1.0.0+1
 
 environment:

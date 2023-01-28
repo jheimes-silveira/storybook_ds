@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../ds/dropdown/cc_dropdown_button.dart';
-import '../../../../../core/utils/utils.dart';
-import '../../../../../modules/components/data/models/dto/atribute_dto.dart';
+import '../../ds/dropdown/cc_dropdown_button.dart';
+import '../utils/utils.dart';
+import '../models/dto/atribute_dto.dart';
 
 class ContentWidget extends StatelessWidget {
   final String title;
@@ -105,9 +105,6 @@ class ContentWidget extends StatelessWidget {
               color: Colors.white,
               onPressed: () {
                 Utils.copyClipboard(_generateWidgetToString());
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Codigo copiado"),
-                ));
               },
               icon: const Icon(Icons.copy, size: 20),
             ),
@@ -300,8 +297,10 @@ class ContentWidget extends StatelessWidget {
                   e.selectedValue = e.selectedValue?.copyWith(
                     value: text,
                   );
-
                   onAtributs!(atributs);
+                  c.selection = TextSelection.fromPosition(
+                    TextPosition(offset: c.selection.baseOffset),
+                  );
                 }
               },
             ),

@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../data/models/dto/atribute_dto.dart';
-import '../../../presentation/ui/widgets/content_widget.dart';
-import '../../../presentation/ui/widgets/device_widget.dart';
+import 'models/dto/atribute_dto.dart';
+import 'widgets/content_widget.dart';
+import 'widgets/device_widget.dart';
 
 abstract class ComponentBasePage<T extends StatefulWidget> extends State {
   String nameObjectInDisplay();

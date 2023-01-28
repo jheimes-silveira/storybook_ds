@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
+import 'custom_button.dart';
+
 class ExemplePage extends StatefulWidget {
   const ExemplePage({Key? key}) : super(key: key);
 
@@ -14,37 +16,21 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
       type: 'Function()',
       name: 'onPressed',
       required: true,
-      builders: [null, 'construtor1', 'construtor2'],
+      builders: ['contained', 'outline', 'text'],
     ),
     AtributeDto(
       type: 'String',
       name: 'text',
       required: true,
-      selectedValue: VariableOption(value: 'Buttom'),
-      builders: [null, 'construtor1', 'construtor2'],
+      selectedValue: VariableOption(value: 'Custom Buttom'),
+      builders: ['contained', 'outline', 'text'],
     ),
     AtributeDto(
-      type: 'String?',
-      name: 'outroArgumentoOpcional',
-      selectedValue: VariableOption(value: 'Teste'),
-      // builders: [null, 'construtor1', 'construtor2'],
+      type: 'bool',
+      name: 'loading',
+      selectedValue: VariableOption(value: false),
+      builders: ['contained', 'outline', 'text'],
     ),
-    AtributeDto(
-        type: 'IconData',
-        name: 'icon',
-        selectedValue: VariableOption(value: Icons.abc_outlined),
-        builders: [
-          'construtor2',
-          'construtor3',
-          'construtor4',
-          'construtor5',
-        ],
-        variableOptions: [
-          VariableOption(value: Icons.abc_outlined),
-          VariableOption(value: Icons.abc),
-          VariableOption(value: Icons.ac_unit_outlined),
-          VariableOption(value: Icons.adb_outlined),
-        ]),
   ];
 
   @override
@@ -54,29 +40,62 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
 
   @override
   Widget buildComponentWidget(BuildContext context) {
+    if (selectedConstructor == 'contained') {
+      return _buildContained();
+    }
+    if (selectedConstructor == 'outline') {
+      return _buildOutline();
+    }
+    if (selectedConstructor == 'text') {
+      return _buildText();
+    }
     return Scaffold(
       body: Center(
-        child: ElevatedButton(
-          child: Text(getWhereAtribut(atributs(), 'text')),
+        child: CustomButton.contained(
+          text: getWhereAtribut(atributs(), 'text'),
           onPressed: () {},
         ),
       ),
     );
   }
 
+  Widget _buildContained() {
+    return CustomButton.contained(
+      text: getWhereAtribut(atributs(), 'text'),
+      loading: getWhereAtribut(atributs(), 'loading'),
+      onPressed: () {},
+    );
+  }
+
+  Widget _buildOutline() {
+    return CustomButton.outline(
+      text: getWhereAtribut(atributs(), 'text'),
+      loading: getWhereAtribut(atributs(), 'loading'),
+      onPressed: () {},
+    );
+  }
+
+  Widget _buildText() {
+    return CustomButton.text(
+      text: getWhereAtribut(atributs(), 'text'),
+      loading: getWhereAtribut(atributs(), 'loading'),
+      onPressed: () {},
+    );
+  }
+
   @override
   String description() {
-    return 'O componente de alerta permite mostrar mensagens de alerta para o usuário';
+    return 'Takimata sanctus amet dolores accusam dolores stet nonumy dolore sea, tempor voluptua elitr invidunt duo takimata erat. Consetetur lorem diam et tempor dolores est nonumy dolor. Et dolor ea amet diam, et eirmod et labore sea et rebum elitr. Magna diam no takimata et amet justo eos erat. Dolor erat ipsum diam diam sed duo stet, diam lorem clita lorem ut sanctus sit eos, duo est duo elitr diam et diam magna sit erat. Magna nonumy elitr clita takimata, elitr sit nonumy ipsum et sit vero, lorem est dolor sanctus sed et amet dolor. Et amet amet ea amet erat amet diam ea ut, invidunt ipsum dolor consetetur sit ipsum tempor, no et est sea voluptua tempor et, accusam dolores est accusam ea magna lorem ea gubergren sit. Clita dolores diam nonumy et et sit tempor, amet accusam at stet lorem kasd labore. Erat rebum gubergren clita stet. Stet et diam lorem eos sanctus ipsum, est ipsum et clita dolor dolor, est sea ea et amet lorem est sit. At dolore diam magna at vero dolor magna sit diam. Dolores sit gubergren eos voluptua ea, gubergren voluptua vero sea eos ipsum elitr. Ipsum dolore kasd stet rebum est amet erat.';
   }
 
   @override
   String nameObjectInDisplay() {
-    return 'CCAlert';
+    return 'CustomButton';
   }
 
   @override
   String title() {
-    return 'CCAlert';
+    return 'Custom Button';
   }
 
   @override
