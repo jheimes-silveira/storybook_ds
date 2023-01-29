@@ -15,7 +15,7 @@ jobs:
         with:
           flutter-version: '3.3.10'
       - run: flutter pub get
-      - run: flutter build web
+      - run: flutter build web -t example/lib/main.dart
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
