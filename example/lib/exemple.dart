@@ -1,7 +1,6 @@
+import 'package:ds_button/ds_button.dart';
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
-
-import 'custom_button.dart';
 
 class ExemplePage extends StatefulWidget {
   const ExemplePage({Key? key}) : super(key: key);
@@ -16,20 +15,20 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
       type: 'Function()',
       name: 'onPressed',
       required: true,
-      builders: ['contained', 'outline', 'text'],
+      builders: ['elevated', 'outline', 'text'],
     ),
     AtributeDto(
       type: 'String',
       name: 'text',
       required: true,
       selectedValue: VariableOption(value: 'Custom Buttom'),
-      builders: ['contained', 'outline', 'text'],
+      builders: ['elevated', 'outline', 'text'],
     ),
     AtributeDto(
       type: 'bool',
       name: 'loading',
       selectedValue: VariableOption(value: false),
-      builders: ['contained', 'outline', 'text'],
+      builders: ['elevated', 'outline', 'text'],
     ),
   ];
 
@@ -40,8 +39,8 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
 
   @override
   Widget buildComponentWidget(BuildContext context) {
-    if (selectedConstructor == 'contained') {
-      return _buildContained();
+    if (selectedConstructor == 'elevated') {
+      return _buildElevated();
     }
     if (selectedConstructor == 'outline') {
       return _buildOutline();
@@ -51,7 +50,7 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
     }
     return Scaffold(
       body: Center(
-        child: CustomButton.contained(
+        child: DSButton.elevated(
           text: getWhereAtribut(atributs(), 'text'),
           onPressed: () {},
         ),
@@ -59,8 +58,8 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
     );
   }
 
-  Widget _buildContained() {
-    return CustomButton.contained(
+  Widget _buildElevated() {
+    return DSButton.elevated(
       text: getWhereAtribut(atributs(), 'text'),
       loading: getWhereAtribut(atributs(), 'loading'),
       onPressed: () {},
@@ -68,7 +67,7 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
   }
 
   Widget _buildOutline() {
-    return CustomButton.outline(
+    return DSButton.outline(
       text: getWhereAtribut(atributs(), 'text'),
       loading: getWhereAtribut(atributs(), 'loading'),
       onPressed: () {},
@@ -76,7 +75,7 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
   }
 
   Widget _buildText() {
-    return CustomButton.text(
+    return DSButton.text(
       text: getWhereAtribut(atributs(), 'text'),
       loading: getWhereAtribut(atributs(), 'loading'),
       onPressed: () {},
@@ -90,7 +89,7 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
 
   @override
   String nameObjectInDisplay() {
-    return 'CustomButton';
+    return 'DSButton';
   }
 
   @override
