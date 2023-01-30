@@ -94,7 +94,7 @@ class _ExemplePageState extends ComponentBasePage<ExemplePage> {
 
   @override
   String title() {
-    return 'Custom Button';
+    return 'DS Button';
   }
 
   @override
