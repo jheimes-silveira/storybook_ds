@@ -3,6 +3,7 @@ import 'package:example/button_page.dart';
 import 'package:flutter/material.dart';
 
 import 'dropdown_button_page.dart';
+import 'xpto_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,6 +38,14 @@ class _HomePageState extends State<HomePage> {
           pageController.jumpToPage(index);
         },
       ),
+      SideMenuItem(
+        priority: 1,
+        title: 'Xpto',
+        onTap: (index, _) {
+          menuController.changePage(index);
+          pageController.jumpToPage(index);
+        },
+      ),
     ];
   }
 
@@ -56,6 +65,7 @@ class _HomePageState extends State<HomePage> {
               children: const [
                 ButtonPage(),
                 DropdownButtonPage(),
+                XptoPage(),
               ],
             ),
           ),

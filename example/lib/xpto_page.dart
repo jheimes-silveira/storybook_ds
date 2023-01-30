@@ -2,14 +2,14 @@ import 'package:ds_button/ds_button.dart';
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
-class ButtonPage extends StatefulWidget {
-  const ButtonPage({Key? key}) : super(key: key);
+class XptoPage extends StatefulWidget {
+  const XptoPage({Key? key}) : super(key: key);
 
   @override
-  Storybook<ButtonPage> createState() => _ButtonPageState();
+  Storybook<XptoPage> createState() => _XptoPageState();
 }
 
-class _ButtonPageState extends Storybook<ButtonPage> {
+class _XptoPageState extends Storybook<XptoPage> {
   List<AtributeDto> listAtributs = [
     AtributeDto(
       type: 'Function()',
@@ -39,6 +39,19 @@ class _ButtonPageState extends Storybook<ButtonPage> {
 
   @override
   Widget buildComponentWidget(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: DropdownButton(
+          items: const [
+            DropdownMenuItem(child: Text('item 1')),
+            DropdownMenuItem(child: Text('item 2')),
+            DropdownMenuItem(child: Text('item 3')),
+          ],
+          onChanged: (value) {},
+        ),
+      ),
+    );
+
     if (selectedConstructor == 'elevated') {
       return _buildElevated();
     }
@@ -48,14 +61,6 @@ class _ButtonPageState extends Storybook<ButtonPage> {
     if (selectedConstructor == 'text') {
       return _buildText();
     }
-    return Scaffold(
-      body: Center(
-        child: DSButton.elevated(
-          text: getWhereAtribut(atributs(), 'text'),
-          onPressed: () {},
-        ),
-      ),
-    );
   }
 
   Widget _buildElevated() {

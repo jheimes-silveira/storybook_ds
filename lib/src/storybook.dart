@@ -5,7 +5,7 @@ import 'models/dto/atribute_dto.dart';
 import 'widgets/content_widget.dart';
 import 'widgets/device_widget.dart';
 
-abstract class ComponentBasePage<T extends StatefulWidget> extends State {
+abstract class Storybook<T extends StatefulWidget> extends State {
   String nameObjectInDisplay();
 
   String title();

@@ -6,11 +6,10 @@ class DropdownButtonPage extends StatefulWidget {
   const DropdownButtonPage({Key? key}) : super(key: key);
 
   @override
-  ComponentBasePage<DropdownButtonPage> createState() =>
-      _DropdownButtonPageState();
+  Storybook<DropdownButtonPage> createState() => _DropdownButtonPageState();
 }
 
-class _DropdownButtonPageState extends ComponentBasePage<DropdownButtonPage> {
+class _DropdownButtonPageState extends Storybook<DropdownButtonPage> {
   var _value = const DSDropdownMenuItem<String?>(label: 'Alagoas');
 
   List<AtributeDto> listAtributs = [
