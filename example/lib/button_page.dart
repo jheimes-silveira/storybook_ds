@@ -2,14 +2,14 @@ import 'package:ds_button/ds_button.dart';
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
-class ExemplePage extends StatefulWidget {
-  const ExemplePage({Key? key}) : super(key: key);
+class ButtonPage extends StatefulWidget {
+  const ButtonPage({Key? key}) : super(key: key);
 
   @override
-  ComponentBasePage<ExemplePage> createState() => _ExemplePageState();
+  ComponentBasePage<ButtonPage> createState() => _ButtonPageState();
 }
 
-class _ExemplePageState extends ComponentBasePage<ExemplePage> {
+class _ButtonPageState extends ComponentBasePage<ButtonPage> {
   List<AtributeDto> listAtributs = [
     AtributeDto(
       type: 'Function()',
