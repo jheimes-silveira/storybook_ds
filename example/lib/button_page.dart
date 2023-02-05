@@ -15,7 +15,7 @@ class _ButtonPageState extends Storybook<ButtonPage> {
       type: 'Function()',
       name: 'onPressed',
       required: true,
-      builders: ['elevated', 'outline', 'text'],
+      builders: [null, 'elevated', 'outline', 'text'],
     ),
     AtributeDto(
       type: 'String',

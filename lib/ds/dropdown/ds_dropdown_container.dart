@@ -79,7 +79,7 @@ class _DSDropdownContainerState extends State<DSDropdownContainer>
           _animationController.forward();
           setState(() {
             _floatingDropdown = _createFloatingDropdown();
-            Overlay.of(context)?.insert(_floatingDropdown);
+            Overlay.of(context).insert(_floatingDropdown);
           });
         } else {
           _animationController.reverse().then(
@@ -206,7 +206,7 @@ class _DSDropdownContainerState extends State<DSDropdownContainer>
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.start,
-                  style: Theme.of(context).textTheme.caption?.copyWith(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         height: 1.4,
                         fontSize: 14,
                       ),

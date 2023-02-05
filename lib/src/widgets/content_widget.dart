@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../../ds/dropdown/cc_dropdown_button.dart';
-import '../utils/utils.dart';
+import 'package:storybook_ds/ds/dropdown/ds_dropdown_button.dart';
 import '../models/dto/atribute_dto.dart';
+import '../utils/utils.dart';
 
 class ContentWidget extends StatelessWidget {
   final String title;
@@ -54,7 +53,7 @@ class ContentWidget extends StatelessWidget {
       padding: const EdgeInsets.only(top: 32.0),
       child: SelectableText(
         description,
-        style: Theme.of(context).textTheme.bodyText2,
+        style: Theme.of(context).textTheme.bodyMedium,
       ),
     );
   }
@@ -62,7 +61,7 @@ class ContentWidget extends StatelessWidget {
   Text _buildTitle(BuildContext context) {
     return Text(
       title,
-      style: Theme.of(context).textTheme.headline5,
+      style: Theme.of(context).textTheme.headlineSmall,
     );
   }
 
@@ -86,7 +85,7 @@ class ContentWidget extends StatelessWidget {
                           child: SelectableText(
                             _generateWidgetToString(),
                             style:
-                                Theme.of(context).textTheme.bodyText1?.copyWith(
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
                                       color: Colors.white,
                                     ),
                           ),
@@ -132,7 +131,7 @@ class ContentWidget extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 16),
         child: Text(
           'Atributos',
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
       ),
     );
@@ -148,18 +147,18 @@ class ContentWidget extends StatelessWidget {
                   if (e.required)
                     TextSpan(
                       text: 'Obrigatório *   ',
-                      style: Theme.of(context).textTheme.caption?.copyWith(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.error,
                           ),
                     ),
                   TextSpan(
                     text: e.type,
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const TextSpan(text: '  '),
                   TextSpan(
                     text: e.name,
-                    style: Theme.of(context).textTheme.bodyText1,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
               ),
@@ -192,7 +191,7 @@ class ContentWidget extends StatelessWidget {
         ),
         child: Text(
           "Configurações de variante",
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
       ),
     );
@@ -236,12 +235,12 @@ class ContentWidget extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: e.type,
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
             children: [
               const TextSpan(text: '  '),
               TextSpan(
                 text: e.name,
-                style: Theme.of(context).textTheme.bodyText1,
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
             ],
           ),
@@ -322,10 +321,10 @@ class ContentWidget extends StatelessWidget {
 
     return Row(
       children: [
-        CCDropdownButton<VariableOption>.singleSelection(
+        DSDropdownButton<VariableOption>.singleSelection(
           onChanged: (value) {
             if (onAtributs != null) {
-              e.selectedValue = value.value;
+              e.selectedValue = value;
 
               onAtributs!(atributs);
             }
@@ -334,14 +333,9 @@ class ContentWidget extends StatelessWidget {
               e.selectedValue?.textInDisplay ??
               e.selectedValue?.value.toString() ??
               ''),
-          value: CCDropdownMenuItem(
-            label: e.selectedValue?.textInSelectedOptions ??
-                e.selectedValue?.textInDisplay ??
-                e.selectedValue?.value.toString() ??
-                '',
-          ),
+          value: e.selectedValue,
           items: e.variableOptions!
-              .map((i) => CCDropdownMenuItem(
+              .map((i) => DSDropdownMenuItem(
                     label: i.textInSelectedOptions ??
                         i.textInDisplay ??
                         i.value.toString(),
@@ -395,15 +389,15 @@ class ContentWidget extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(top: 16),
-      child: CCDropdownButton<String>.singleSelection(
+      child: DSDropdownButton<String>.singleSelection(
         onChanged: (value) {
-          onSelectedConstructor(value.value);
+          onSelectedConstructor(value);
         },
-        value: CCDropdownMenuItem(label: constructor ?? 'default'),
+        value: constructor ?? 'default',
         hintText: constructor ?? 'default',
         label: 'Construtores',
         items: builders
-            .map((i) => CCDropdownMenuItem(
+            .map((i) => DSDropdownMenuItem(
                   label: i ?? 'default',
                   value: i,
                 ))

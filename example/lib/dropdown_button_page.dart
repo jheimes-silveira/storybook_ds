@@ -1,5 +1,5 @@
-import 'package:example/dropdown/ds_dropdown_button.dart';
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/ds/dropdown/ds_dropdown_button.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 class DropdownButtonPage extends StatefulWidget {
@@ -10,7 +10,7 @@ class DropdownButtonPage extends StatefulWidget {
 }
 
 class _DropdownButtonPageState extends Storybook<DropdownButtonPage> {
-  var _value = const DSDropdownMenuItem<String?>(label: 'Alagoas');
+  String? _value = 'Alagoas';
 
   List<AtributeDto> listAtributs = [
     AtributeDto(
@@ -31,6 +31,12 @@ class _DropdownButtonPageState extends Storybook<DropdownButtonPage> {
       builders: [null, 'singleSelection'],
       selectedValue: VariableOption(value: 'Cidades'),
     ),
+    AtributeDto(
+      type: 'String?',
+      name: 'prefixText',
+      builders: [null, 'singleSelection'],
+      selectedValue: VariableOption(value: null),
+    ),
   ];
 
   @override
@@ -49,11 +55,12 @@ class _DropdownButtonPageState extends Storybook<DropdownButtonPage> {
             Padding(
               padding: const EdgeInsets.only(top: 130.0),
               child: DSDropdownButton<String>.singleSelection(
-                onChanged: (DSDropdownMenuItem item) {
+                onChanged: (item) {
                   setState(() {
-                    _value = item as DSDropdownMenuItem<String?>;
+                    _value = item;
                   });
                 },
+                prefixText: getWhereAtribut(atributs(), 'prefixText'),
                 search: getWhereAtribut(atributs(), 'search'),
                 label: getWhereAtribut(atributs(), 'label'),
                 value: _value,

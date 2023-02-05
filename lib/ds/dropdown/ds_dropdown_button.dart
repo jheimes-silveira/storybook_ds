@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/ds/dropdown/ds_dropdown_container.dart';
+import 'package:storybook_ds/ds/dropdown/ds_dropdown_controller.dart';
 
-import 'cc_checkbox_list_tile.dart';
-import 'cc_dropdown_container.dart';
-import 'cc_dropdown_controller.dart';
+import 'ds_checkbox_list_tile.dart';
 
-class CCDropdownButton<T> extends StatefulWidget {
+class DSDropdownButton<T> extends StatefulWidget {
   final String hintText;
-  final List<CCDropdownMenuItem<T?>> items;
-  final List<CCDropdownMenuItem<T?>> initSelected;
-  final void Function(List<CCDropdownMenuItem<T?>>) onChanged;
+  final List<DSDropdownMenuItem<T?>> items;
+  final List<T?> initSelected;
+  final void Function(List<T?>) onChanged;
   final String? prefixText;
   final Widget? prefix;
   final bool isMultiSelection;
@@ -18,12 +18,12 @@ class CCDropdownButton<T> extends StatefulWidget {
   final InputBorder? enabledBorder;
   final InputBorder? focusedBorder;
   final InputBorder? disabledBorder;
-  final CCDropdownController? controller;
+  final DSDropdownController? controller;
   final BoxConstraints? constraints;
   final String? error;
   final String? label;
 
-  const CCDropdownButton({
+  const DSDropdownButton({
     Key? key,
     this.hintText = '',
     this.items = const [],
@@ -44,11 +44,11 @@ class CCDropdownButton<T> extends StatefulWidget {
     this.label,
   }) : super(key: key);
 
-  factory CCDropdownButton.singleSelection({
-    required List<CCDropdownMenuItem<T?>> items,
-    required void Function(CCDropdownMenuItem<T?>) onChanged,
+  factory DSDropdownButton.singleSelection({
+    required List<DSDropdownMenuItem<T?>> items,
+    required void Function(T?) onChanged,
     String hintText = '',
-    CCDropdownMenuItem<T?>? value,
+    T? value,
     String? prefixText,
     Widget? prefix,
     double buttonHeight = 40,
@@ -56,13 +56,13 @@ class CCDropdownButton<T> extends StatefulWidget {
     InputBorder? enabledBorder,
     InputBorder? focusedBorder,
     InputBorder? disabledBorder,
-    CCDropdownController? controller,
+    DSDropdownController? controller,
     BoxConstraints? constraints,
     bool search = false,
     String? error,
     String? label,
   }) {
-    return CCDropdownButton(
+    return DSDropdownButton(
       hintText: hintText,
       items: items,
       initSelected: value == null ? [] : [value],
@@ -87,11 +87,11 @@ class CCDropdownButton<T> extends StatefulWidget {
     );
   }
 
-  factory CCDropdownButton.multiSelection({
+  factory DSDropdownButton.multiSelection({
     String hintText = '',
-    required List<CCDropdownMenuItem<T?>> items,
-    List<CCDropdownMenuItem<T?>> values = const [],
-    required void Function(List<CCDropdownMenuItem<T?>>) onChanged,
+    required List<DSDropdownMenuItem<T?>> items,
+    List<T?> values = const [],
+    required void Function(List<T?>) onChanged,
     String? prefixText,
     Widget? prefix,
     double buttonHeight = 40,
@@ -99,12 +99,12 @@ class CCDropdownButton<T> extends StatefulWidget {
     InputBorder? enabledBorder,
     InputBorder? focusedBorder,
     InputBorder? disabledBorder,
-    CCDropdownController? controller,
+    DSDropdownController? controller,
     BoxConstraints? constraints,
     String? error,
     String? label,
   }) {
-    return CCDropdownButton(
+    return DSDropdownButton(
       hintText: hintText,
       items: items,
       initSelected: values,
@@ -125,16 +125,16 @@ class CCDropdownButton<T> extends StatefulWidget {
   }
 
   @override
-  State<CCDropdownButton> createState() => _CCDropdownButtonState<T>();
+  State<DSDropdownButton> createState() => _DSDropdownButtonState<T>();
 }
 
-class _CCDropdownButtonState<T> extends State<CCDropdownButton<T>> {
-  late CCDropdownController _controller;
-  List<CCDropdownMenuItem<T?>> _selected = [];
+class _DSDropdownButtonState<T> extends State<DSDropdownButton<T>> {
+  late DSDropdownController _controller;
+  List<DSDropdownMenuItem<T?>> _selected = [];
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller ?? CCDropdownController();
+    _controller = widget.controller ?? DSDropdownController();
   }
 
   @override
@@ -144,7 +144,7 @@ class _CCDropdownButtonState<T> extends State<CCDropdownButton<T>> {
       isMultiSelection: widget.isMultiSelection,
       onChanged: (value) {
         _selected = value;
-        widget.onChanged(_selected);
+        widget.onChanged(_selected.map((e) => e.value).toList());
       },
       items: widget.items,
       prefixText: widget.prefixText,
@@ -154,7 +154,7 @@ class _CCDropdownButtonState<T> extends State<CCDropdownButton<T>> {
       controller: _controller,
     );
 
-    return CCDropdownContainer(
+    return DSDropdownContainer(
       hintText: widget.hintText,
       text: getText(),
       controller: _controller,
@@ -170,20 +170,20 @@ class _CCDropdownButtonState<T> extends State<CCDropdownButton<T>> {
   }
 
   String getText() {
-    return widget.initSelected.map((e) => e.label).toList().join(', ');
+    return _selected.map((e) => e.label).toList().join(', ');
   }
 }
 
 class _DropdownContent<T> extends StatefulWidget {
-  final List<CCDropdownMenuItem<T?>> items;
-  final List<CCDropdownMenuItem<T?>> initSelected;
-  final CCDropdownController? controller;
+  final List<DSDropdownMenuItem<T?>> items;
+  final List<DSDropdownMenuItem<T?>> initSelected;
+  final DSDropdownController? controller;
   final bool isMultiSelection;
   final String? prefixText;
   final double dropdownMaxHeight;
   final Widget? prefix;
   final bool search;
-  final void Function(List<CCDropdownMenuItem<T?>>) onChanged;
+  final void Function(List<DSDropdownMenuItem<T?>>) onChanged;
 
   const _DropdownContent({
     Key? key,
@@ -203,8 +203,8 @@ class _DropdownContent<T> extends StatefulWidget {
 }
 
 class _DropdownContentState<T> extends State<_DropdownContent<T>> {
-  final List<CCDropdownMenuItem<T?>> _selected = [];
-  List<CCDropdownMenuItem<T?>> _itemsDisplay = [];
+  final List<DSDropdownMenuItem<T?>> _selected = [];
+  List<DSDropdownMenuItem<T?>> _itemsDisplay = [];
 
   @override
   void initState() {
@@ -245,7 +245,7 @@ class _DropdownContentState<T> extends State<_DropdownContent<T>> {
                 ),
                 itemBuilder: (context, index) {
                   final e = _itemsDisplay[index];
-                  return CCCheckboxListTile(
+                  return DSCheckboxListTile(
                     padding: const EdgeInsets.only(
                       right: 12.0,
                       left: 12.0,
@@ -305,14 +305,14 @@ class _DropdownContentState<T> extends State<_DropdownContent<T>> {
   }
 }
 
-class CCDropdownMenuItem<T> {
+class DSDropdownMenuItem<T> {
   final String label;
   final Key? key;
   final T? value;
   final VoidCallback? onTap;
   final bool enabled;
 
-  const CCDropdownMenuItem({
+  const DSDropdownMenuItem({
     required this.label,
     this.value,
     this.key,
@@ -321,17 +321,14 @@ class CCDropdownMenuItem<T> {
   });
 
   @override
-  bool operator ==(covariant CCDropdownMenuItem<T> other) {
+  bool operator ==(covariant DSDropdownMenuItem<T> other) {
     if (identical(this, other)) return true;
 
-    return other.label == label &&
-        other.key == key &&
-        other.value == value &&
-        other.enabled == enabled;
+    return other.value == value;
   }
 
   @override
   int get hashCode {
-    return label.hashCode ^ key.hashCode ^ value.hashCode ^ enabled.hashCode;
+    return value.hashCode;
   }
 }
