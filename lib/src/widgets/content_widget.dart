@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/ds/dropdown/ds_dropdown_button.dart';
+import 'package:storybook_ds/src/widgets/atributs_variant.dart';
+
 import '../models/dto/atribute_dto.dart';
 import '../utils/utils.dart';
 
@@ -11,6 +13,7 @@ class ContentWidget extends StatelessWidget {
   final List<AtributeDto> atributs;
   final Function(List<AtributeDto> atributs)? onAtributs;
   final Function(String? constructor) onSelectedConstructor;
+  final String Function() updatePreviewCode;
 
   const ContentWidget({
     Key? key,
@@ -19,6 +22,7 @@ class ContentWidget extends StatelessWidget {
     required this.atributs,
     required this.nameObjectInDisplay,
     required this.onSelectedConstructor,
+    required this.updatePreviewCode,
     this.onAtributs,
     this.constructor,
   }) : super(key: key);
@@ -40,7 +44,7 @@ class ContentWidget extends StatelessWidget {
             _buildDescription(context),
             _buildBuilders(context, atributs),
             _buildAtributes(context, atributs),
-            _buildAtributsVariant(context, atributs),
+            _buildAtributsVariant(atributs),
             _buildPreviewCode(context),
           ],
         ),
@@ -83,7 +87,7 @@ class ContentWidget extends StatelessWidget {
                       children: [
                         Expanded(
                           child: SelectableText(
-                            _generateWidgetToString(),
+                            updatePreviewCode(),
                             style:
                                 Theme.of(context).textTheme.bodyLarge?.copyWith(
                                       color: Colors.white,
@@ -103,7 +107,7 @@ class ContentWidget extends StatelessWidget {
             child: IconButton(
               color: Colors.white,
               onPressed: () {
-                Utils.copyClipboard(_generateWidgetToString());
+                Utils.copyClipboard(updatePreviewCode());
               },
               icon: const Icon(Icons.copy, size: 20),
             ),
@@ -111,16 +115,6 @@ class ContentWidget extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _generateWidgetToString() {
-    final atributes = atributs
-        .where(
-            (e) => e.builders == null || e.builders!.contains(this.constructor))
-        .map((e) => "\n    ${e.name}: ${e.toStringValue},")
-        .join();
-    final constructor = this.constructor == null ? '' : '.${this.constructor}';
-    return "$nameObjectInDisplay$constructor($atributes\n)";
   }
 
   Widget _buildAtributes(BuildContext context, List<AtributeDto> atributes) {
@@ -177,191 +171,6 @@ class ContentWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildAtributsVariant(
-    BuildContext context,
-    List<AtributeDto> atributs,
-  ) {
-    final List<Widget> widgets = [];
-
-    widgets.add(
-      Padding(
-        padding: const EdgeInsets.only(
-          top: 16.0,
-          bottom: 16.0,
-        ),
-        child: Text(
-          "Configurações de variante",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-      ),
-    );
-
-    for (var e in atributs) {
-      if (e.type.contains('String') ||
-          e.type.contains('bool') ||
-          e.variableOptions != null) {
-        if (e.builders != null && !e.builders!.contains(constructor)) {
-          continue;
-        }
-
-        widgets.add(
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              _optionsVariants(context, e, atributs),
-              const Divider(),
-            ],
-          ),
-        );
-      }
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: widgets,
-    );
-  }
-
-  Widget _optionsVariants(
-    BuildContext context,
-    AtributeDto e,
-    List<AtributeDto> atributs,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            text: e.type,
-            style: Theme.of(context).textTheme.bodySmall,
-            children: [
-              const TextSpan(text: '  '),
-              TextSpan(
-                text: e.name,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: _buildChangeAction(context, e, atributs),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChangeAction(
-    BuildContext context,
-    AtributeDto e,
-    List<AtributeDto> atributs,
-  ) {
-    if (e.type == 'bool' || e.type == 'bool?') {
-      return Switch(
-        value: e.selectedValue?.value,
-        onChanged: (value) {
-          if (onAtributs != null) {
-            e.selectedValue = VariableOption(
-              value: value,
-              textInDisplay: e.selectedValue?.textInDisplay,
-            );
-            onAtributs!(atributs);
-          }
-        },
-      );
-    }
-
-    if (e.type.contains('String')) {
-      final c = TextEditingController(
-        text: e.selectedValue?.value ?? '',
-      );
-
-      c.selection = TextSelection.fromPosition(
-        TextPosition(
-          offset: c.text.length,
-        ),
-      );
-
-      return Row(
-        children: [
-          Expanded(
-            child: TextField(
-              key: Key(e.name),
-              controller: c,
-              enabled: e.selectedValue?.value == null ? false : true,
-              onChanged: (text) {
-                if (onAtributs != null) {
-                  e.selectedValue = e.selectedValue?.copyWith(
-                    value: text,
-                  );
-                  onAtributs!(atributs);
-                  c.selection = TextSelection.fromPosition(
-                    TextPosition(offset: c.selection.baseOffset),
-                  );
-                }
-              },
-            ),
-          ),
-          if (e.type.contains('?'))
-            Switch(
-              value: e.selectedValue?.value == null ? false : true,
-              onChanged: (value) {
-                e.selectedValue = VariableOption(
-                  value: value ? '' : null,
-                  textInDisplay: e.selectedValue?.textInDisplay,
-                );
-                onAtributs!(atributs);
-              },
-            ),
-        ],
-      );
-    }
-
-    return Row(
-      children: [
-        DSDropdownButton<VariableOption>.singleSelection(
-          onChanged: (value) {
-            if (onAtributs != null) {
-              e.selectedValue = value;
-
-              onAtributs!(atributs);
-            }
-          },
-          hintText: (e.selectedValue?.textInSelectedOptions ??
-              e.selectedValue?.textInDisplay ??
-              e.selectedValue?.value.toString() ??
-              ''),
-          value: e.selectedValue,
-          items: e.variableOptions!
-              .map((i) => DSDropdownMenuItem(
-                    label: i.textInSelectedOptions ??
-                        i.textInDisplay ??
-                        i.value.toString(),
-                    value: i,
-                  ))
-              .toList(),
-        ),
-        if (e.type.contains('?'))
-          Switch(
-            value: e.selectedValue?.value == null ? false : true,
-            onChanged: (value) {
-              if (value) {
-                e.selectedValue = e.variableOptions?[0];
-              } else {
-                e.selectedValue = VariableOption(
-                  value: null,
-                  textInDisplay: e.selectedValue?.textInDisplay,
-                );
-              }
-              onAtributs!(atributs);
-            },
-          ),
-      ],
-    );
-  }
-
   _buildBuilders(BuildContext context, List<AtributeDto> atributs) {
     List<String?> builders = [];
     for (var e in atributs) {
@@ -403,6 +212,14 @@ class ContentWidget extends StatelessWidget {
                 ))
             .toList(),
       ),
+    );
+  }
+
+  Widget _buildAtributsVariant(List<AtributeDto> atributs) {
+    return AtributsVariantWidget(
+      atributs: atributs,
+      onAtributs: onAtributs,
+      constructor: constructor,
     );
   }
 }

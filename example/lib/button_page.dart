@@ -33,6 +33,12 @@ class _ButtonPageState extends Storybook<ButtonPage> {
   ];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+  
+  @override
   List<AtributeDto> atributs() {
     return listAtributs;
   }

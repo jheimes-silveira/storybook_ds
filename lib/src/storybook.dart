@@ -55,8 +55,29 @@ abstract class Storybook<T extends StatefulWidget> extends State {
             selectedConstructor = constructor;
           });
         },
+        updatePreviewCode: updatePreviewCode,
       ),
     );
+  }
+
+  @protected
+  @mustCallSuper
+  String updatePreviewCode() {
+    final atributes = atributs()
+        .where(
+          (e) {
+            final constructor = e.builders == null ||
+                e.builders!.contains(this.selectedConstructor);
+            final ignoreInDisplay = e.selectedValue?.ignoreInDisplay ?? true;
+            return constructor && !ignoreInDisplay;
+          },
+        )
+        .map((e) => "\n    ${e.name}: ${e.toStringValue},")
+        .join();
+    final constructor =
+        this.selectedConstructor == null ? '' : '.${this.selectedConstructor}';
+    final nameClass = nameObjectInDisplay();
+    return "$nameClass$constructor($atributes\n)";
   }
 
   Widget _buildDevice() {
