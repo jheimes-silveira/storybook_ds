@@ -5,21 +5,105 @@ class AtributeDto {
   final String? description;
   final List<VariableOption>? variableOptions;
   final List<String?>? builders;
-  late VariableOptionType variableOptionType;
+  final VariableOptionType variableOptionType;
   final bool required;
 
   VariableOption? selectedValue;
 
-  AtributeDto({
+  factory AtributeDto({
+    required String type,
+    required String name,
+    String? description,
+    List<VariableOption>? variableOptions,
+    List<String?>? builders,
+    bool required = false,
+    VariableOption? selectedValue,
+  }) {
+    return AtributeDto._raw(
+      type: type,
+      name: name,
+      variableOptions: variableOptions,
+      selectedValue: selectedValue,
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: DefaultType(),
+    );
+  }
+
+  factory AtributeDto.rangeIntInterval({
+    required int begin,
+    required int end,
+    required String type,
+    required String name,
+    String? description,
+    List<String?>? builders,
+    bool required = false,
+    VariableOption? selectedValue,
+  }) {
+    return AtributeDto._raw(
+      type: type,
+      name: name,
+      variableOptions: null,
+      selectedValue: selectedValue,
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: RangeIntIntervalType(begin, end),
+    );
+  }
+  factory AtributeDto.rangeDoubleInterval({
+    required double begin,
+    required double end,
+    required String type,
+    required String name,
+    String? description,
+    List<String?>? builders,
+    bool required = false,
+    VariableOption? selectedValue,
+  }) {
+    return AtributeDto._raw(
+      type: type,
+      name: name,
+      variableOptions: null,
+      selectedValue: selectedValue,
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: RangeDoubleIntervalType(begin, end),
+    );
+  }
+  factory AtributeDto.wrap({
+    required String type,
+    required String name,
+    required List<VariableOption> variableOptions,
+    String? description,
+    List<String?>? builders,
+    bool required = false,
+    VariableOption? selectedValue,
+  }) {
+    return AtributeDto._raw(
+      type: type,
+      name: name,
+      variableOptions: variableOptions,
+      selectedValue: selectedValue,
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: WrapType(),
+    );
+  }
+
+  AtributeDto._raw({
     required this.type,
     required this.name,
-    this.variableOptions,
-    this.selectedValue,
-    this.builders,
-    this.description,
-    this.required = false,
-    final VariableOptionType? variableOptionType,
-  }) : variableOptionType = variableOptionType ?? DefaultType();
+    required this.variableOptions,
+    required this.selectedValue,
+    required this.builders,
+    required this.description,
+    required this.required,
+    required this.variableOptionType,
+  });
 
   String get toStringValue {
     if (type.contains('String') && selectedValue?.value != null) {
@@ -39,6 +123,7 @@ class RangeIntIntervalType extends VariableOptionType {
     this.end,
   );
 }
+
 class RangeDoubleIntervalType extends VariableOptionType {
   double begin;
   double end;
@@ -48,22 +133,33 @@ class RangeDoubleIntervalType extends VariableOptionType {
   );
 }
 
+class WrapType extends VariableOptionType {}
+
 class DefaultType extends VariableOptionType {}
 
 class VariableOption {
   dynamic value;
-  String? textInDisplay;
-  String? textInSelectedOptions;
+  final String? _textInDisplay;
+  final String? _textInSelectedOptions;
   bool ignoreInDisplay;
   bool ignoreInSelectedOptions;
 
+  String get textInSelectedOptions {
+    return _textInSelectedOptions ?? _textInDisplay ?? value.toString();
+  }
+
+  String get textInDisplay {
+    return _textInDisplay ?? value.toString();
+  }
+
   VariableOption({
     required this.value,
-    this.textInDisplay,
-    this.textInSelectedOptions,
     this.ignoreInDisplay = false,
     this.ignoreInSelectedOptions = false,
-  });
+    String? textInDisplay,
+    String? textInSelectedOptions,
+  })  : _textInDisplay = textInDisplay,
+        _textInSelectedOptions = textInSelectedOptions;
 
   VariableOption copyWith({
     dynamic value,
@@ -71,10 +167,9 @@ class VariableOption {
     String? textInSelectedOptions,
   }) {
     return VariableOption(
-      value: value ?? this.value,
-      textInDisplay: textInDisplay ?? this.textInDisplay,
-      textInSelectedOptions:
-          textInSelectedOptions ?? this.textInSelectedOptions,
+      value: value,
+      textInDisplay: textInDisplay ?? _textInDisplay,
+      textInSelectedOptions: textInSelectedOptions ?? _textInSelectedOptions,
     );
   }
 }

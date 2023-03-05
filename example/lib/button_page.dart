@@ -31,12 +31,6 @@ class _ButtonPageState extends Storybook<ButtonPage> {
       builders: ['elevated', 'outline', 'text'],
     ),
   ];
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
   
   @override
   List<AtributeDto> atributs() {

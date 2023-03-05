@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/src/widgets/custom_chip_selected.dart';
 
 import '../../ds/dropdown/ds_dropdown_button.dart';
 import '../../storybook_ds.dart';
@@ -97,6 +98,7 @@ class AtributsVariantWidget extends StatelessWidget {
 
         childrenPadding: EdgeInsets.only(left: padding),
         tilePadding: EdgeInsets.only(left: padding, right: padding),
+        expandedAlignment: Alignment.centerLeft,
         title: _buildTypeDescription(e, context), //header title
         children: [
           _buildChangeAction(context, e, atributs),
@@ -135,7 +137,7 @@ class AtributsVariantWidget extends StatelessWidget {
           if (onAtributs != null) {
             e.selectedValue = VariableOption(
               value: value,
-              textInDisplay: e.selectedValue?.textInDisplay,
+              textInDisplay: e.selectedValue?.textInSelectedOptions,
             );
             onAtributs!(atributs);
           }
@@ -199,6 +201,49 @@ class AtributsVariantWidget extends StatelessWidget {
       );
     }
 
+    if (e.variableOptionType is WrapType) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16, top: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Wrap(
+                alignment: WrapAlignment.start,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                spacing: 8,
+                runAlignment: WrapAlignment.start,
+                runSpacing: 8,
+                children: e.variableOptions!
+                    .map(
+                      (e2) => CustomChipSelected(
+                          label: e2.textInSelectedOptions,
+                          selected: e.selectedValue?.value == e2.value,
+                          onTap: () {
+                            if (onAtributs != null) {
+                              e.selectedValue = e2;
+
+                              onAtributs!(atributs);
+                            }
+                          }),
+                    )
+                    .toList(),
+              ),
+            ),
+            if (e.type.contains('?'))
+              Switch(
+                value: e.selectedValue?.value == null ? false : true,
+                onChanged: (value) {
+                  e.selectedValue = e.selectedValue?.copyWith(value: null);
+                  onAtributs!(atributs);
+                },
+              ),
+          ],
+        ),
+      );
+    }
+
     if (e.variableOptionType is RangeDoubleIntervalType ||
         e.variableOptionType is RangeIntIntervalType) {
       dynamic va = e.variableOptionType;
@@ -255,7 +300,11 @@ class AtributsVariantWidget extends StatelessWidget {
       builder: (_, constraints) {
         var children2 = [
           DSDropdownButton<VariableOption>.singleSelection(
-            constraints: constraints,
+            constraints: BoxConstraints(
+              minWidth: constraints.minWidth,
+              maxWidth: constraints.maxWidth - (e.type.contains('?') ? 60 : 9),
+            ),
+            buttonHeight: 30,
             onChanged: (value) {
               if (onAtributs != null) {
                 e.selectedValue = value;
@@ -263,16 +312,11 @@ class AtributsVariantWidget extends StatelessWidget {
                 onAtributs!(atributs);
               }
             },
-            hintText: (e.selectedValue?.textInSelectedOptions ??
-                e.selectedValue?.textInDisplay ??
-                e.selectedValue?.value.toString() ??
-                ''),
+            hintText: (e.selectedValue?.textInSelectedOptions ?? ''),
             value: e.selectedValue,
             items: e.variableOptions!
                 .map((i) => DSDropdownMenuItem(
-                      label: i.textInSelectedOptions ??
-                          i.textInDisplay ??
-                          i.value.toString(),
+                      label: i.textInSelectedOptions,
                       value: i,
                     ))
                 .toList(),
