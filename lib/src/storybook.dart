@@ -10,7 +10,7 @@ abstract class Storybook<T extends StatefulWidget> extends State {
 
   String get title;
 
-  String get description;
+  String get description => '';
 
   ThemeData get light => ThemeData.light();
 
@@ -143,8 +143,8 @@ abstract class Storybook<T extends StatefulWidget> extends State {
     final atributes = atributs
         .where(
           (e) {
-            final constructor = e.builders == null ||
-                e.builders!.contains(this.selectedConstructor);
+            final constructor = e.builders.isEmpty ||
+                e.builders.contains(this.selectedConstructor);
             final ignoreInDisplay = e.selectedValue?.ignoreInDisplay ?? true;
             return constructor && !ignoreInDisplay;
           },
@@ -158,11 +158,12 @@ abstract class Storybook<T extends StatefulWidget> extends State {
   }
 
   Widget _buildDevice() {
-    final height = 750.0;
+    const height = 750.0;
 
     return SizedBox(
       height: height,
-      child: DeviceFrame(isFrameVisible: true,
+      child: DeviceFrame(
+        isFrameVisible: true,
         device: Devices.android.samsungGalaxyNote20Ultra,
         screen: Builder(
           builder: (deviceContext) => buildComponentWidget(deviceContext),

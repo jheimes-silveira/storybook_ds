@@ -64,6 +64,32 @@ class _ButtonPageState extends Storybook<ButtonPage> {
               ))
           .toList(),
     ),
+    AtributeDto(
+      type: 'Color',
+      name: 'color',
+      selectedValue: VariableOption(
+        value: 'primaryDark',
+        textInDisplay: 'WillTheme.of(context).colors.primaryDark',
+        textInSelectedOptions: 'primaryDark',
+      ),
+      variableOptions: [
+        VariableOption(
+          value: 'primaryDark',
+          textInDisplay: 'WillTheme.of(context).colors.primaryDark',
+          textInSelectedOptions: 'primaryDark',
+        ),
+        VariableOption(
+          value: 'primaryLight',
+          textInDisplay: 'WillTheme.of(context).colors.primaryLight',
+          textInSelectedOptions: 'primaryLight',
+        ),
+        VariableOption(
+          value: 'primaryLightest',
+          textInDisplay: 'WillTheme.of(context).colors.primaryLightest',
+          textInSelectedOptions: 'primaryLightest',
+        ),
+      ],
+    ),
   ];
 
   @override

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:scrollable_table_view/scrollable_table_view.dart';
 import 'package:storybook_ds/src/widgets/custom_chip_selected.dart';
 
 import '../../storybook_ds.dart';
@@ -26,8 +25,7 @@ class AtributsVariantWidget extends StatelessWidget {
             _buildTitle(context),
             ...atributs
                 .where(
-                  (e) =>
-                      e.builders != null && e.builders!.contains(constructor),
+                  (e) => e.builders.isEmpty || e.builders.contains(constructor),
                 )
                 .map(
                   (e) => Padding(
@@ -82,15 +80,12 @@ class AtributsVariantWidget extends StatelessWidget {
                     ),
                   ),
                 )
-                .toList()
+                .toList(),
+            const SizedBox(height: 150),
           ],
         );
       },
     );
-    // return Column(
-    //   crossAxisAlignment: CrossAxisAlignment.start,
-    //   children: widgets,
-    // );
   }
 
   Widget _buildIsRequired(AtributeDto e, BuildContext context) {
@@ -176,33 +171,6 @@ class AtributsVariantWidget extends StatelessWidget {
       );
     }
 
-    if (e.variableOptionType is WrapType) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 16, top: 8),
-        child: Wrap(
-          alignment: WrapAlignment.start,
-          crossAxisAlignment: WrapCrossAlignment.start,
-          spacing: 8,
-          runAlignment: WrapAlignment.start,
-          runSpacing: 8,
-          children: e.variableOptions!
-              .map(
-                (e2) => CustomChipSelected(
-                    label: e2.textInSelectedOptions,
-                    selected: e.selectedValue?.value == e2.value,
-                    onTap: () {
-                      if (onAtributs != null) {
-                        e.selectedValue = e2;
-
-                        onAtributs!(atributs);
-                      }
-                    }),
-              )
-              .toList(),
-        ),
-      );
-    }
-
     if (e.variableOptionType is RangeDoubleIntervalType ||
         e.variableOptionType is RangeIntIntervalType) {
       dynamic va = e.variableOptionType;
@@ -241,6 +209,32 @@ class AtributsVariantWidget extends StatelessWidget {
       );
     }
 
+    if (e.variableOptions != null) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16, top: 8),
+        child: Wrap(
+          alignment: WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          spacing: 8,
+          runAlignment: WrapAlignment.start,
+          runSpacing: 8,
+          children: e.variableOptions!
+              .map(
+                (e2) => CustomChipSelected(
+                    label: e2.textInSelectedOptions,
+                    selected: e.selectedValue?.value == e2.value,
+                    onTap: () {
+                      if (onAtributs != null) {
+                        e.selectedValue = e2;
+
+                        onAtributs!(atributs);
+                      }
+                    }),
+              )
+              .toList(),
+        ),
+      );
+    }
     return Container();
   }
 
@@ -266,7 +260,7 @@ class AtributsVariantWidget extends StatelessWidget {
       return Switch(
         value: e.selectedValue?.value == null ? false : true,
         onChanged: (value) {
-          e.selectedValue = value ? e.variableOptions![0] : null;
+          e.selectedValue = value ? (e.variableOptions![0]) : null;
           onAtributs!(atributs);
         },
       );

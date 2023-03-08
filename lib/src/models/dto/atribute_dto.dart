@@ -4,7 +4,7 @@ class AtributeDto {
   final String name;
   final String? description;
   final List<VariableOption>? variableOptions;
-  final List<String?>? builders;
+  final List<String?> builders;
   final VariableOptionType variableOptionType;
   final bool required;
   final VariableOption? defaultValue;
@@ -16,17 +16,21 @@ class AtributeDto {
     required String name,
     String? description,
     List<VariableOption>? variableOptions,
-    List<String?>? builders,
+    List<String?> builders = const [],
     bool required = false,
     VariableOption? selectedValue,
     VariableOption? defaultValue,
   }) {
+    if (variableOptions == null && selectedValue != null) {
+      variableOptions = [selectedValue];
+    }
+
+    variableOptions ??= [VariableOption(value: '')];
+    
     return AtributeDto._raw(
       type: type,
       name: name,
-      variableOptions: variableOptions == null && selectedValue != null
-          ? [selectedValue]
-          : null,
+      variableOptions: variableOptions,
       selectedValue: selectedValue,
       defaultValue: defaultValue,
       builders: builders,
@@ -42,7 +46,7 @@ class AtributeDto {
     required String type,
     required String name,
     String? description,
-    List<String?>? builders,
+    List<String?> builders = const [],
     bool required = false,
     int? selectedValue,
     int? defaultValue,
@@ -68,7 +72,7 @@ class AtributeDto {
     required String type,
     required String name,
     String? description,
-    List<String?>? builders,
+    List<String?> builders = const [],
     bool required = false,
     double? selectedValue,
     double? defaultValue,
@@ -93,7 +97,7 @@ class AtributeDto {
     required String name,
     required List<VariableOption> variableOptions,
     String? description,
-    List<String?>? builders,
+    List<String?> builders = const [],
     bool required = false,
     VariableOption? selectedValue,
     VariableOption? defaultValue,

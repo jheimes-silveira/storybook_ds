@@ -1,3 +1,6 @@
+## 0.0.9 - Incluir visualização de Wrap 
+- [Experimental][BREAKING CHANGE] mudanças em implementação da `class` storybook
+
 ## 0.0.8 - Incluir visualização de Wrap 
 - Incluir visualização de Wrap
 

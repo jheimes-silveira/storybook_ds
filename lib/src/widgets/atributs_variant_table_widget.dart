@@ -23,7 +23,7 @@ class AtributsVariantTableWidget extends StatelessWidget {
 
     for (var e in atributs) {
       if (_canBuildVariableOption(e)) {
-        if (e.builders != null && !e.builders!.contains(constructor)) {
+        if (e.builders.isNotEmpty && !e.builders.contains(constructor)) {
           continue;
         }
 
