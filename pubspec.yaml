@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  scrollable_table_view: ^1.0.1
+  device_frame: ^1.1.0
 
 dev_dependencies:
   flutter_test:

@@ -7,6 +7,7 @@ class AtributeDto {
   final List<String?>? builders;
   final VariableOptionType variableOptionType;
   final bool required;
+  final VariableOption? defaultValue;
 
   VariableOption? selectedValue;
 
@@ -18,12 +19,16 @@ class AtributeDto {
     List<String?>? builders,
     bool required = false,
     VariableOption? selectedValue,
+    VariableOption? defaultValue,
   }) {
     return AtributeDto._raw(
       type: type,
       name: name,
-      variableOptions: variableOptions,
+      variableOptions: variableOptions == null && selectedValue != null
+          ? [selectedValue]
+          : null,
       selectedValue: selectedValue,
+      defaultValue: defaultValue,
       builders: builders,
       description: description,
       required: required,
@@ -39,13 +44,18 @@ class AtributeDto {
     String? description,
     List<String?>? builders,
     bool required = false,
-    VariableOption? selectedValue,
+    int? selectedValue,
+    int? defaultValue,
   }) {
     return AtributeDto._raw(
       type: type,
       name: name,
-      variableOptions: null,
-      selectedValue: selectedValue,
+      variableOptions: [
+        VariableOption(value: begin),
+        VariableOption(value: end),
+      ],
+      selectedValue: VariableOption(value: selectedValue),
+      defaultValue: VariableOption(value: defaultValue),
       builders: builders,
       description: description,
       required: required,
@@ -60,13 +70,18 @@ class AtributeDto {
     String? description,
     List<String?>? builders,
     bool required = false,
-    VariableOption? selectedValue,
+    double? selectedValue,
+    double? defaultValue,
   }) {
     return AtributeDto._raw(
       type: type,
       name: name,
-      variableOptions: null,
-      selectedValue: selectedValue,
+      variableOptions: [
+        VariableOption(value: begin),
+        VariableOption(value: end),
+      ],
+      selectedValue: VariableOption(value: selectedValue),
+      defaultValue: VariableOption(value: defaultValue),
       builders: builders,
       description: description,
       required: required,
@@ -81,12 +96,14 @@ class AtributeDto {
     List<String?>? builders,
     bool required = false,
     VariableOption? selectedValue,
+    VariableOption? defaultValue,
   }) {
     return AtributeDto._raw(
       type: type,
       name: name,
       variableOptions: variableOptions,
       selectedValue: selectedValue,
+      defaultValue: defaultValue,
       builders: builders,
       description: description,
       required: required,
@@ -103,6 +120,7 @@ class AtributeDto {
     required this.description,
     required this.required,
     required this.variableOptionType,
+    required this.defaultValue,
   });
 
   String get toStringValue {

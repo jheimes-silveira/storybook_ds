@@ -1,10 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class DeviceWidget extends StatefulWidget {
   final Widget Function(BuildContext context) buildComponentWidget;
   final EdgeInsets? margin;
-  final Decoration? decoration;
+
   final double width;
   final double height;
 
@@ -12,7 +11,6 @@ class DeviceWidget extends StatefulWidget {
     Key? key,
     required this.buildComponentWidget,
     this.margin,
-    this.decoration,
     required this.width,
     required this.height,
   }) : super(key: key);
@@ -24,33 +22,16 @@ class DeviceWidget extends StatefulWidget {
 class _DeviceWidgetState extends State<DeviceWidget> {
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
-      return SizedBox(
-        width: widget.width,
-        child: Column(
-          children: [
-            Expanded(
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 5,
-                  ),
-                ),
-                margin: const EdgeInsets.all(16.0),
-                child: widget.buildComponentWidget(context),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return Container(
       width: widget.width,
       height: widget.height,
-      decoration: widget.decoration,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(
+          width: 4,
+          color: Colors.black,
+        ),
+      ),
       child: widget.buildComponentWidget(context),
     );
   }

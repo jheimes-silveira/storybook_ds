@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:storybook_ds/ds/dropdown/ds_dropdown_button.dart';
-import 'package:storybook_ds/src/widgets/atributs_variant.dart';
+import 'package:storybook_ds/src/widgets/atributs_variant_widget.dart';
 
 import '../models/dto/atribute_dto.dart';
 import '../utils/utils.dart';
+import 'atributs_variant_table_widget.dart';
+import 'custom_chip_selected.dart';
 
 class ContentWidget extends StatelessWidget {
   final String title;
@@ -41,11 +42,11 @@ class ContentWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             _buildTitle(context),
-            _buildDescription(context),
+            // _buildDescription(context),
             _buildBuilders(context, atributs),
-            _buildAtributes(context, atributs),
+            // _buildAtributes(context, atributs),
             _buildAtributsVariant(atributs),
-            _buildPreviewCode(context),
+            // _buildPreviewCode(context),
           ],
         ),
       ),
@@ -198,20 +199,51 @@ class ContentWidget extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(top: 16),
-      child: DSDropdownButton<String>.singleSelection(
-        onChanged: (value) {
-          onSelectedConstructor(value);
-        },
-        value: constructor ?? 'default',
-        hintText: constructor ?? 'default',
-        label: 'Construtores',
-        items: builders
-            .map((i) => DSDropdownMenuItem(
-                  label: i ?? 'default',
-                  value: i,
-                ))
-            .toList(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Construtores",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            alignment: WrapAlignment.start,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            spacing: 8,
+            runAlignment: WrapAlignment.start,
+            runSpacing: 8,
+            children: builders
+                .map(
+                  (e2) => CustomChipSelected(
+                      label: e2 ?? 'default',
+                      selected: constructor == e2,
+                      onTap: () {
+                        if (onAtributs != null) {
+                          onSelectedConstructor(e2);
+
+                          onAtributs!(atributs);
+                        }
+                      }),
+                )
+                .toList(),
+          ),
+        ],
       ),
+      // child: DSDropdownButton<String>.singleSelection(
+      //   onChanged: (value) {
+      //     onSelectedConstructor(value);
+      //   },
+      //   value: constructor ?? 'default',
+      //   hintText: constructor ?? 'default',
+      //   label: 'Construtores',
+      //   items: builders
+      //       .map((i) => DSDropdownMenuItem(
+      //             label: i ?? 'default',
+      //             value: i,
+      //           ))
+      //       .toList(),
+      // ),
     );
   }
 

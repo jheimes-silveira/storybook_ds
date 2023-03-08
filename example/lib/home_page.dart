@@ -2,8 +2,6 @@ import 'package:easy_sidemenu/easy_sidemenu.dart';
 import 'package:example/button_page.dart';
 import 'package:flutter/material.dart';
 
-import 'dropdown_button_page.dart';
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -29,14 +27,6 @@ class _HomePageState extends State<HomePage> {
           pageController.jumpToPage(index);
         },
       ),
-      SideMenuItem(
-        priority: 1,
-        title: 'Dropdown',
-        onTap: (index, _) {
-          menuController.changePage(index);
-          pageController.jumpToPage(index);
-        },
-      ),
     ];
   }
 
@@ -55,7 +45,6 @@ class _HomePageState extends State<HomePage> {
               controller: pageController,
               children: const [
                 ButtonPage(),
-                DropdownButtonPage(),
               ],
             ),
           ),

@@ -1,61 +1,138 @@
-import 'package:flutter/foundation.dart';
+import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
 
 import 'models/dto/atribute_dto.dart';
+import 'utils/utils.dart';
 import 'widgets/content_widget.dart';
-import 'widgets/device_widget.dart';
 
 abstract class Storybook<T extends StatefulWidget> extends State {
-  String nameObjectInDisplay();
+  String? selectedConstructor;
 
-  String title();
+  String get title;
 
-  String description();
+  String get description;
 
-  List<AtributeDto> atributs();
+  ThemeData get light => ThemeData.light();
+
+  ThemeData get dark => ThemeData.dark();
+
+  List<AtributeDto> get atributs;
+
+  String get nameObjectInDisplay;
 
   Widget buildComponentWidget(BuildContext context);
 
-  void onUpdateAtributs(List<AtributeDto> atributs);
-
-  getWhereAtribut(List<AtributeDto> atributs, String name) {
+  getWhereAtribut(String name) {
     final atribute = atributs.where((e) => e.name == name).first;
     return atribute.selectedValue?.value;
   }
 
-  String? selectedConstructor;
+  @protected
+  @mustCallSuper
+  void onUpdateAtributs(List<AtributeDto> atributs) {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+      ),
+      body: Row(
+        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (kIsWeb) _buildContent(),
-          _buildDevice(),
+          SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 450,
+                minWidth: 450,
+              ),
+              child: _buildContent(),
+            ),
+          ),
+          Expanded(
+            flex: 70,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildDevice(),
+                  _buildPreviewCode(),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildContent() {
-    return Expanded(
-      child: ContentWidget(
-        atributs: atributs(),
-        onAtributs: (atributs) {
-          onUpdateAtributs(atributs);
-        },
-        description: description(),
-        title: title(),
-        constructor: selectedConstructor,
-        nameObjectInDisplay: nameObjectInDisplay(),
-        onSelectedConstructor: (String? constructor) {
-          setState(() {
-            selectedConstructor = constructor;
-          });
-        },
-        updatePreviewCode: updatePreviewCode,
+    return ContentWidget(
+      atributs: atributs,
+      onAtributs: (atributs) {
+        onUpdateAtributs(atributs);
+      },
+      description: description,
+      title: title,
+      constructor: selectedConstructor,
+      nameObjectInDisplay: nameObjectInDisplay,
+      onSelectedConstructor: (String? constructor) {
+        setState(() {
+          selectedConstructor = constructor;
+        });
+      },
+      updatePreviewCode: updatePreviewCode,
+    );
+  }
+
+  Widget _buildPreviewCode() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 32.0, bottom: 32.0),
+      child: Stack(
+        children: [
+          Card(
+            elevation: 0,
+            color: Colors.grey[800],
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Expanded(
+                          child: SelectableText(
+                            updatePreviewCode(),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: Colors.white,
+                                    ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: IconButton(
+              color: Colors.white,
+              onPressed: () {
+                Utils.copyClipboard(updatePreviewCode());
+              },
+              icon: const Icon(Icons.copy, size: 20),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -63,7 +140,7 @@ abstract class Storybook<T extends StatefulWidget> extends State {
   @protected
   @mustCallSuper
   String updatePreviewCode() {
-    final atributes = atributs()
+    final atributes = atributs
         .where(
           (e) {
             final constructor = e.builders == null ||
@@ -76,32 +153,21 @@ abstract class Storybook<T extends StatefulWidget> extends State {
         .join();
     final constructor =
         this.selectedConstructor == null ? '' : '.${this.selectedConstructor}';
-    final nameClass = nameObjectInDisplay();
+    final nameClass = nameObjectInDisplay;
     return "$nameClass$constructor($atributes\n)";
   }
 
   Widget _buildDevice() {
-    final height = kIsWeb ? 630.0 : MediaQuery.of(context).size.height;
-    final width = kIsWeb ? 520.0 : MediaQuery.of(context).size.width;
-    final deviceWidget = DeviceWidget(
-      decoration: kIsWeb
-          ? BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(
-                width: 8,
-                color: Colors.black,
-              ),
-            )
-          : null,
-      margin: kIsWeb ? null : EdgeInsets.zero,
-      height: height,
-      width: width,
-      buildComponentWidget: buildComponentWidget,
-    );
-    if (kIsWeb) {
-      return deviceWidget;
-    }
+    final height = 750.0;
 
-    return Expanded(child: deviceWidget);
+    return SizedBox(
+      height: height,
+      child: DeviceFrame(isFrameVisible: true,
+        device: Devices.android.samsungGalaxyNote20Ultra,
+        screen: Builder(
+          builder: (deviceContext) => buildComponentWidget(deviceContext),
+        ),
+      ),
+    );
   }
 }

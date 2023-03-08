@@ -1,6 +1,8 @@
 import 'package:example/home_page.dart';
 import 'package:flutter/material.dart';
 
+import 'button_page.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -13,9 +15,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+     
       ),
-      home: const HomePage(),
+      home: const ButtonPage(),
     );
   }
 }
