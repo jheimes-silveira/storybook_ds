@@ -1,3 +1,6 @@
+## 0.0.10 - Incluir visualização de Wrap 
+- Incluir tabela com valores das variaveis do componente
+
 ## 0.0.9 - Incluir visualização de Wrap 
 - [Experimental][BREAKING CHANGE] mudanças em implementação da `class` storybook
 

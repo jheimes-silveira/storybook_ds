@@ -71,12 +71,12 @@ abstract class Storybook<T extends StatefulWidget> extends State {
               ],
             ),
             _buildPreviewCode(),
-            AtributsVariantTableWidget(
-              atributs: atributs,
-              onAtributs: (atributs) {
-                onUpdateAtributs(atributs);
-              },
-            )
+            // AtributsVariantTableWidget(
+            //   atributs: atributs,
+            //   onAtributs: (atributs) {
+            //     onUpdateAtributs(atributs);
+            //   },
+            // ),
           ],
         ),
       ),
