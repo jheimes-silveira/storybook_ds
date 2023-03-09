@@ -34,33 +34,29 @@ class AtributsVariantTableWidget extends StatelessWidget {
     }
     return LayoutBuilder(
       builder: (_, constraints) {
-        return Container(
+        return SizedBox(
           height: 300,
           child: ScrollableTableView(
             columns: [
               TableViewColumn(
                 label: "Nome",
-                width: constraints.maxWidth * 0.1,
+                width: constraints.maxWidth / 5,
               ),
               TableViewColumn(
                 label: "Tipo",
-                width: constraints.maxWidth * 0.2,
+                width: constraints.maxWidth / 5,
               ),
               TableViewColumn(
                 label: "Obrigatório",
-                width: constraints.maxWidth * 0.1,
-              ),
-              TableViewColumn(
-                label: "Controle",
-                width: constraints.maxWidth * 0.3,
+                width: constraints.maxWidth / 5,
               ),
               TableViewColumn(
                 label: "Default",
-                width: constraints.maxWidth * 0.2,
+                width: constraints.maxWidth / 5,
               ),
               TableViewColumn(
                 label: "Pode ser null?",
-                width: constraints.maxWidth * 0.1,
+                width: constraints.maxWidth / 5,
               ),
             ],
             rows: atributs.map((e) {
@@ -74,21 +70,13 @@ class AtributsVariantTableWidget extends StatelessWidget {
                     child: _buildTypeDescription(e, context),
                   ),
                   TableViewCell(
-                    child: Text(
-                      '${e.required}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: e.required ? Colors.green : Colors.redAccent),
-                    ),
-                  ),
-                  TableViewCell(
-                    child: _buildChangeAction(context, e, atributs),
+                    child: _buildRequired(context, e.required),
                   ),
                   TableViewCell(
                     child: Text(e.defaultValue?.value ?? ''),
                   ),
                   TableViewCell(
-                    child: _isVariableNubable(context, e, atributs),
+                    child: _buildRequired(context, e.type.contains('?')),
                   ),
                 ],
               );
@@ -101,6 +89,15 @@ class AtributsVariantTableWidget extends StatelessWidget {
     //   crossAxisAlignment: CrossAxisAlignment.start,
     //   children: widgets,
     // );
+  }
+
+  Text _buildRequired(BuildContext context, bool required) {
+    return Text(
+      '$required',
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: required ? Colors.green : Colors.redAccent),
+    );
   }
 
   Padding _buildTitle(BuildContext context) {

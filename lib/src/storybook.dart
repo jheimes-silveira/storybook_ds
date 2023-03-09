@@ -1,5 +1,6 @@
 import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/src/widgets/atributs_variant_table_widget.dart';
 
 import 'models/dto/atribute_dto.dart';
 import 'utils/utils.dart';
@@ -35,37 +36,49 @@ abstract class Storybook<T extends StatefulWidget> extends State {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height * 0.8;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
-      body: Row(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 450,
-                minWidth: 450,
-              ),
-              child: _buildContent(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: height,
+                  child: SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 450,
+                        minWidth: 450,
+                      ),
+                      child: _buildContent(),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: _buildDevice(height),
+                  ),
+                ),
+              ],
             ),
-          ),
-          Expanded(
-            flex: 70,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildDevice(),
-                  _buildPreviewCode(),
-                ],
-              ),
-            ),
-          ),
-        ],
+            _buildPreviewCode(),
+            AtributsVariantTableWidget(
+              atributs: atributs,
+              onAtributs: (atributs) {
+                onUpdateAtributs(atributs);
+              },
+            )
+          ],
+        ),
       ),
     );
   }
@@ -91,7 +104,7 @@ abstract class Storybook<T extends StatefulWidget> extends State {
 
   Widget _buildPreviewCode() {
     return Padding(
-      padding: const EdgeInsets.only(top: 32.0, bottom: 32.0),
+      padding: const EdgeInsets.all(32.0),
       child: Stack(
         children: [
           Card(
@@ -157,9 +170,7 @@ abstract class Storybook<T extends StatefulWidget> extends State {
     return "$nameClass$constructor($atributes\n)";
   }
 
-  Widget _buildDevice() {
-    const height = 750.0;
-
+  Widget _buildDevice(double height) {
     return SizedBox(
       height: height,
       child: DeviceFrame(
