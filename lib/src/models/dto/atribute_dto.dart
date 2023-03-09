@@ -92,28 +92,6 @@ class AtributeDto {
       variableOptionType: RangeDoubleIntervalType(begin, end),
     );
   }
-  factory AtributeDto.wrap({
-    required String type,
-    required String name,
-    required List<VariableOption> variableOptions,
-    String? description,
-    List<String?> builders = const [],
-    bool required = false,
-    VariableOption? selectedValue,
-    VariableOption? defaultValue,
-  }) {
-    return AtributeDto._raw(
-      type: type,
-      name: name,
-      variableOptions: variableOptions,
-      selectedValue: selectedValue,
-      defaultValue: defaultValue,
-      builders: builders,
-      description: description,
-      required: required,
-      variableOptionType: WrapType(),
-    );
-  }
 
   AtributeDto._raw({
     required this.type,

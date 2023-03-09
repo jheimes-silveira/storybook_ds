@@ -1,6 +1,7 @@
-import 'package:ds_button/ds_button.dart';
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
+
+import 'custom_button.dart';
 
 class ButtonPage extends StatefulWidget {
   const ButtonPage({Key? key}) : super(key: key);
@@ -26,67 +27,100 @@ class _ButtonPageState extends Storybook<ButtonPage> {
       builders: ['elevated', 'outline', 'text'],
     ),
     AtributeDto(
-      type: 'String?',
-      name: 'text4',
-      required: true,
-      selectedValue: VariableOption(value: 'Custom Buttom'),
-      builders: ['elevated', 'outline', 'text'],
-    ),
-    AtributeDto(
       type: 'bool',
       name: 'loading',
       selectedValue: VariableOption(value: false),
       builders: ['elevated', 'outline', 'text'],
     ),
-    AtributeDto(
-      type: 'bool?',
-      name: 'loading2',
-      selectedValue: VariableOption(value: false),
-      builders: ['elevated', 'outline', 'text'],
-    ),
     AtributeDto.rangeDoubleInterval(
       type: 'double?',
-      name: 'valor2',
+      name: 'borderRadius',
       selectedValue: 0,
-      builders: ['elevated', 'outline', 'text'],
+      builders: ['elevated', 'outline'],
       begin: 0,
-      end: 30,
-    ),
-    AtributeDto.wrap(
-      type: 'CrossAxisAlignment?',
-      name: 'spacer',
-      selectedValue: VariableOption(value: CrossAxisAlignment.center),
-      builders: ['elevated', 'outline', 'text'],
-      variableOptions: CrossAxisAlignment.values
-          .map((e) => VariableOption(
-                value: e,
-                textInSelectedOptions: e.name,
-              ))
-          .toList(),
+      end: 20,
     ),
     AtributeDto(
-      type: 'Color',
+      type: 'Color?',
       name: 'color',
-      selectedValue: VariableOption(
-        value: 'primaryDark',
-        textInDisplay: 'WillTheme.of(context).colors.primaryDark',
-        textInSelectedOptions: 'primaryDark',
-      ),
+      builders: ['elevated'],
+      selectedValue: VariableOption(value: null),
       variableOptions: [
         VariableOption(
-          value: 'primaryDark',
-          textInDisplay: 'WillTheme.of(context).colors.primaryDark',
-          textInSelectedOptions: 'primaryDark',
+          value: Colors.amber,
+          textInDisplay: 'Colors.amber',
+          textInSelectedOptions: 'amber',
         ),
         VariableOption(
-          value: 'primaryLight',
-          textInDisplay: 'WillTheme.of(context).colors.primaryLight',
-          textInSelectedOptions: 'primaryLight',
+          value: Colors.black,
+          textInDisplay: 'Colors.black',
+          textInSelectedOptions: 'black',
         ),
         VariableOption(
-          value: 'primaryLightest',
-          textInDisplay: 'WillTheme.of(context).colors.primaryLightest',
-          textInSelectedOptions: 'primaryLightest',
+          value: Colors.red,
+          textInDisplay: 'Colors.red',
+          textInSelectedOptions: 'red',
+        ),
+        VariableOption(
+          value: Colors.green,
+          textInDisplay: 'Colors.green',
+          textInSelectedOptions: 'green',
+        ),
+      ],
+    ),
+    AtributeDto(
+      type: 'Color?',
+      name: 'borderSideColor',
+      builders: ['outline'],
+      selectedValue: VariableOption(value: null),
+      variableOptions: [
+        VariableOption(
+          value: Colors.amber,
+          textInDisplay: 'Colors.amber',
+          textInSelectedOptions: 'amber',
+        ),
+        VariableOption(
+          value: Colors.black,
+          textInDisplay: 'Colors.black',
+          textInSelectedOptions: 'black',
+        ),
+        VariableOption(
+          value: Colors.red,
+          textInDisplay: 'Colors.red',
+          textInSelectedOptions: 'red',
+        ),
+        VariableOption(
+          value: Colors.green,
+          textInDisplay: 'Colors.green',
+          textInSelectedOptions: 'green',
+        ),
+      ],
+    ),
+    AtributeDto(
+      type: 'Color?',
+      name: 'textColor',
+      builders: ['text'],
+      selectedValue: VariableOption(value: null),
+      variableOptions: [
+        VariableOption(
+          value: Colors.amber,
+          textInDisplay: 'Colors.amber',
+          textInSelectedOptions: 'amber',
+        ),
+        VariableOption(
+          value: Colors.black,
+          textInDisplay: 'Colors.black',
+          textInSelectedOptions: 'black',
+        ),
+        VariableOption(
+          value: Colors.red,
+          textInDisplay: 'Colors.red',
+          textInSelectedOptions: 'red',
+        ),
+        VariableOption(
+          value: Colors.green,
+          textInDisplay: 'Colors.green',
+          textInSelectedOptions: 'green',
         ),
       ],
     ),
@@ -110,35 +144,40 @@ class _ButtonPageState extends Storybook<ButtonPage> {
   }
 
   Widget _buildElevated() {
-    return DSButton.elevated(
+    return CustomButton.elevated(
       text: getWhereAtribut('text'),
       loading: getWhereAtribut('loading'),
+      color: getWhereAtribut('color'),
+      borderRadius: getWhereAtribut('borderRadius'),
       onPressed: () {},
     );
   }
 
   Widget _buildOutline() {
-    return DSButton.outline(
+    return CustomButton.outline(
       text: getWhereAtribut('text'),
       loading: getWhereAtribut('loading'),
+      borderSideColor: getWhereAtribut('borderSideColor'),
+      borderRadius: getWhereAtribut('borderRadius'),
       onPressed: () {},
     );
   }
 
   Widget _buildText() {
-    return DSButton.text(
+    return CustomButton.text(
       text: getWhereAtribut('text'),
       loading: getWhereAtribut('loading'),
+      textColor: getWhereAtribut('textColor'),
       onPressed: () {},
     );
   }
 
   @override
   String description =
-      'Takimata sanctus amet dolores accusam dolores stet nonumy dolore sea, tempor voluptua elitr invidunt duo takimata erat. Consetetur lorem diam et tempor dolores est nonumy dolor. Et dolor ea amet diam, et eirmod et labore sea et rebum elitr. Magna diam no takimata et amet justo eos erat. Dolor erat ipsum diam diam sed duo stet, diam lorem clita lorem ut sanctus sit eos, duo est duo elitr diam et diam magna sit erat. Magna nonumy elitr clita takimata, elitr sit nonumy ipsum et sit vero, lorem est dolor sanctus sed et amet dolor. Et amet amet ea amet erat amet diam ea ut, invidunt ipsum dolor consetetur sit ipsum tempor, no et est sea voluptua tempor et, accusam dolores est accusam ea magna lorem ea gubergren sit. Clita dolores diam nonumy et et sit tempor, amet accusam at stet lorem kasd labore. Erat rebum gubergren clita stet. Stet et diam lorem eos sanctus ipsum, est ipsum et clita dolor dolor, est sea ea et amet lorem est sit. At dolore diam magna at vero dolor magna sit diam. Dolores sit gubergren eos voluptua ea, gubergren voluptua vero sea eos ipsum elitr. Ipsum dolore kasd stet rebum est amet erat.';
+      'Magna et nonumy dolor duo sanctus sed est stet voluptua, dolor ipsum et et aliquyam amet et. Sed diam et.';
 
   @override
-  String nameObjectInDisplay = 'DSButton';
+  String nameObjectInDisplay = 'CustomButton';
 
   @override
   String title = 'DS Button';
