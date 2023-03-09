@@ -35,7 +35,7 @@ class AtributsVariantTableWidget extends StatelessWidget {
     return LayoutBuilder(
       builder: (_, constraints) {
         return SizedBox(
-          height: 300,
+          height: 700,
           child: ScrollableTableView(
             columns: [
               TableViewColumn(
