@@ -42,7 +42,7 @@ class _ButtonPageState extends Storybook<ButtonPage> {...
 
 Remova a classe **build** da sua classe Storybook. <br> Adicione os overrides:
 
-**Title**: título da tela. Use o nome do componente de preferência.
+**Title**: título da tela. Obs: use o nome do componente de preferência.
 ```dart
 @override
 String get title => "DS Button";
@@ -54,8 +54,7 @@ String get title => "DS Button";
 String get nameObjectInDisplay => "DSButton";
 ```
 
-**Atributs**: Adicione os atributos do seu componente. Esses são representados pela classe **AtributeDto**.
-<!-- Em builders, defina em quais construtores da classe o atributo estará presente, sendo null o construtor padrão. -->
+**Atributs**: Adicione os atributos do seu componente. Esses são representados pela classe **AtributeDto** (mais detalhes a seguir).
 ```dart
 @override
 List<AtributeDto> atributs = [
