@@ -1,5 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-class AtributeDto {
+class AttributeDto {
   final String type;
   final String name;
   final String? description;
@@ -11,7 +11,7 @@ class AtributeDto {
 
   VariableOption? selectedValue;
 
-  factory AtributeDto({
+  factory AttributeDto({
     required String type,
     required String name,
     String? description,
@@ -27,7 +27,7 @@ class AtributeDto {
 
     variableOptions ??= [VariableOption(value: '')];
     
-    return AtributeDto._raw(
+    return AttributeDto._raw(
       type: type,
       name: name,
       variableOptions: variableOptions,
@@ -40,7 +40,7 @@ class AtributeDto {
     );
   }
 
-  factory AtributeDto.rangeIntInterval({
+  factory AttributeDto.rangeIntInterval({
     required int begin,
     required int end,
     required String type,
@@ -51,7 +51,7 @@ class AtributeDto {
     int? selectedValue,
     int? defaultValue,
   }) {
-    return AtributeDto._raw(
+    return AttributeDto._raw(
       type: type,
       name: name,
       variableOptions: [
@@ -66,7 +66,7 @@ class AtributeDto {
       variableOptionType: RangeIntIntervalType(begin, end),
     );
   }
-  factory AtributeDto.rangeDoubleInterval({
+  factory AttributeDto.rangeDoubleInterval({
     required double begin,
     required double end,
     required String type,
@@ -77,7 +77,7 @@ class AtributeDto {
     double? selectedValue,
     double? defaultValue,
   }) {
-    return AtributeDto._raw(
+    return AttributeDto._raw(
       type: type,
       name: name,
       variableOptions: [
@@ -93,7 +93,7 @@ class AtributeDto {
     );
   }
 
-  AtributeDto._raw({
+  AttributeDto._raw({
     required this.type,
     required this.name,
     required this.variableOptions,

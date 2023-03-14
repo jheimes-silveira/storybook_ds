@@ -1,8 +1,8 @@
 import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
-import 'package:storybook_ds/src/widgets/atributs_variant_table_widget.dart';
+import 'package:storybook_ds/src/widgets/attributes_variant_table_widget.dart';
 
-import 'models/dto/atribute_dto.dart';
+import 'models/dto/attribute_dto.dart';
 import 'utils/utils.dart';
 import 'widgets/content_widget.dart';
 
@@ -17,20 +17,20 @@ abstract class Storybook<T extends StatefulWidget> extends State {
 
   ThemeData get dark => ThemeData.dark();
 
-  List<AtributeDto> get atributs;
+  List<AttributeDto> get attributes;
 
   String get nameObjectInDisplay;
 
   Widget buildComponentWidget(BuildContext context);
 
-  getWhereAtribut(String name) {
-    final atribute = atributs.where((e) => e.name == name).first;
-    return atribute.selectedValue?.value;
+  getWhereAttribut(String name) {
+    final attribute = attributes.where((e) => e.name == name).first;
+    return attribute.selectedValue?.value;
   }
 
   @protected
   @mustCallSuper
-  void onUpdateAtributs(List<AtributeDto> atributs) {
+  void onUpdateAttributes(List<AttributeDto> attributes) {
     setState(() {});
   }
 
@@ -71,10 +71,10 @@ abstract class Storybook<T extends StatefulWidget> extends State {
               ],
             ),
             _buildPreviewCode(),
-            // AtributsVariantTableWidget(
-            //   atributs: atributs,
-            //   onAtributs: (atributs) {
-            //     onUpdateAtributs(atributs);
+            // AttributesVariantTableWidget(
+            //   attributes: attributes,
+            //   onAttributes: (attributes) {
+            //     onUpdateAttributes(attributes);
             //   },
             // ),
           ],
@@ -85,9 +85,9 @@ abstract class Storybook<T extends StatefulWidget> extends State {
 
   Widget _buildContent() {
     return ContentWidget(
-      atributs: atributs,
-      onAtributs: (atributs) {
-        onUpdateAtributs(atributs);
+      attributes: attributes,
+      onAttributes: (attributes) {
+        onUpdateAttributes(attributes);
       },
       description: description,
       title: title,
@@ -153,7 +153,7 @@ abstract class Storybook<T extends StatefulWidget> extends State {
   @protected
   @mustCallSuper
   String updatePreviewCode() {
-    final atributes = atributs
+    final atributes = attributes
         .where(
           (e) {
             final constructor = e.builders.isEmpty ||
