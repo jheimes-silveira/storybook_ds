@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:storybook_ds/src/widgets/atributs_variant_widget.dart';
+import 'package:storybook_ds/src/widgets/attributes_variant_widget.dart';
 
-import '../models/dto/atribute_dto.dart';
+import '../models/dto/attribute_dto.dart';
 import '../utils/utils.dart';
 import 'custom_chip_selected.dart';
 
@@ -10,8 +10,8 @@ class ContentWidget extends StatelessWidget {
   final String description;
   final String? constructor;
   final String nameObjectInDisplay;
-  final List<AtributeDto> atributs;
-  final Function(List<AtributeDto> atributs)? onAtributs;
+  final List<AttributeDto> attributes;
+  final Function(List<AttributeDto> attributes)? onAttributes;
   final Function(String? constructor) onSelectedConstructor;
   final String Function() updatePreviewCode;
 
@@ -19,11 +19,11 @@ class ContentWidget extends StatelessWidget {
     Key? key,
     required this.title,
     required this.description,
-    required this.atributs,
+    required this.attributes,
     required this.nameObjectInDisplay,
     required this.onSelectedConstructor,
     required this.updatePreviewCode,
-    this.onAtributs,
+    this.onAttributes,
     this.constructor,
   }) : super(key: key);
 
@@ -42,8 +42,8 @@ class ContentWidget extends StatelessWidget {
           children: [
             _buildTitle(context),
             _buildDescription(context),
-            _buildBuilders(context, atributs),
-            _buildAtributsVariant(atributs),
+            _buildBuilders(context, attributes),
+            _buildAttributesVariant(attributes),
             // _buildPreviewCode(context),
           ],
         ),
@@ -68,9 +68,9 @@ class ContentWidget extends StatelessWidget {
     );
   }
 
-  _buildBuilders(BuildContext context, List<AtributeDto> atributs) {
+  _buildBuilders(BuildContext context, List<AttributeDto> attributes) {
     List<String?> builders = [];
-    for (var e in atributs) {
+    for (var e in attributes) {
       if (e.builders.isNotEmpty) {
         for (var e2 in e.builders) {
           if (!builders.contains(e2)) {
@@ -112,10 +112,10 @@ class ContentWidget extends StatelessWidget {
                       label: e2 ?? 'default',
                       selected: constructor == e2,
                       onTap: () {
-                        if (onAtributs != null) {
+                        if (onAttributes != null) {
                           onSelectedConstructor(e2);
 
-                          onAtributs!(atributs);
+                          onAttributes!(attributes);
                         }
                       }),
                 )
@@ -126,10 +126,10 @@ class ContentWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildAtributsVariant(List<AtributeDto> atributs) {
-    return AtributsVariantWidget(
-      atributs: atributs,
-      onAtributs: onAtributs,
+  Widget _buildAttributesVariant(List<AttributeDto> attributes) {
+    return AttributesVariantWidget(
+      attributes: attributes,
+      onAttributes: onAttributes,
       constructor: constructor,
     );
   }

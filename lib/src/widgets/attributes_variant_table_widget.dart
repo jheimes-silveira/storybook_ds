@@ -4,14 +4,14 @@ import 'package:storybook_ds/src/widgets/custom_chip_selected.dart';
 
 import '../../storybook_ds.dart';
 
-class AtributsVariantTableWidget extends StatelessWidget {
-  final List<AtributeDto> atributs;
-  final Function(List<AtributeDto> atributs)? onAtributs;
+class AttributesVariantTableWidget extends StatelessWidget {
+  final List<AttributeDto> attributes;
+  final Function(List<AttributeDto> attributes)? onAttributes;
   final String? constructor;
-  const AtributsVariantTableWidget({
+  const AttributesVariantTableWidget({
     Key? key,
-    required this.atributs,
-    required this.onAtributs,
+    required this.attributes,
+    required this.onAttributes,
     this.constructor,
   }) : super(key: key);
 
@@ -21,14 +21,14 @@ class AtributsVariantTableWidget extends StatelessWidget {
 
     widgets.add(_buildTitle(context));
 
-    for (var e in atributs) {
+    for (var e in attributes) {
       if (_canBuildVariableOption(e)) {
         if (e.builders.isNotEmpty && !e.builders.contains(constructor)) {
           continue;
         }
 
         widgets.add(
-          _optionsVariants(context, e, atributs),
+          _optionsVariants(context, e, attributes),
         );
       }
     }
@@ -59,7 +59,7 @@ class AtributsVariantTableWidget extends StatelessWidget {
                 width: constraints.maxWidth / 5,
               ),
             ],
-            rows: atributs.map((e) {
+            rows: attributes.map((e) {
               return TableViewRow(
                 height: 60,
                 cells: [
@@ -115,8 +115,8 @@ class AtributsVariantTableWidget extends StatelessWidget {
 
   Widget _optionsVariants(
     BuildContext context,
-    AtributeDto e,
-    List<AtributeDto> atributs,
+    AttributeDto e,
+    List<AttributeDto> attributes,
   ) {
     double padding = 16.0;
 
@@ -135,7 +135,7 @@ class AtributsVariantTableWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildTypeDescription(e, context),
-          Expanded(child: _buildChangeAction(context, e, atributs)),
+          Expanded(child: _buildChangeAction(context, e, attributes)),
         ],
       ),
     );
@@ -163,13 +163,13 @@ class AtributsVariantTableWidget extends StatelessWidget {
         expandedAlignment: Alignment.centerLeft,
         title: _buildTypeDescription(e, context), //header title
         children: [
-          _buildChangeAction(context, e, atributs),
+          _buildChangeAction(context, e, attributes),
         ],
       ),
     );
   }
 
-  Widget _buildNameDescription(AtributeDto e, BuildContext context) {
+  Widget _buildNameDescription(AttributeDto e, BuildContext context) {
     return Text(
       e.name,
       style: Theme.of(context)
@@ -179,7 +179,7 @@ class AtributsVariantTableWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTypeDescription(AtributeDto e, BuildContext context) {
+  Widget _buildTypeDescription(AttributeDto e, BuildContext context) {
     return Text(
       e.type,
       style: Theme.of(context).textTheme.bodyMedium,
@@ -188,19 +188,19 @@ class AtributsVariantTableWidget extends StatelessWidget {
 
   Widget _buildChangeAction(
     BuildContext context,
-    AtributeDto e,
-    List<AtributeDto> atributs,
+    AttributeDto e,
+    List<AttributeDto> attributes,
   ) {
     if (e.type == 'bool' || e.type == 'bool?') {
       return Switch(
         value: e.selectedValue?.value,
         onChanged: (value) {
-          if (onAtributs != null) {
+          if (onAttributes != null) {
             e.selectedValue = VariableOption(
               value: value,
               textInDisplay: e.selectedValue?.textInSelectedOptions,
             );
-            onAtributs!(atributs);
+            onAttributes!(attributes);
           }
         },
       );
@@ -232,11 +232,11 @@ class AtributsVariantTableWidget extends StatelessWidget {
           controller: c,
           enabled: e.selectedValue?.value == null ? false : true,
           onChanged: (text) {
-            if (onAtributs != null) {
+            if (onAttributes != null) {
               e.selectedValue = e.selectedValue?.copyWith(
                 value: text,
               );
-              onAtributs!(atributs);
+              onAttributes!(attributes);
               c.selection = TextSelection.fromPosition(
                 TextPosition(offset: c.selection.baseOffset),
               );
@@ -261,10 +261,10 @@ class AtributsVariantTableWidget extends StatelessWidget {
                     label: e2.textInSelectedOptions,
                     selected: e.selectedValue?.value == e2.value,
                     onTap: () {
-                      if (onAtributs != null) {
+                      if (onAttributes != null) {
                         e.selectedValue = e2;
 
-                        onAtributs!(atributs);
+                        onAttributes!(attributes);
                       }
                     }),
               )
@@ -300,7 +300,7 @@ class AtributsVariantTableWidget extends StatelessWidget {
                       e.selectedValue?.value = v.toInt();
                     }
 
-                    onAtributs!(atributs);
+                    onAttributes!(attributes);
                   },
                 ),
               ),
@@ -314,7 +314,7 @@ class AtributsVariantTableWidget extends StatelessWidget {
     return Container();
   }
 
-  bool _canBuildVariableOption(AtributeDto e) {
+  bool _canBuildVariableOption(AttributeDto e) {
     return e.type == 'String' ||
         e.type == 'String?' ||
         e.type == 'bool' ||
@@ -324,21 +324,21 @@ class AtributsVariantTableWidget extends StatelessWidget {
         e.variableOptions != null;
   }
 
-  bool _canBuildVariableOptionTypeBool(AtributeDto e) {
+  bool _canBuildVariableOptionTypeBool(AttributeDto e) {
     return e.type == 'bool' || e.type == 'bool?';
   }
 
   _isVariableNubable(
     BuildContext context,
-    AtributeDto e,
-    List<AtributeDto> atributs,
+    AttributeDto e,
+    List<AttributeDto> attributes,
   ) {
     if (e.type.contains('?')) {
       return Switch(
         value: e.selectedValue?.value == null ? false : true,
         onChanged: (value) {
           e.selectedValue = value ? e.variableOptions![0] : null;
-          onAtributs!(atributs);
+          onAttributes!(attributes);
         },
       );
     }

@@ -3,14 +3,14 @@ import 'package:storybook_ds/src/widgets/custom_chip_selected.dart';
 
 import '../../storybook_ds.dart';
 
-class AtributsVariantWidget extends StatelessWidget {
-  final List<AtributeDto> atributs;
-  final Function(List<AtributeDto> atributs)? onAtributs;
+class AttributesVariantWidget extends StatelessWidget {
+  final List<AttributeDto> attributes;
+  final Function(List<AttributeDto> attributes)? onAttributes;
   final String? constructor;
-  const AtributsVariantWidget({
+  const AttributesVariantWidget({
     Key? key,
-    required this.atributs,
-    required this.onAtributs,
+    required this.attributes,
+    required this.onAttributes,
     this.constructor,
   }) : super(key: key);
 
@@ -23,7 +23,7 @@ class AtributsVariantWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             _buildTitle(context),
-            ...atributs
+            ...attributes
                 .where(
                   (e) => e.builders.isEmpty || e.builders.contains(constructor),
                 )
@@ -57,11 +57,11 @@ class AtributsVariantWidget extends StatelessWidget {
                         _buildIsRequired(e, context),
                         const SizedBox(width: 8),
                         if (_canBuildVariableOptionTypeBool(e))
-                          _buildVariableOptionTypeBool(e, atributs),
+                          _buildVariableOptionTypeBool(e, attributes),
                       ]),
                       // leading: Container(),
                       trailing: _canBuildVariableOptionTypeBool(e)
-                          ? _isVariableNubable(e, atributs)
+                          ? _isVariableNubable(e, attributes)
                           : (_canBuildVariableOption(e)
                               ? null
                               : const SizedBox()),
@@ -72,8 +72,8 @@ class AtributsVariantWidget extends StatelessWidget {
                             children: [
                               Expanded(
                                   child:
-                                      _buildChangeAction(context, e, atributs)),
-                              _isVariableNubable(e, atributs),
+                                      _buildChangeAction(context, e, attributes)),
+                              _isVariableNubable(e, attributes),
                             ],
                           ),
                       ],
@@ -88,7 +88,7 @@ class AtributsVariantWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildIsRequired(AtributeDto e, BuildContext context) {
+  Widget _buildIsRequired(AttributeDto e, BuildContext context) {
     return e.required
         ? Text(
             'Obrigatório *',
@@ -111,7 +111,7 @@ class AtributsVariantWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildNameDescription(AtributeDto e, BuildContext context) {
+  Widget _buildNameDescription(AttributeDto e, BuildContext context) {
     return Text(
       e.name,
       style: Theme.of(context)
@@ -121,7 +121,7 @@ class AtributsVariantWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTypeDescription(AtributeDto e, BuildContext context) {
+  Widget _buildTypeDescription(AttributeDto e, BuildContext context) {
     return Text(
       e.type,
       style: Theme.of(context).textTheme.bodyMedium,
@@ -130,8 +130,8 @@ class AtributsVariantWidget extends StatelessWidget {
 
   Widget _buildChangeAction(
     BuildContext context,
-    AtributeDto e,
-    List<AtributeDto> atributs,
+    AttributeDto e,
+    List<AttributeDto> attributes,
   ) {
     if (e.type == 'String' || e.type == 'String?') {
       final c = TextEditingController(
@@ -157,11 +157,11 @@ class AtributsVariantWidget extends StatelessWidget {
           controller: c,
           enabled: e.selectedValue?.value == null ? false : true,
           onChanged: (text) {
-            if (onAtributs != null) {
+            if (onAttributes != null) {
               e.selectedValue = e.selectedValue?.copyWith(
                 value: text,
               );
-              onAtributs!(atributs);
+              onAttributes!(attributes);
               c.selection = TextSelection.fromPosition(
                 TextPosition(offset: c.selection.baseOffset),
               );
@@ -198,7 +198,7 @@ class AtributsVariantWidget extends StatelessWidget {
                       e.selectedValue?.value = v.toInt();
                     }
 
-                    onAtributs!(atributs);
+                    onAttributes!(attributes);
                   },
                 ),
               ),
@@ -224,10 +224,10 @@ class AtributsVariantWidget extends StatelessWidget {
                     label: e2.textInSelectedOptions,
                     selected: e.selectedValue?.value == e2.value,
                     onTap: () {
-                      if (onAtributs != null) {
+                      if (onAttributes != null) {
                         e.selectedValue = e2;
 
-                        onAtributs!(atributs);
+                        onAttributes!(attributes);
                       }
                     }),
               )
@@ -238,7 +238,7 @@ class AtributsVariantWidget extends StatelessWidget {
     return Container();
   }
 
-  bool _canBuildVariableOption(AtributeDto e) {
+  bool _canBuildVariableOption(AttributeDto e) {
     return e.type == 'String' ||
         e.type == 'String?' ||
         e.type == 'bool' ||
@@ -248,20 +248,20 @@ class AtributsVariantWidget extends StatelessWidget {
         e.variableOptions != null;
   }
 
-  bool _canBuildVariableOptionTypeBool(AtributeDto e) {
+  bool _canBuildVariableOptionTypeBool(AttributeDto e) {
     return e.type == 'bool' || e.type == 'bool?';
   }
 
   Widget _isVariableNubable(
-    AtributeDto e,
-    List<AtributeDto> atributs,
+    AttributeDto e,
+    List<AttributeDto> attributes,
   ) {
     if (e.type.contains('?')) {
       return Switch(
         value: e.selectedValue?.value == null ? false : true,
         onChanged: (value) {
           e.selectedValue = value ? (e.variableOptions![0]) : null;
-          onAtributs!(atributs);
+          onAttributes!(attributes);
         },
       );
     }
@@ -270,8 +270,8 @@ class AtributsVariantWidget extends StatelessWidget {
   }
 
   Widget _buildVariableOptionTypeBool(
-    AtributeDto e,
-    List<AtributeDto> atributs,
+    AttributeDto e,
+    List<AttributeDto> attributes,
   ) {
     return Opacity(
       opacity: e.selectedValue?.value == null ? 0.5 : 1,
@@ -281,7 +281,7 @@ class AtributsVariantWidget extends StatelessWidget {
           value: e.selectedValue?.value ?? false,
           onChanged: (value) {
             e.selectedValue?.value = value;
-            onAtributs!(atributs);
+            onAttributes!(attributes);
           },
         ),
       ),

@@ -12,27 +12,27 @@ class ButtonPage extends StatefulWidget {
 
 class _ButtonPageState extends Storybook<ButtonPage> {
   @override
-  List<AtributeDto> atributs = [
-    AtributeDto(
+  List<AttributeDto> attributes = [
+    AttributeDto(
       type: 'Function()',
       name: 'onPressed',
       required: true,
       builders: ['elevated', 'outline', 'text'],
     ),
-    AtributeDto(
+    AttributeDto(
       type: 'String',
       name: 'text',
       required: true,
       selectedValue: VariableOption(value: 'Custom Buttom'),
       builders: ['elevated', 'outline', 'text'],
     ),
-    AtributeDto(
+    AttributeDto(
       type: 'bool',
       name: 'loading',
       selectedValue: VariableOption(value: false),
       builders: ['elevated', 'outline', 'text'],
     ),
-    AtributeDto.rangeDoubleInterval(
+    AttributeDto.rangeDoubleInterval(
       type: 'double?',
       name: 'borderRadius',
       selectedValue: 0,
@@ -40,7 +40,7 @@ class _ButtonPageState extends Storybook<ButtonPage> {
       begin: 0,
       end: 20,
     ),
-    AtributeDto(
+    AttributeDto(
       type: 'Color?',
       name: 'color',
       builders: ['elevated'],
@@ -68,7 +68,7 @@ class _ButtonPageState extends Storybook<ButtonPage> {
         ),
       ],
     ),
-    AtributeDto(
+    AttributeDto(
       type: 'Color?',
       name: 'borderSideColor',
       builders: ['outline'],
@@ -96,7 +96,7 @@ class _ButtonPageState extends Storybook<ButtonPage> {
         ),
       ],
     ),
-    AtributeDto(
+    AttributeDto(
       type: 'Color?',
       name: 'textColor',
       builders: ['text'],
@@ -145,29 +145,29 @@ class _ButtonPageState extends Storybook<ButtonPage> {
 
   Widget _buildElevated() {
     return CustomButton.elevated(
-      text: getWhereAtribut('text'),
-      loading: getWhereAtribut('loading'),
-      color: getWhereAtribut('color'),
-      borderRadius: getWhereAtribut('borderRadius'),
+      text: getWhereAttribut('text'),
+      loading: getWhereAttribut('loading'),
+      color: getWhereAttribut('color'),
+      borderRadius: getWhereAttribut('borderRadius'),
       onPressed: () {},
     );
   }
 
   Widget _buildOutline() {
     return CustomButton.outline(
-      text: getWhereAtribut('text'),
-      loading: getWhereAtribut('loading'),
-      borderSideColor: getWhereAtribut('borderSideColor'),
-      borderRadius: getWhereAtribut('borderRadius'),
+      text: getWhereAttribut('text'),
+      loading: getWhereAttribut('loading'),
+      borderSideColor: getWhereAttribut('borderSideColor'),
+      borderRadius: getWhereAttribut('borderRadius'),
       onPressed: () {},
     );
   }
 
   Widget _buildText() {
     return CustomButton.text(
-      text: getWhereAtribut('text'),
-      loading: getWhereAtribut('loading'),
-      textColor: getWhereAtribut('textColor'),
+      text: getWhereAttribut('text'),
+      loading: getWhereAttribut('loading'),
+      textColor: getWhereAttribut('textColor'),
       onPressed: () {},
     );
   }
