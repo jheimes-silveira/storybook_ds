@@ -26,7 +26,7 @@ class AttributeDto {
     }
 
     variableOptions ??= [VariableOption(value: '')];
-    
+
     return AttributeDto._raw(
       type: type,
       name: name,
@@ -43,7 +43,7 @@ class AttributeDto {
   factory AttributeDto.rangeIntInterval({
     required int begin,
     required int end,
-    required String type,
+    bool canBeNull = false,
     required String name,
     String? description,
     List<String?> builders = const [],
@@ -52,7 +52,7 @@ class AttributeDto {
     int? defaultValue,
   }) {
     return AttributeDto._raw(
-      type: type,
+      type: 'int${canBeNull ? '?' : ''}',
       name: name,
       variableOptions: [
         VariableOption(value: begin),
@@ -66,11 +66,53 @@ class AttributeDto {
       variableOptionType: RangeIntIntervalType(begin, end),
     );
   }
+  factory AttributeDto.string({
+    required String name,
+    bool canBeNull = false,
+    String? description,
+    List<String?> builders = const [],
+    bool required = false,
+    String? mask,
+    String? selectedValue,
+    String? defaultValue,
+  }) {
+    return AttributeDto._raw(
+      type: 'String${canBeNull ? '?' : ''}',
+      name: name,
+      variableOptions: [],
+      selectedValue: VariableOption(value: selectedValue),
+      defaultValue: VariableOption(value: defaultValue),
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: StringType(mask: mask),
+    );
+  }
+  factory AttributeDto.function({
+    required dynamic function,
+    required String name,
+    bool canBeNull = false,
+    String? description,
+    List<String?> builders = const [],
+    bool required = false,
+  }) {
+    return AttributeDto._raw(
+      type: 'Function${canBeNull ? '?' : ''}',
+      name: name,
+      variableOptions: [],
+      selectedValue: VariableOption(value: null),
+      defaultValue: VariableOption(value: null),
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: FunctionType(function: function),
+    );
+  }
   factory AttributeDto.rangeDoubleInterval({
     required double begin,
     required double end,
-    required String type,
     required String name,
+    bool canBeNull = false,
     String? description,
     List<String?> builders = const [],
     bool required = false,
@@ -78,7 +120,7 @@ class AttributeDto {
     double? defaultValue,
   }) {
     return AttributeDto._raw(
-      type: type,
+      type: 'double${canBeNull ? '?' : ''}',
       name: name,
       variableOptions: [
         VariableOption(value: begin),
@@ -114,6 +156,20 @@ class AttributeDto {
 }
 
 abstract class VariableOptionType {}
+
+class FunctionType extends VariableOptionType {
+  dynamic function;
+  FunctionType({
+    required this.function,
+  });
+}
+
+class StringType extends VariableOptionType {
+  String? mask;
+  StringType({
+    this.mask,
+  });
+}
 
 class RangeIntIntervalType extends VariableOptionType {
   int begin;

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:storybook_ds/src/widgets/attributes_variant_widget.dart';
 
 import '../models/dto/attribute_dto.dart';
-import '../utils/utils.dart';
 import 'custom_chip_selected.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -88,7 +87,6 @@ class ContentWidget extends StatelessWidget {
       Future.delayed(const Duration(milliseconds: 50))
           .then((_) => onSelectedConstructor(builders[0]));
     }
-
 
     return Padding(
       padding: const EdgeInsets.only(top: 16),

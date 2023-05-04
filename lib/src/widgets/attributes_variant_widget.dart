@@ -49,16 +49,18 @@ class AttributesVariantWidget extends StatelessWidget {
                       childrenPadding: const EdgeInsets.only(left: 8),
                       tilePadding: const EdgeInsets.only(left: 8, right: 8),
                       expandedAlignment: Alignment.centerLeft,
-                      title: Row(children: [
-                        _buildTypeDescription(e, context),
-                        const SizedBox(width: 8),
-                        _buildNameDescription(e, context),
-                        const SizedBox(width: 8),
-                        _buildIsRequired(e, context),
-                        const SizedBox(width: 8),
-                        if (_canBuildVariableOptionTypeBool(e))
-                          _buildVariableOptionTypeBool(e, attributes),
-                      ]),
+                      title: Row(
+                        children: [
+                          _buildTypeDescription(e, context),
+                          const SizedBox(width: 8),
+                          _buildNameDescription(e, context),
+                          const SizedBox(width: 8),
+                          _buildIsRequired(e, context),
+                          const SizedBox(width: 8),
+                          if (_canBuildVariableOptionTypeBool(e))
+                            _buildVariableOptionTypeBool(e, attributes),
+                        ],
+                      ),
                       // leading: Container(),
                       trailing: _canBuildVariableOptionTypeBool(e)
                           ? _isVariableNubable(e, attributes)
@@ -71,8 +73,9 @@ class AttributesVariantWidget extends StatelessWidget {
                           Row(
                             children: [
                               Expanded(
-                                  child:
-                                      _buildChangeAction(context, e, attributes)),
+                                child:
+                                    _buildChangeAction(context, e, attributes),
+                              ),
                               _isVariableNubable(e, attributes),
                             ],
                           ),
@@ -206,6 +209,16 @@ class AttributesVariantWidget extends StatelessWidget {
           ),
           Text('${va.end}'),
         ],
+      );
+    }
+
+    if (e.variableOptionType is FunctionType) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16, top: 8),
+        child: Text((e.variableOptionType as FunctionType)
+            .function
+            .runtimeType
+            .toString()),
       );
     }
 

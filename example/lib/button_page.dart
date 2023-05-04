@@ -13,11 +13,13 @@ class ButtonPage extends StatefulWidget {
 class _ButtonPageState extends Storybook<ButtonPage> {
   @override
   List<AttributeDto> attributes = [
-    AttributeDto(
-      type: 'Function()',
+    AttributeDto.function(
       name: 'onPressed',
       required: true,
       builders: ['elevated', 'outline', 'text'],
+      function: (int a, String b) {
+        return 0;
+      },
     ),
     AttributeDto(
       type: 'String',
@@ -33,7 +35,7 @@ class _ButtonPageState extends Storybook<ButtonPage> {
       builders: ['elevated', 'outline', 'text'],
     ),
     AttributeDto.rangeDoubleInterval(
-      type: 'double?',
+      canBeNull: true,
       name: 'borderRadius',
       selectedValue: 0,
       builders: ['elevated', 'outline'],
