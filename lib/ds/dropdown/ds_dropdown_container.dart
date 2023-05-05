@@ -79,7 +79,6 @@ class _DSDropdownContainerState extends State<DSDropdownContainer>
           _animationController.forward();
           setState(() {
             _floatingDropdown = _createFloatingDropdown();
-            Overlay.of(context).insert(_floatingDropdown);
           });
         } else {
           _animationController.reverse().then(

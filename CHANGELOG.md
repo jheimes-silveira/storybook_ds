@@ -1,4 +1,7 @@
-## 0.0.10 - Incluir visualização de Wrap 
+## 0.0.11 - Incluir visualização de Wrap 
+- Correção de problema de compatibilidade de SDK 3.3.10
+
+## 0.0.10 - Incluir visualização de Wrap
 - Incluir tabela com valores das variaveis do componente
 
 ## 0.0.9 - Incluir visualização de Wrap 

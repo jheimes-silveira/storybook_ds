@@ -143,21 +143,6 @@ class AttributesVariantTableWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: ExpansionTile(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(
-            color: Colors.grey,
-            width: 1,
-          ),
-        ),
-        collapsedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(
-            color: Colors.grey,
-            width: 1,
-          ),
-        ),
-
         childrenPadding: EdgeInsets.only(left: padding),
         tilePadding: EdgeInsets.only(left: padding, right: padding),
         expandedAlignment: Alignment.centerLeft,

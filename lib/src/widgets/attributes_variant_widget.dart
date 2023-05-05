@@ -30,56 +30,50 @@ class AttributesVariantWidget extends StatelessWidget {
                 .map(
                   (e) => Padding(
                     padding: const EdgeInsets.only(top: 8.0),
-                    child: ExpansionTile(
-                      shape: RoundedRectangleBorder(
+                    child: Container(
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        side: const BorderSide(
-                          color: Colors.grey,
+                        border: Border.all(
                           width: 1,
+                          color: Colors.grey,
                         ),
                       ),
-                      collapsedShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: const BorderSide(
-                          color: Colors.grey,
-                          width: 1,
+                      child: ExpansionTile(
+                        childrenPadding: const EdgeInsets.only(left: 8),
+                        tilePadding: const EdgeInsets.only(left: 8, right: 8),
+                        expandedAlignment: Alignment.centerLeft,
+                        title: Row(
+                          children: [
+                            _buildTypeDescription(e, context),
+                            const SizedBox(width: 8),
+                            _buildNameDescription(e, context),
+                            const SizedBox(width: 8),
+                            _buildIsRequired(e, context),
+                            const SizedBox(width: 8),
+                            if (_canBuildVariableOptionTypeBool(e))
+                              _buildVariableOptionTypeBool(e, attributes),
+                          ],
                         ),
-                      ),
+                        // leading: Container(),
+                        trailing: _canBuildVariableOptionTypeBool(e)
+                            ? _isVariableNubable(e, attributes)
+                            : (_canBuildVariableOption(e)
+                                ? null
+                                : const SizedBox()),
 
-                      childrenPadding: const EdgeInsets.only(left: 8),
-                      tilePadding: const EdgeInsets.only(left: 8, right: 8),
-                      expandedAlignment: Alignment.centerLeft,
-                      title: Row(
                         children: [
-                          _buildTypeDescription(e, context),
-                          const SizedBox(width: 8),
-                          _buildNameDescription(e, context),
-                          const SizedBox(width: 8),
-                          _buildIsRequired(e, context),
-                          const SizedBox(width: 8),
-                          if (_canBuildVariableOptionTypeBool(e))
-                            _buildVariableOptionTypeBool(e, attributes),
+                          if (!_canBuildVariableOptionTypeBool(e))
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildChangeAction(
+                                      context, e, attributes),
+                                ),
+                                _isVariableNubable(e, attributes),
+                              ],
+                            ),
                         ],
                       ),
-                      // leading: Container(),
-                      trailing: _canBuildVariableOptionTypeBool(e)
-                          ? _isVariableNubable(e, attributes)
-                          : (_canBuildVariableOption(e)
-                              ? null
-                              : const SizedBox()),
-
-                      children: [
-                        if (!_canBuildVariableOptionTypeBool(e))
-                          Row(
-                            children: [
-                              Expanded(
-                                child:
-                                    _buildChangeAction(context, e, attributes),
-                              ),
-                              _isVariableNubable(e, attributes),
-                            ],
-                          ),
-                      ],
                     ),
                   ),
                 )
