@@ -1,4 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:quill_html_editor/quill_html_editor.dart';
+
 class AttributeDto {
   final String type;
   final String name;
@@ -134,6 +139,51 @@ class AttributeDto {
       variableOptionType: RangeDoubleIntervalType(begin, end),
     );
   }
+  factory AttributeDto.html({
+    required String name,
+    bool canBeNull = false,
+    String? description,
+    List<String?> builders = const [],
+    bool required = false,
+    String? selectedValue,
+    String? defaultValue,
+  }) {
+    return AttributeDto._raw(
+      type: 'String${canBeNull ? '?' : ''}',
+      name: name,
+      variableOptions: [
+        VariableOption(value: selectedValue),
+      ],
+      selectedValue: VariableOption(value: selectedValue),
+      defaultValue: VariableOption(value: defaultValue),
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: HtmlType(),
+    );
+  }
+
+  factory AttributeDto.color({
+    required String name,
+    bool canBeNull = false,
+    String? description,
+    List<String?> builders = const [],
+    bool required = false,
+    Color? selectedValue,
+    Color? defaultValue,
+  }) {
+    return AttributeDto._raw(
+      type: 'Color${canBeNull ? '?' : ''}',
+      name: name,
+      variableOptions: [VariableOption(value: Colors.white)],
+      selectedValue: VariableOption(value: selectedValue),
+      defaultValue: VariableOption(value: defaultValue),
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: ColorType(),
+    );
+  }
 
   AttributeDto._raw({
     required this.type,
@@ -171,6 +221,8 @@ class StringType extends VariableOptionType {
   });
 }
 
+class ColorType extends VariableOptionType {}
+
 class RangeIntIntervalType extends VariableOptionType {
   int begin;
   int end;
@@ -187,6 +239,11 @@ class RangeDoubleIntervalType extends VariableOptionType {
     this.begin,
     this.end,
   );
+}
+
+class HtmlType extends VariableOptionType {
+  final QuillEditorController controller = QuillEditorController();
+  bool canUpdateOnChange = false;
 }
 
 class WrapType extends VariableOptionType {}

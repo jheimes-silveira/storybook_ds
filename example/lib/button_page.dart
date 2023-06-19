@@ -34,6 +34,18 @@ class _ButtonPageState extends Storybook<ButtonPage> {
       selectedValue: VariableOption(value: false),
       builders: ['elevated', 'outline', 'text'],
     ),
+    AttributeDto.html(
+      canBeNull: true,
+      name: 'teste',
+      selectedValue: 'Labore <b>dolore</b> dolor sit <b>labore</b> eos sit sanctus. Dolores sed sit et dolore est et clita et, rebum et aliquyam.',
+      builders: ['elevated'],
+    ),
+    AttributeDto.html(
+      canBeNull: false,
+      name: 'teste2',
+      selectedValue: 'Labore <b>dolore</b> dolor sit <b>labore</b> eos sit sanctus. Dolores sed sit et dolore est et clita et, rebum et aliquyam.',
+      builders: ['elevated'],
+    ),
     AttributeDto.rangeDoubleInterval(
       canBeNull: true,
       name: 'borderRadius',
@@ -42,33 +54,10 @@ class _ButtonPageState extends Storybook<ButtonPage> {
       begin: 0,
       end: 20,
     ),
-    AttributeDto(
-      type: 'Color?',
+    AttributeDto.color(
+      canBeNull: true,
       name: 'color',
       builders: ['elevated'],
-      selectedValue: VariableOption(value: null),
-      variableOptions: [
-        VariableOption(
-          value: Colors.amber,
-          textInDisplay: 'Colors.amber',
-          textInSelectedOptions: 'amber',
-        ),
-        VariableOption(
-          value: Colors.black,
-          textInDisplay: 'Colors.black',
-          textInSelectedOptions: 'black',
-        ),
-        VariableOption(
-          value: Colors.red,
-          textInDisplay: 'Colors.red',
-          textInSelectedOptions: 'red',
-        ),
-        VariableOption(
-          value: Colors.green,
-          textInDisplay: 'Colors.green',
-          textInSelectedOptions: 'green',
-        ),
-      ],
     ),
     AttributeDto(
       type: 'Color?',

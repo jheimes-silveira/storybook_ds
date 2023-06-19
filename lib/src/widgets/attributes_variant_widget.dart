@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:quill_html_editor/quill_html_editor.dart';
 import 'package:storybook_ds/src/widgets/custom_chip_selected.dart';
 
 import '../../storybook_ds.dart';
@@ -13,6 +15,8 @@ class AttributesVariantWidget extends StatelessWidget {
     required this.onAttributes,
     this.constructor,
   }) : super(key: key);
+// create some values
+// ValueChanged<Color> callback
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +46,16 @@ class AttributesVariantWidget extends StatelessWidget {
                         childrenPadding: const EdgeInsets.only(left: 8),
                         tilePadding: const EdgeInsets.only(left: 8, right: 8),
                         expandedAlignment: Alignment.centerLeft,
+                        onExpansionChanged: (value) async {
+                          if (e.variableOptionType is HtmlType) {
+                            final html = (e.variableOptionType as HtmlType);
+                            html.canUpdateOnChange = false;
+
+                            Future.delayed(const Duration(milliseconds: 300))
+                                .then((value) => html.controller
+                                    .setText(e.selectedValue?.value));
+                          }
+                        },
                         title: Row(
                           children: [
                             _buildTypeDescription(e, context),
@@ -67,7 +81,10 @@ class AttributesVariantWidget extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: _buildChangeAction(
-                                      context, e, attributes),
+                                    context,
+                                    e,
+                                    attributes,
+                                  ),
                                 ),
                                 _isVariableNubable(e, attributes),
                               ],
@@ -130,6 +147,81 @@ class AttributesVariantWidget extends StatelessWidget {
     AttributeDto e,
     List<AttributeDto> attributes,
   ) {
+    if (e.variableOptionType is HtmlType) {
+      final HtmlType htmlType = e.variableOptionType as HtmlType;
+      final QuillEditorController htmlController = htmlType.controller;
+
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: ToolBar(
+                  controller: htmlController,
+                  padding: const EdgeInsets.all(4),
+                  iconSize: 20,
+                  iconColor: Colors.grey,
+                  activeIconColor: Colors.black,
+                  toolBarConfig: const [
+                    ToolBarStyle.bold,
+                    ToolBarStyle.italic,
+                    ToolBarStyle.underline,
+                    ToolBarStyle.strike,
+                    ToolBarStyle.color,
+                    ToolBarStyle.background,
+                    ToolBarStyle.align,
+                    ToolBarStyle.listOrdered,
+                    ToolBarStyle.listBullet,
+                    ToolBarStyle.link,
+                    ToolBarStyle.image,
+                  ],
+                ),
+              ),
+              Column(
+                children: [
+                  if (e.type.contains('?'))
+                    Switch(
+                      value: e.selectedValue?.value == null ? false : true,
+                      onChanged: (value) {
+                        final html = (e.variableOptionType as HtmlType);
+                        if (value) {
+                          e.selectedValue?.value = '';
+                          html.controller.setText('');
+                        } else {
+                          e.selectedValue?.value = null;
+                          html.controller.clear();
+                          html.canUpdateOnChange = false;
+                        }
+
+                        onAttributes!(attributes);
+                      },
+                    ),
+                ],
+              )
+            ],
+          ),
+          if (e.selectedValue?.value != null)
+            QuillHtmlEditor(
+              controller: htmlController,
+              isEnabled: e.selectedValue?.value != null,
+              minHeight: 200,
+              hintText:'',
+              text: e.selectedValue?.value,
+              onTextChanged: (text) async {
+                final html = e.variableOptionType as HtmlType;
+                if (e.selectedValue?.value != text) {
+                  if (html.canUpdateOnChange) {
+                    e.selectedValue?.value = text;
+                  } else {
+                    html.canUpdateOnChange = true;
+                  }
+                  onAttributes!(attributes);
+                }
+              },
+            ),
+        ],
+      );
+    }
     if (e.type == 'String' || e.type == 'String?') {
       final c = TextEditingController(
         text: e.selectedValue?.value ?? '',
@@ -215,6 +307,33 @@ class AttributesVariantWidget extends StatelessWidget {
             .toString()),
       );
     }
+    if (e.variableOptionType is ColorType) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16, top: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                _showDialogChangeColor(context, e);
+              },
+              child: Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: e.selectedValue?.value,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.black,
+                    width: 1,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     if (e.variableOptions != null) {
       return Padding(
@@ -263,6 +382,10 @@ class AttributesVariantWidget extends StatelessWidget {
     AttributeDto e,
     List<AttributeDto> attributes,
   ) {
+    //TODO refatorar para strategy no futuro
+    if (e.variableOptionType is HtmlType) {
+      return const SizedBox();
+    }
     if (e.type.contains('?')) {
       return Switch(
         value: e.selectedValue?.value == null ? false : true,
@@ -292,6 +415,35 @@ class AttributesVariantWidget extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  _showDialogChangeColor(BuildContext context, AttributeDto e) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: e.selectedValue?.value ?? Colors.white,
+              onColorChanged: (color) {
+                if (onAttributes != null) {
+                  e.selectedValue?.value = color;
+                  onAttributes!(attributes);
+                }
+              },
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text('Fechar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
