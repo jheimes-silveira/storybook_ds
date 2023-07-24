@@ -1,3 +1,6 @@
+## 0.0.14 - Incluir visualização de Wrap 
+- Ajustar visualização para dispositivo mobile 
+
 ## 0.0.11 - Incluir visualização de Wrap 
 - Correção de problema de compatibilidade de SDK 3.3.10
 

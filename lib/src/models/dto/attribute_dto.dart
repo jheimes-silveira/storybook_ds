@@ -2,7 +2,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:quill_html_editor/quill_html_editor.dart';
 
 class AttributeDto {
   final String type;
@@ -242,7 +241,6 @@ class RangeDoubleIntervalType extends VariableOptionType {
 }
 
 class HtmlType extends VariableOptionType {
-  final QuillEditorController controller = QuillEditorController();
   bool canUpdateOnChange = false;
 }
 

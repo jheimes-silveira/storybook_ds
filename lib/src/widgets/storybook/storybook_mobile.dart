@@ -1,10 +1,9 @@
 import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
-import 'package:storybook_ds/src/widgets/attributes_variant_table_widget.dart';
 
-import 'models/dto/attribute_dto.dart';
-import 'utils/utils.dart';
-import 'widgets/content_widget.dart';
+import '../../models/dto/attribute_dto.dart';
+import '../../utils/utils.dart';
+import '../content_widget.dart';
 
 abstract class Storybook<T extends StatefulWidget> extends State {
   String? selectedConstructor;
@@ -36,47 +35,40 @@ abstract class Storybook<T extends StatefulWidget> extends State {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height * 0.8;
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: height,
-                  child: SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 450,
-                        minWidth: 450,
-                      ),
-                      child: _buildContent(),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: _buildDevice(height),
-                  ),
-                ),
-              ],
+    return DefaultTabController(
+      length: 3,
+      initialIndex: 1,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          bottom: const TabBar(
+            labelColor: Colors.black,
+            tabs: <Widget>[
+              Tab(
+                text: 'Atributos',
+              ),
+              Tab(
+                text: 'Componente',
+              ),
+              Tab(
+                text: 'Código',
+              ),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: <Widget>[
+            Center(
+              child: _buildContent(),
             ),
-            _buildPreviewCode(),
-            // AttributesVariantTableWidget(
-            //   attributes: attributes,
-            //   onAttributes: (attributes) {
-            //     onUpdateAttributes(attributes);
-            //   },
-            // ),
+            Center(
+              child: buildComponentWidget(context),
+            ),
+            Center(
+              child: _buildPreviewCode(),
+            ),
           ],
         ),
       ),

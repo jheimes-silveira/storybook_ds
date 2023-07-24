@@ -1,7 +1,7 @@
 name: storybook_ds
 description: Storybook Uma forma de apresentar os componentes de qualquer Design System
 homepage: https://github.com/jheimes-silveira/storybook_ds
-version: 1.0.0+12
+version: 1.0.0+14
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -12,7 +12,7 @@ dependencies:
   scrollable_table_view: ^1.0.1
   device_frame: ^1.1.0
   flutter_colorpicker: ^1.0.3
-  quill_html_editor: ^2.1.9
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
