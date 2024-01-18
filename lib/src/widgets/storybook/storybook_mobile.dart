@@ -149,7 +149,7 @@ abstract class Storybook<T extends StatefulWidget> extends State {
         .where(
           (e) {
             final constructor = e.builders.isEmpty ||
-                e.builders.contains(this.selectedConstructor);
+                e.builders.contains(selectedConstructor);
             final ignoreInDisplay = e.selectedValue?.ignoreInDisplay ?? true;
             return constructor && !ignoreInDisplay;
           },
@@ -157,21 +157,8 @@ abstract class Storybook<T extends StatefulWidget> extends State {
         .map((e) => "\n    ${e.name}: ${e.toStringValue},")
         .join();
     final constructor =
-        this.selectedConstructor == null ? '' : '.${this.selectedConstructor}';
+        selectedConstructor == null ? '' : '.$selectedConstructor';
     final nameClass = nameObjectInDisplay;
     return "$nameClass$constructor($atributes\n)";
-  }
-
-  Widget _buildDevice(double height) {
-    return SizedBox(
-      height: height,
-      child: DeviceFrame(
-        isFrameVisible: true,
-        device: Devices.android.samsungGalaxyNote20Ultra,
-        screen: Builder(
-          builder: (deviceContext) => buildComponentWidget(deviceContext),
-        ),
-      ),
-    );
   }
 }

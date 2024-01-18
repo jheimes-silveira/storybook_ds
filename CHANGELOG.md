@@ -1,3 +1,6 @@
+## 0.0.15 - Incluir scala e layout do display
+- Incluir ferramentas de ajustes de scala e redirecionamento de layout do display
+
 ## 0.0.14 - Incluir visualização de Wrap 
 - Ajustar visualização para dispositivo mobile 
 

@@ -81,6 +81,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.0"
+  input_slider:
+    dependency: transitive
+    description:
+      name: input_slider
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.1"
   json_annotation:
     dependency: transitive
     description:
@@ -155,7 +162,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.0+14"
+    version: "1.0.0+15"
   stream_channel:
     dependency: transitive
     description:

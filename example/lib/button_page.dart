@@ -25,7 +25,7 @@ class _ButtonPageState extends Storybook<ButtonPage> {
       type: 'String',
       name: 'text',
       required: true,
-      selectedValue: VariableOption(value: 'Custom Buttom'),
+      selectedValue: VariableOption(value: 'Custom button'),
       builders: ['elevated', 'outline', 'text'],
     ),
     AttributeDto(

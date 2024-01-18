@@ -1,5 +1,7 @@
 import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
+import 'package:input_slider/input_slider.dart';
+import 'package:input_slider/input_slider_form.dart';
 
 import '../../models/dto/attribute_dto.dart';
 import '../../utils/utils.dart';
@@ -27,6 +29,11 @@ abstract class Storybook<T extends StatefulWidget> extends State {
     return attribute.selectedValue?.value;
   }
 
+  bool _showSettings = false;
+  double _displayScale = 1;
+  double _displayWidth = 320;
+  double _displayHeight = 560;
+
   @protected
   @mustCallSuper
   void onUpdateAttributes(List<AttributeDto> attributes) {
@@ -42,6 +49,20 @@ abstract class Storybook<T extends StatefulWidget> extends State {
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _showSettings = !_showSettings;
+              });
+            },
+            icon: const Icon(
+              Icons.settings,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(width: 32),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -66,6 +87,57 @@ abstract class Storybook<T extends StatefulWidget> extends State {
                   child: SingleChildScrollView(
                     child: _buildDevice(height),
                   ),
+                ),
+                Column(
+                  children: [
+                    AnimatedContainer(
+                        padding: const EdgeInsets.only(right: 32, top: 32),
+                        height: _showSettings
+                            ? MediaQuery.of(context).size.height * 0.4
+                            : 0.0,
+                        duration: const Duration(milliseconds: 500),
+                        child: InputSliderForm(
+                          leadingWeight: 1,
+                          sliderWeight: 20,
+                          filled: true,
+                          vertical: true,
+                          children: [
+                            InputSlider(
+                              onChange: (value) {
+                                setState(() {
+                                  _displayScale = value;
+                                });
+                              },
+                              min: 0.1,
+                              max: 1.5,
+                              defaultValue: 1.0,
+                              leading: const Text("scale"),
+                            ),
+                            InputSlider(
+                              onChange: (value) {
+                                setState(() {
+                                  _displayWidth = value;
+                                });
+                              },
+                              min: 150.0,
+                              max: 3000.0,
+                              defaultValue: 320.0,
+                              leading: const Text("width"),
+                            ),
+                            InputSlider(
+                              onChange: (value) {
+                                setState(() {
+                                  _displayHeight = value;
+                                });
+                              },
+                              leading: const Text("height"),
+                              min: 250.0,
+                              max: 3000.0,
+                              defaultValue: 560,
+                            ),
+                          ],
+                        )),
+                  ],
                 ),
               ],
             ),
@@ -155,8 +227,8 @@ abstract class Storybook<T extends StatefulWidget> extends State {
     final atributes = attributes
         .where(
           (e) {
-            final constructor = e.builders.isEmpty ||
-                e.builders.contains(this.selectedConstructor);
+            final constructor =
+                e.builders.isEmpty || e.builders.contains(selectedConstructor);
             final ignoreInDisplay = e.selectedValue?.ignoreInDisplay ?? true;
             return constructor && !ignoreInDisplay;
           },
@@ -164,19 +236,32 @@ abstract class Storybook<T extends StatefulWidget> extends State {
         .map((e) => "\n    ${e.name}: ${e.toStringValue},")
         .join();
     final constructor =
-        this.selectedConstructor == null ? '' : '.${this.selectedConstructor}';
+        selectedConstructor == null ? '' : '.$selectedConstructor';
     final nameClass = nameObjectInDisplay;
     return "$nameClass$constructor($atributes\n)";
   }
 
   Widget _buildDevice(double height) {
-    return SizedBox(
-      height: height,
-      child: DeviceFrame(
-        isFrameVisible: true,
-        device: Devices.android.samsungGalaxyNote20Ultra,
-        screen: Builder(
-          builder: (deviceContext) => buildComponentWidget(deviceContext),
+    return Padding(
+      padding: const EdgeInsets.only(top: 32),
+      child: SizedBox(
+        height: height,
+        child: DeviceFrame(
+          isFrameVisible: true,
+          device: DeviceInfo.genericPhone(
+            platform: TargetPlatform.windows,
+            name: 'Medium',
+            id: 'medium',
+            screenSize: Size(_displayWidth, _displayHeight),
+          ),
+          screen: Builder(
+            builder: (deviceContext) => Scaffold(
+              body: Transform.scale(
+                scale: _displayScale,
+                child: buildComponentWidget(deviceContext),
+              ),
+            ),
+          ),
         ),
       ),
     );
