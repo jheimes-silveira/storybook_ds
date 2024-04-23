@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'button_page.dart';
+import 'custom_card_storybook.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(),
       debugShowCheckedModeBanner: false,
-      home: const ButtonPage(),
+      home: const CustomCardStorybook(),
     );
   }
 }

@@ -155,27 +155,57 @@ class AttributesVariantWidget extends StatelessWidget {
 
       return Padding(
         padding: const EdgeInsets.only(bottom: 16, right: 16.0),
-        child: TextField(
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-              borderSide: BorderSide(color: Colors.grey),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+              ),
+              key: Key(e.name),
+              controller: c,
+              enabled: e.selectedValue?.value == null ? false : true,
+              onChanged: (text) {
+                if (onAttributes != null) {
+                  e.selectedValue = e.selectedValue?.copyWith(
+                    value: text,
+                  );
+                  onAttributes!(attributes);
+                  c.selection = TextSelection.fromPosition(
+                    TextPosition(offset: c.selection.baseOffset),
+                  );
+                }
+              },
             ),
-          ),
-          key: Key(e.name),
-          controller: c,
-          enabled: e.selectedValue?.value == null ? false : true,
-          onChanged: (text) {
-            if (onAttributes != null) {
-              e.selectedValue = e.selectedValue?.copyWith(
-                value: text,
-              );
-              onAttributes!(attributes);
-              c.selection = TextSelection.fromPosition(
-                TextPosition(offset: c.selection.baseOffset),
-              );
-            }
-          },
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16, top: 8),
+              child: Wrap(
+                alignment: WrapAlignment.start,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                spacing: 8,
+                runAlignment: WrapAlignment.start,
+                runSpacing: 8,
+                children: e.variableOptions!
+                    .map(
+                      (e2) => CustomChipSelected(
+                          label: e2.textInSelectedOptions,
+                          selected: e.selectedValue?.value == e2.value,
+                          onTap: () {
+                            if (onAttributes != null) {
+                              e.selectedValue = e2;
+
+                              onAttributes!(attributes);
+                            }
+                          }),
+                    )
+                    .toList(),
+              ),
+            ),
+          ],
         ),
       );
     }

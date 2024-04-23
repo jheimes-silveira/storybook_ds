@@ -30,9 +30,8 @@ abstract class Storybook<T extends StatefulWidget> extends State {
   }
 
   bool _showSettings = false;
-  double _displayScale = 1;
-  double _displayWidth = 320;
-  double _displayHeight = 560;
+  double _displayWidth = 412;
+  double _displayHeight = 732;
 
   @protected
   @mustCallSuper
@@ -46,7 +45,6 @@ abstract class Storybook<T extends StatefulWidget> extends State {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
         actions: [
@@ -105,24 +103,14 @@ abstract class Storybook<T extends StatefulWidget> extends State {
                             InputSlider(
                               onChange: (value) {
                                 setState(() {
-                                  _displayScale = value;
-                                });
-                              },
-                              min: 0.1,
-                              max: 1.5,
-                              defaultValue: 1.0,
-                              leading: const Text("scale"),
-                            ),
-                            InputSlider(
-                              onChange: (value) {
-                                setState(() {
                                   _displayWidth = value;
                                 });
                               },
                               min: 150.0,
                               max: 3000.0,
-                              defaultValue: 320.0,
-                              leading: const Text("width"),
+                              defaultValue: 412,
+                              leading: const Icon(Icons.width_normal_rounded),
+                              leadingWeight: 2,
                             ),
                             InputSlider(
                               onChange: (value) {
@@ -130,10 +118,11 @@ abstract class Storybook<T extends StatefulWidget> extends State {
                                   _displayHeight = value;
                                 });
                               },
-                              leading: const Text("height"),
+                              leading: const Icon(Icons.height_rounded),
+                              leadingWeight: 2,
                               min: 250.0,
                               max: 3000.0,
-                              defaultValue: 560,
+                              defaultValue: 732,
                             ),
                           ],
                         )),
@@ -180,7 +169,7 @@ abstract class Storybook<T extends StatefulWidget> extends State {
         children: [
           Card(
             elevation: 0,
-            color: Colors.grey[800],
+            color: Colors.grey.shade900,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
@@ -192,10 +181,10 @@ abstract class Storybook<T extends StatefulWidget> extends State {
                         Expanded(
                           child: SelectableText(
                             updatePreviewCode(),
-                            style:
-                                Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: Colors.white,
-                                    ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(color: Colors.white),
                           ),
                         ),
                       ],
@@ -249,18 +238,16 @@ abstract class Storybook<T extends StatefulWidget> extends State {
         child: DeviceFrame(
           isFrameVisible: true,
           device: DeviceInfo.genericPhone(
-            platform: TargetPlatform.windows,
+            screenSize: Size(
+              _displayWidth,
+              _displayHeight,
+            ),
             name: 'Medium',
             id: 'medium',
-            screenSize: Size(_displayWidth, _displayHeight),
+            platform: TargetPlatform.windows,
           ),
           screen: Builder(
-            builder: (deviceContext) => Scaffold(
-              body: Transform.scale(
-                scale: _displayScale,
-                child: buildComponentWidget(deviceContext),
-              ),
-            ),
+            builder: (deviceContext) => buildComponentWidget(deviceContext),
           ),
         ),
       ),

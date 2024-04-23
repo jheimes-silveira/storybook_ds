@@ -138,29 +138,6 @@ class AttributeDto {
       variableOptionType: RangeDoubleIntervalType(begin, end),
     );
   }
-  factory AttributeDto.html({
-    required String name,
-    bool canBeNull = false,
-    String? description,
-    List<String?> builders = const [],
-    bool required = false,
-    String? selectedValue,
-    String? defaultValue,
-  }) {
-    return AttributeDto._raw(
-      type: 'String${canBeNull ? '?' : ''}',
-      name: name,
-      variableOptions: [
-        VariableOption(value: selectedValue),
-      ],
-      selectedValue: VariableOption(value: selectedValue),
-      defaultValue: VariableOption(value: defaultValue),
-      builders: builders,
-      description: description,
-      required: required,
-      variableOptionType: HtmlType(),
-    );
-  }
 
   factory AttributeDto.color({
     required String name,
