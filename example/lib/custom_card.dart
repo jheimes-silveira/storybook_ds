@@ -47,7 +47,6 @@ class CustomCard extends StatefulWidget {
   final double? height;
 
   const CustomCard({
-    super.key,
     required this.title,
     this.description,
     this.style = StyleCustomCard.outline,
@@ -57,7 +56,8 @@ class CustomCard extends StatefulWidget {
     this.textNegative,
     this.width,
     this.height,
-  });
+    Key? key,
+  }) : super(key: key);
 
   factory CustomCard.outline({
     required String title,
