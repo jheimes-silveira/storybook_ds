@@ -1,3 +1,6 @@
+## 0.0.16 - Incluir scala e layout do display
+- Incluir opção de sugestões quando o tipo for String
+
 ## 0.0.15 - Incluir scala e layout do display
 - Incluir ferramentas de ajustes de scala e redirecionamento de layout do display
 
