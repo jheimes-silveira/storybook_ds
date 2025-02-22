@@ -8,12 +8,12 @@ class DeviceWidget extends StatefulWidget {
   final double height;
 
   const DeviceWidget({
-    Key? key,
+    super.key,
     required this.buildComponentWidget,
     this.margin,
     required this.width,
     required this.height,
-  }) : super(key: key);
+  });
 
   @override
   State<DeviceWidget> createState() => _DeviceWidgetState();

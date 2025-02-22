@@ -2,34 +2,47 @@ import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
 import 'package:input_slider/input_slider.dart';
 import 'package:input_slider/input_slider_form.dart';
+import 'package:storybook_ds/src/models/multiple_theme_settings.dart';
 
 import '../../models/dto/attribute_dto.dart';
 import '../../utils/utils.dart';
 import '../content_widget.dart';
 
-abstract class Storybook<T extends StatefulWidget> extends State {
+abstract class Storybook<T extends StatefulWidget> extends State<T> {
+  /// Construtor selecionado, porem quando não possui nenhum construtor selecionado o padão é null
   String? selectedConstructor;
 
+  /// Título do Storybook.
   String get title;
 
+  /// Descrição do Storybook.
   String get description => '';
 
-  ThemeData get light => ThemeData.light();
+  /// Multiplos themas
+  MultipleThemeSettings? multipleThemeSettings;
 
-  ThemeData get dark => ThemeData.dark();
-
+  /// Lista de atributos do Storybook.
   List<AttributeDto> get attributes;
 
+  /// Nome do objeto em exibição.
   String get nameObjectInDisplay;
 
+  /// Constrói o widget do componente.
   Widget buildComponentWidget(BuildContext context);
 
-  getWhereAttribut(String name) {
-    final attribute = attributes.where((e) => e.name == name).first;
-    return attribute.selectedValue?.value;
+  bool _showSettings = false;
+  bool _showDeviceInDisplay = true;
+
+  bool get showSettings => _showSettings && _showDeviceInDisplay;
+  bool get showDeviceInDisplay => _showDeviceInDisplay;
+
+  set showSettings(bool value) => _showSettings = value;
+
+  set showDeviceInDisplay(bool value) {
+    _showDeviceInDisplay = value;
+    if (_showDeviceInDisplay == false) _showSettings = false;
   }
 
-  bool _showSettings = false;
   double _displayWidth = 412;
   double _displayHeight = 732;
 
@@ -39,29 +52,19 @@ abstract class Storybook<T extends StatefulWidget> extends State {
     setState(() {});
   }
 
+  void onUpdateTheme(MultipleThemeSettings multipleThemeSettings) {}
+
+  dynamic getWhereAttribut(String name) {
+    final attribute = attributes.firstWhere((e) => e.name == name);
+    return attribute.selectedValue?.value;
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height * 0.8;
 
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _showSettings = !_showSettings;
-              });
-            },
-            icon: const Icon(
-              Icons.settings,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(width: 32),
-        ],
-      ),
+      appBar: _buildAppBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -82,71 +85,118 @@ abstract class Storybook<T extends StatefulWidget> extends State {
                   ),
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: _buildDevice(height),
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        child: _buildDevice(context, height),
+                      ),
+                      _buildSettingsDimensionDeviceInDisplay(context),
+                    ],
                   ),
-                ),
-                Column(
-                  children: [
-                    AnimatedContainer(
-                        padding: const EdgeInsets.only(right: 32, top: 32),
-                        height: _showSettings
-                            ? MediaQuery.of(context).size.height * 0.4
-                            : 0.0,
-                        duration: const Duration(milliseconds: 500),
-                        child: InputSliderForm(
-                          leadingWeight: 1,
-                          sliderWeight: 20,
-                          filled: true,
-                          vertical: true,
-                          children: [
-                            InputSlider(
-                              onChange: (value) {
-                                setState(() {
-                                  _displayWidth = value;
-                                });
-                              },
-                              min: 150.0,
-                              max: 3000.0,
-                              defaultValue: 412,
-                              leading: const Icon(Icons.width_normal_rounded),
-                              leadingWeight: 2,
-                            ),
-                            InputSlider(
-                              onChange: (value) {
-                                setState(() {
-                                  _displayHeight = value;
-                                });
-                              },
-                              leading: const Icon(Icons.height_rounded),
-                              leadingWeight: 2,
-                              min: 250.0,
-                              max: 3000.0,
-                              defaultValue: 732,
-                            ),
-                          ],
-                        )),
-                  ],
                 ),
               ],
             ),
             _buildPreviewCode(),
-            // AttributesVariantTableWidget(
-            //   attributes: attributes,
-            //   onAttributes: (attributes) {
-            //     onUpdateAttributes(attributes);
-            //   },
-            // ),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildSettingsDimensionDeviceInDisplay(BuildContext context) {
+    return Positioned(
+      right: 0,
+      top: 0,
+      child: AnimatedContainer(
+        padding: const EdgeInsets.only(right: 32, top: 32),
+        height: showSettings ? MediaQuery.of(context).size.height * 0.4 : 0.0,
+        duration: const Duration(milliseconds: 500),
+        child: InputSliderForm(
+          leadingWeight: 1,
+          sliderWeight: 20,
+          filled: true,
+          vertical: true,
+          children: [
+            InputSlider(
+              onChange: (value) {
+                setState(() {
+                  _displayWidth = value;
+                });
+              },
+              min: 150.0,
+              max: 3000.0,
+              defaultValue: 412,
+              leading: const Icon(Icons.width_normal_rounded),
+              leadingWeight: 2,
+            ),
+            InputSlider(
+              onChange: (value) {
+                setState(() {
+                  _displayHeight = value;
+                });
+              },
+              leading: const Icon(Icons.height_rounded),
+              leadingWeight: 2,
+              min: 250.0,
+              max: 3000.0,
+              defaultValue: 732,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      actions: [
+        IconButton(
+          onPressed: () {
+            setState(() {
+              showDeviceInDisplay = !showDeviceInDisplay;
+            });
+          },
+          icon: Icon(
+            showDeviceInDisplay ? Icons.mobile_screen_share : Icons.mobile_off,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(width: 24),
+        Opacity(
+          opacity: showDeviceInDisplay ? 1 : 0.5,
+          child: AbsorbPointer(
+            absorbing: !showDeviceInDisplay,
+            child: IconButton(
+              onPressed: () {
+                setState(() {
+                  showSettings = !showSettings;
+                });
+              },
+              icon: const Icon(
+                Icons.settings,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 24),
+      ],
+    );
+  }
+
   Widget _buildContent() {
     return ContentWidget(
+      multipleThemeSettings: multipleThemeSettings,
+      onUpdateTheme: (MultipleThemeSettings multipleThemeSettings) {
+        setState(() {
+          this.multipleThemeSettings = multipleThemeSettings;
+          onUpdateTheme(multipleThemeSettings);
+        });
+      },
       attributes: attributes,
-      onAttributes: (attributes) {
+      onAttributes: (attributes, attribute) {
         onUpdateAttributes(attributes);
       },
       description: description,
@@ -164,7 +214,7 @@ abstract class Storybook<T extends StatefulWidget> extends State {
 
   Widget _buildPreviewCode() {
     return Padding(
-      padding: const EdgeInsets.all(32.0),
+      padding: const EdgeInsets.all(24.0),
       child: Stack(
         children: [
           Card(
@@ -213,42 +263,45 @@ abstract class Storybook<T extends StatefulWidget> extends State {
   @protected
   @mustCallSuper
   String updatePreviewCode() {
-    final atributes = attributes
-        .where(
-          (e) {
-            final constructor =
-                e.builders.isEmpty || e.builders.contains(selectedConstructor);
-            final ignoreInDisplay = e.selectedValue?.ignoreInDisplay ?? true;
-            return constructor && !ignoreInDisplay;
-          },
-        )
+    final attributesString = attributes
+        .where((e) {
+          final constructor =
+              e.builders.isEmpty || e.builders.contains(selectedConstructor);
+          final ignoreInDisplay = e.selectedValue?.ignoreInDisplay ?? true;
+          return constructor && !ignoreInDisplay;
+        })
         .map((e) => "\n    ${e.name}: ${e.toStringValue},")
         .join();
     final constructor =
         selectedConstructor == null ? '' : '.$selectedConstructor';
     final nameClass = nameObjectInDisplay;
-    return "$nameClass$constructor($atributes\n)";
+    return "$nameClass$constructor($attributesString\n)";
   }
 
-  Widget _buildDevice(double height) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 32),
-      child: SizedBox(
-        height: height,
-        child: DeviceFrame(
-          isFrameVisible: true,
-          device: DeviceInfo.genericPhone(
-            screenSize: Size(
-              _displayWidth,
-              _displayHeight,
-            ),
-            name: 'Medium',
-            id: 'medium',
-            platform: TargetPlatform.windows,
-          ),
-          screen: Builder(
-            builder: (deviceContext) => buildComponentWidget(deviceContext),
-          ),
+  Widget _buildDevice(BuildContext context, double height) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 32),
+        child: SizedBox(
+          height: height,
+          child: showDeviceInDisplay
+              ? DeviceFrame(
+                  isFrameVisible: true,
+                  device: DeviceInfo.genericPhone(
+                    screenSize: Size(
+                      _displayWidth,
+                      _displayHeight,
+                    ),
+                    name: 'Medium',
+                    id: 'medium',
+                    platform: TargetPlatform.windows,
+                  ),
+                  screen: Builder(
+                    builder: (deviceContext) =>
+                        buildComponentWidget(deviceContext),
+                  ),
+                )
+              : buildComponentWidget(context),
         ),
       ),
     );

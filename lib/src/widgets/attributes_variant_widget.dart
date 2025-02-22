@@ -6,14 +6,15 @@ import '../../storybook_ds.dart';
 
 class AttributesVariantWidget extends StatelessWidget {
   final List<AttributeDto> attributes;
-  final Function(List<AttributeDto> attributes)? onAttributes;
+  final Function(List<AttributeDto> attributes, AttributeDto attribute)?
+      onAttributes;
   final String? constructor;
   const AttributesVariantWidget({
-    Key? key,
+    super.key,
     required this.attributes,
     required this.onAttributes,
     this.constructor,
-  }) : super(key: key);
+  });
 // create some values
 // ValueChanged<Color> callback
 
@@ -88,8 +89,7 @@ class AttributesVariantWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                )
-                .toList(),
+                ),
             const SizedBox(height: 150),
           ],
         );
@@ -174,7 +174,8 @@ class AttributesVariantWidget extends StatelessWidget {
                   e.selectedValue = e.selectedValue?.copyWith(
                     value: text,
                   );
-                  onAttributes!(attributes);
+                  onAttributes!(attributes, e);
+                  e.onChangeValue?.call(e);
                   c.selection = TextSelection.fromPosition(
                     TextPosition(offset: c.selection.baseOffset),
                   );
@@ -198,7 +199,7 @@ class AttributesVariantWidget extends StatelessWidget {
                             if (onAttributes != null) {
                               e.selectedValue = e2;
 
-                              onAttributes!(attributes);
+                              onAttributes!(attributes, e);
                             }
                           }),
                     )
@@ -237,7 +238,7 @@ class AttributesVariantWidget extends StatelessWidget {
                       e.selectedValue?.value = v.toInt();
                     }
 
-                    onAttributes!(attributes);
+                    onAttributes!(attributes, e);
                   },
                 ),
               ),
@@ -303,7 +304,7 @@ class AttributesVariantWidget extends StatelessWidget {
                       if (onAttributes != null) {
                         e.selectedValue = e2;
 
-                        onAttributes!(attributes);
+                        onAttributes!(attributes, e);
                       }
                     }),
               )
@@ -341,7 +342,7 @@ class AttributesVariantWidget extends StatelessWidget {
         value: e.selectedValue?.value == null ? false : true,
         onChanged: (value) {
           e.selectedValue = value ? (e.variableOptions![0]) : null;
-          onAttributes!(attributes);
+          onAttributes!(attributes, e);
         },
       );
     }
@@ -361,7 +362,7 @@ class AttributesVariantWidget extends StatelessWidget {
           value: e.selectedValue?.value ?? false,
           onChanged: (value) {
             e.selectedValue?.value = value;
-            onAttributes!(attributes);
+            onAttributes!(attributes, e);
           },
         ),
       ),
@@ -379,7 +380,7 @@ class AttributesVariantWidget extends StatelessWidget {
               onColorChanged: (color) {
                 if (onAttributes != null) {
                   e.selectedValue?.value = color;
-                  onAttributes!(attributes);
+                  onAttributes!(attributes, e);
                 }
               },
             ),

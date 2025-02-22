@@ -113,30 +113,27 @@ class CustomCard extends StatefulWidget {
 class _CustomCardState extends State<CustomCard> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(
-        right: 16,
-        left: 16,
-        bottom: 16,
-      ),
-      width: widget.width,
-      height: widget.height,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: widget.style.color,
-        border: widget.style.border,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTitle(),
-          if (widget.description != null && widget.height != null)
-            Expanded(child: _buildDescription()),
-          if (widget.description != null && widget.height == null)
-            _buildDescription(),
-          _buildButtonAction(),
-        ],
+    return Card(
+      child: Container(
+        width: widget.width,
+        height: widget.height,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+         
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTitle(),
+            if (widget.description != null && widget.height != null)
+              Expanded(child: _buildDescription()),
+            if (widget.description != null && widget.height == null)
+              _buildDescription(),
+            _buildButtonAction(),
+          ],
+        ),
       ),
     );
   }
