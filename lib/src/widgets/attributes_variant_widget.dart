@@ -307,6 +307,7 @@ class AttributesVariantWidget extends StatelessWidget {
                         e.selectedValue = e2;
 
                         onAttributes!(attributes, e);
+                        e.onChangeValue?.call(e);
                       }
                     }),
               )
