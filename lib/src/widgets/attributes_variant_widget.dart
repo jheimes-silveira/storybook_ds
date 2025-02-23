@@ -200,6 +200,7 @@ class AttributesVariantWidget extends StatelessWidget {
                               e.selectedValue = e2;
 
                               onAttributes!(attributes, e);
+                              e.onChangeValue?.call(e);
                             }
                           }),
                     )
@@ -239,6 +240,7 @@ class AttributesVariantWidget extends StatelessWidget {
                     }
 
                     onAttributes!(attributes, e);
+                    e.onChangeValue?.call(e);
                   },
                 ),
               ),
@@ -343,6 +345,7 @@ class AttributesVariantWidget extends StatelessWidget {
         onChanged: (value) {
           e.selectedValue = value ? (e.variableOptions![0]) : null;
           onAttributes!(attributes, e);
+          e.onChangeValue?.call(e);
         },
       );
     }
