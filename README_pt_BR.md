@@ -17,7 +17,7 @@ Ou adicione manualmente:
 dependencies:
   flutter:
     sdk: flutter
-  storybook:
+  storybook: {{version}}
 ```
 
 ## Uso
@@ -40,24 +40,24 @@ class ButtonPage extends StatefulWidget {
 class _ButtonPageState extends Storybook<ButtonPage> {...
 ```
 
-Adicione os overrides:
+Adicione os overrides *obrigatorios*:
 
 Título da tela com o nome do componente.
 ```dart
 @override
-String title() => "DS Button";
+String get title => 'DS Button';
 ```
 
 Descrição explicativa do componente.
 ```dart
 @override
-String description() => "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
+String get description => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.';
 ```
 
 Nome da classe do componente que será chamado no código. Display é a parte do storybook onde é mostrado o código do componente.
 ```dart
 @override
-String nameObjectInDisplay() => "DSButton";
+String get nameObjectInDisplay => "DSButton";
 ```
 
 Adicione os atributos do componente, que são representados pela classe AtributeDto (mais detalhes a seguir).
@@ -89,6 +89,55 @@ List<AtributeDto> atributs() {
 }
 ```
 
+Configurações de Tema Múltiplo
+Visão Geral
+Podemos lidar com múltiplos temas dentro do projeto de apresentação. Você pode instanciar as configurações de tema múltiplo conforme mostrado abaixo.
+
+Exemplo de Uso
+```dart
+  @override
+  MultipleThemeSettings? multipleThemeSettings = MultipleThemeSettings(
+    selectableThemes: [
+      ThemeSettings(
+        title: 'Thema 1',
+        light: ThemeData.light(),
+        dark: ThemeData.dark(),
+      ),
+    ],
+  );
+```
+Ao incluir este trecho, você pode selecionar qual tema aplicar no projeto. O tema selecionado é retornado na função onUpdateTheme.
+
+Função de Atualização de Tema
+```dart
+  @override
+  void onUpdateTheme(MultipleThemeSettings multipleThemeSettings) {
+    // TODO: implement
+  }
+```
+## Detalhes das Configurações
+
+- **MultipleThemeSettings**: Classe que gerencia múltiplos temas.
+  - **selectableThemes**: Lista de temas disponíveis para seleção.
+- **ThemeSettings**: Classe que define as configurações de um tema específico.
+  - **title**: Título do tema.
+  - **light**: Configuração do tema claro.
+  - **dark**: Configuração do tema escuro.
+
+ **ThemeSettings**
+ 
+| Nome                | Tipo          | Descrição                                                                 |
+|---------------------|---------------|---------------------------------------------------------------------------|
+| `ThemeSettings`     | `Constructor` | Construtor para inicializar as configurações de tema.                     |
+| `switchThemeMode`   | `bool`        | Retorna `true` se o tema escuro estiver disponível.                       |
+| `data`              | `dynamic`     | Retorna os dados adicionais associados ao tema.                           |
+| `title`             | `String`      | Retorna o título do tema.                                                 |
+| `light`             | `ThemeData`   | Retorna o tema claro.                                                     |
+| `dark`              | `ThemeData`   | Retorna o tema escuro, ou o tema claro se o escuro não estiver definido.  |
+| `isDarkMode`        | `bool`        | Retorna `true` se o modo escuro estiver ativado, caso contrário `false`.  |
+| `currentTheme()`    | `ThemeData`   | Retorna o tema atual com base no estado do modo escuro.                   |
+| `setCurrentTheme()` | `void`        | Define o tema atual com base no valor de `isDarkMode`.                    |
+
 Função chamada ao atualizar algum atributo.
 ```dart
 @override
@@ -106,16 +155,16 @@ Verifique qual o construtor selecionado por meio da variável selectedConstructo
 Widget buildComponentWidget(BuildContext context) {
   if (selectedConstructor == 'elevated') {
     return DSButton.elevated(
-      text: getWhereAtribut(atributs(), 'text'),
-      loading: getWhereAtribut(atributs(), 'loading'),
+      text: getWhereAttribut('text'),
+      loading: getWhereAttribut('loading'),
       onPressed: () {},
     );
   }
 
   if (selectedConstructor == 'outline') {
     return DSButton.outline(
-      text: getWhereAtribut(atributs(), 'text'),
-      loading: getWhereAtribut(atributs(), 'loading'),
+      text: getWhereAttribut('text'),
+      loading: getWhereAttribut('loading'),
       onPressed: () {},
     );
   }
