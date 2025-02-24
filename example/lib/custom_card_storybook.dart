@@ -1,8 +1,74 @@
-import 'package:example/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 import 'custom_card.dart';
+
+final ThemeData customThemeDark = ThemeData.dark().copyWith(
+  buttonTheme: const ButtonThemeData(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.zero, // Cantos quadrados para botões
+    ),
+  ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para ElevatedButton
+      ),
+    ),
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para TextButton
+      ),
+    ),
+  ),
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para OutlinedButton
+      ),
+    ),
+  ),
+  cardTheme: const CardTheme(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.zero, // Cantos quadrados para Cards
+    ),
+  ),
+);
+final ThemeData customThemeLight = ThemeData.light().copyWith(
+  buttonTheme: const ButtonThemeData(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.zero, // Cantos quadrados para botões
+    ),
+  ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para ElevatedButton
+      ),
+    ),
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para TextButton
+      ),
+    ),
+  ),
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para OutlinedButton
+      ),
+    ),
+  ),
+  cardTheme: const CardTheme(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.zero, // Cantos quadrados para Cards
+    ),
+  ),
+);
 
 class CustomCardStorybook extends StatefulWidget {
   final Function(ThemeData theme) onChangeTheme;
@@ -26,8 +92,8 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       ),
       ThemeSettings(
         title: 'Custom theme 1',
-        light: MyThemeExemple.customThemeLight,
-        dark: MyThemeExemple.customThemeDark,
+        light: customThemeLight,
+        dark: customThemeDark,
       ),
       ThemeSettings(
         title: 'Custom theme 2',
