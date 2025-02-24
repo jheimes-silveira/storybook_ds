@@ -1,4 +1,4 @@
-library storybook_ds;
+library;
 
 export 'src/models/dto/attribute_dto.dart';
 export 'src/widgets/storybook/storybook_mobile.dart'

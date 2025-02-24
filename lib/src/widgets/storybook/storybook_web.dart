@@ -28,19 +28,6 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
   /// Constrói o widget do componente.
   Widget buildComponentWidget(BuildContext context);
 
-  bool _showSettings = false;
-  bool _showDeviceInDisplay = true;
-
-  bool get showSettings => _showSettings && _showDeviceInDisplay;
-  bool get showDeviceInDisplay => _showDeviceInDisplay;
-
-  set showSettings(bool value) => _showSettings = value;
-
-  set showDeviceInDisplay(bool value) {
-    _showDeviceInDisplay = value;
-    if (_showDeviceInDisplay == false) _showSettings = false;
-  }
-
   @protected
   @mustCallSuper
   void onUpdateAttributes(List<AttributeDto> attributes) {
@@ -89,45 +76,6 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
           ],
         ),
       ),
-    );
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      actions: [
-        IconButton(
-          onPressed: () {
-            setState(() {
-              showDeviceInDisplay = !showDeviceInDisplay;
-            });
-          },
-          icon: Icon(
-            showDeviceInDisplay ? Icons.mobile_screen_share : Icons.mobile_off,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(width: 24),
-        Opacity(
-          opacity: showDeviceInDisplay ? 1 : 0.5,
-          child: AbsorbPointer(
-            absorbing: !showDeviceInDisplay,
-            child: IconButton(
-              onPressed: () {
-                setState(() {
-                  showSettings = !showSettings;
-                });
-              },
-              icon: const Icon(
-                Icons.settings,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 24),
-      ],
     );
   }
 
@@ -243,24 +191,6 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
             home: buildComponentWidget(context2),
           ),
         ),
-        // child: showDeviceInDisplay
-        //     ? DeviceFrame(
-        //         isFrameVisible: true,
-        //         device: DeviceInfo.genericPhone(
-        //           screenSize: Size(
-        //             _displayWidth,
-        //             _displayHeight,
-        //           ),
-        //           name: 'Medium',
-        //           id: 'medium',
-        //           platform: TargetPlatform.windows,
-        //         ),
-        //         screen: Builder(
-        //           builder: (deviceContext) =>
-        //               buildComponentWidget(deviceContext),
-        //         ),
-        //       )
-        //     : buildComponentWidget(context),
       ),
     );
   }
