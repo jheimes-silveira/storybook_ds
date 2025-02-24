@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: '3.7.5'
+          flutter-version: '3.27.3'
       - run: flutter pub get ./example
       - run: flutter build web -t example/lib/main.dart
       - uses: FirebaseExtended/action-hosting-deploy@v0

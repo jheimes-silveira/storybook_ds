@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:storybook_ds/src/widgets/custom_chip_selected.dart';
 
 import '../../storybook_ds.dart';
@@ -260,33 +259,6 @@ class AttributesVariantWidget extends StatelessWidget {
             .toString()),
       );
     }
-    if (e.variableOptionType is ColorType) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 16, top: 8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                _showDialogChangeColor(context, e);
-              },
-              child: Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: e.selectedValue?.value,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 1,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
 
     if (e.variableOptions != null) {
       return Padding(
@@ -370,35 +342,6 @@ class AttributesVariantWidget extends StatelessWidget {
           },
         ),
       ),
-    );
-  }
-
-  _showDialogChangeColor(BuildContext context, AttributeDto e) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: e.selectedValue?.value ?? Colors.white,
-              onColorChanged: (color) {
-                if (onAttributes != null) {
-                  e.selectedValue?.value = color;
-                  onAttributes!(attributes, e);
-                }
-              },
-            ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              child: const Text('Fechar'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
