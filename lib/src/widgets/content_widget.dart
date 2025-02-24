@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/src/models/multiple_theme_settings.dart';
 import 'package:storybook_ds/src/widgets/attributes_variant_widget.dart';
 
 import '../models/dto/attribute_dto.dart';
+import 'attributes_theme_widget.dart';
 import 'custom_chip_selected.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -10,12 +12,22 @@ class ContentWidget extends StatelessWidget {
   final String? constructor;
   final String nameObjectInDisplay;
   final List<AttributeDto> attributes;
-  final Function(List<AttributeDto> attributes)? onAttributes;
+  final MultipleThemeSettings? multipleThemeSettings;
+
+  final void Function(
+    MultipleThemeSettings multipleThemeSettings,
+  )? onUpdateTheme;
+
+  final Function(
+    List<AttributeDto> attributes,
+    AttributeDto currentAtribute,
+  )? onAttributes;
+
   final Function(String? constructor) onSelectedConstructor;
   final String Function() updatePreviewCode;
 
   const ContentWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.attributes,
@@ -24,15 +36,17 @@ class ContentWidget extends StatelessWidget {
     required this.updatePreviewCode,
     this.onAttributes,
     this.constructor,
-  }) : super(key: key);
+    this.multipleThemeSettings,
+    this.onUpdateTheme,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
         margin: const EdgeInsets.only(
-          right: 32,
-          left: 32,
+          left: 24,
+          right: 24,
           top: 48,
         ),
         child: Column(
@@ -42,6 +56,7 @@ class ContentWidget extends StatelessWidget {
             _buildTitle(context),
             _buildDescription(context),
             _buildBuilders(context, attributes),
+            _buildAttributesTheme(multipleThemeSettings),
             _buildAttributesVariant(attributes),
             // _buildPreviewCode(context),
           ],
@@ -52,7 +67,7 @@ class ContentWidget extends StatelessWidget {
 
   Padding _buildDescription(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 32.0),
+      padding: const EdgeInsets.only(top: 24.0),
       child: SelectableText(
         description,
         style: Theme.of(context).textTheme.bodyMedium,
@@ -113,7 +128,11 @@ class ContentWidget extends StatelessWidget {
                         if (onAttributes != null) {
                           onSelectedConstructor(e2);
 
-                          onAttributes!(attributes);
+                          final attribute = attributes.firstWhere(
+                            (element) => element.builders.contains(e2),
+                            orElse: () => attributes.first,
+                          );
+                          onAttributes!(attributes, attribute);
                         }
                       }),
                 )
@@ -129,6 +148,19 @@ class ContentWidget extends StatelessWidget {
       attributes: attributes,
       onAttributes: onAttributes,
       constructor: constructor,
+    );
+  }
+
+  Widget _buildAttributesTheme(MultipleThemeSettings? multipleThemeSettings) {
+    if (multipleThemeSettings == null ||
+        multipleThemeSettings.selectableThemes.isEmpty ||
+        onUpdateTheme == null) {
+      return const SizedBox();
+    }
+
+    return AttributesThemeWidget(
+      themeSettings: multipleThemeSettings,
+      onUpdateTheme: onUpdateTheme!,
     );
   }
 }

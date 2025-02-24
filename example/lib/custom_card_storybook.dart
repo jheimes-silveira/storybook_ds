@@ -1,10 +1,15 @@
+import 'package:example/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 import 'custom_card.dart';
 
 class CustomCardStorybook extends StatefulWidget {
-  const CustomCardStorybook({Key? key}) : super(key: key);
+  final Function(ThemeData theme) onChangeTheme;
+  const CustomCardStorybook({
+    Key? key,
+    required this.onChangeTheme,
+  }) : super(key: key);
 
   @override
   Storybook<CustomCardStorybook> createState() => _CustomCardStorybookState();
@@ -12,11 +17,36 @@ class CustomCardStorybook extends StatefulWidget {
 
 class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
   @override
+  MultipleThemeSettings? multipleThemeSettings = MultipleThemeSettings(
+    selectableThemes: [
+      ThemeSettings(
+        title: 'Principal',
+        light: ThemeData.light(),
+        dark: ThemeData.dark(),
+      ),
+      ThemeSettings(
+        title: 'Custom theme 1',
+        light: customThemeLight,
+        dark: customThemeDark,
+      ),
+      ThemeSettings(
+        title: 'Custom theme 2',
+        light: ThemeData.light(),
+      ),
+    ],
+  );
+
+  @override
   List<AttributeDto> attributes = [
     _factoryAttributeDtoString(
       name: 'title',
       selectedValue: 'Lorem justo clita tempor labore',
       required: true,
+    ),
+    AttributeDto(
+      name: 'hidden',
+      type: 'bool?',
+      selectedValue: VariableOption(value: false),
     ),
     _factoryAttributeDtoString(
       name: 'description',
@@ -107,6 +137,10 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       ],
     ),
   ];
+  @override
+  void onUpdateTheme(MultipleThemeSettings multipleThemeSettings) {
+    widget.onChangeTheme(multipleThemeSettings.selectedThemes.currentTheme());
+  }
 
   @override
   Widget buildComponentWidget(BuildContext context) {

@@ -1,25 +1,29 @@
-import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/storybook_ds.dart';
 
-import '../../models/dto/attribute_dto.dart';
 import '../../utils/utils.dart';
 import '../content_widget.dart';
 
-abstract class Storybook<T extends StatefulWidget> extends State {
+abstract class Storybook<T extends StatefulWidget> extends State<T> {
+  /// Construtor selecionado, porem quando não possui nenhum construtor selecionado o padão é null
   String? selectedConstructor;
 
+  /// Título do Storybook.
   String get title;
 
+  /// Descrição do Storybook.
   String get description => '';
 
-  ThemeData get light => ThemeData.light();
+  /// Multiplos themas
+  MultipleThemeSettings? multipleThemeSettings;
 
-  ThemeData get dark => ThemeData.dark();
-
+  /// Lista de atributos do Storybook.
   List<AttributeDto> get attributes;
 
+  /// Nome do objeto em exibição.
   String get nameObjectInDisplay;
 
+  /// Constrói o widget do componente.
   Widget buildComponentWidget(BuildContext context);
 
   getWhereAttribut(String name) {
@@ -32,6 +36,8 @@ abstract class Storybook<T extends StatefulWidget> extends State {
   void onUpdateAttributes(List<AttributeDto> attributes) {
     setState(() {});
   }
+
+  void onUpdateTheme(MultipleThemeSettings multipleThemeSettings) {}
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +83,15 @@ abstract class Storybook<T extends StatefulWidget> extends State {
 
   Widget _buildContent() {
     return ContentWidget(
+      multipleThemeSettings: multipleThemeSettings,
+      onUpdateTheme: (MultipleThemeSettings multipleThemeSettings) {
+        setState(() {
+          this.multipleThemeSettings = multipleThemeSettings;
+          onUpdateTheme(multipleThemeSettings);
+        });
+      },
       attributes: attributes,
-      onAttributes: (attributes) {
+      onAttributes: (attributes, attribute) {
         onUpdateAttributes(attributes);
       },
       description: description,
@@ -148,8 +161,8 @@ abstract class Storybook<T extends StatefulWidget> extends State {
     final atributes = attributes
         .where(
           (e) {
-            final constructor = e.builders.isEmpty ||
-                e.builders.contains(selectedConstructor);
+            final constructor =
+                e.builders.isEmpty || e.builders.contains(selectedConstructor);
             final ignoreInDisplay = e.selectedValue?.ignoreInDisplay ?? true;
             return constructor && !ignoreInDisplay;
           },
