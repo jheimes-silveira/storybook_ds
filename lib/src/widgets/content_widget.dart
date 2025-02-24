@@ -46,6 +46,7 @@ class ContentWidget extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(
           left: 24,
+          right: 24,
           top: 48,
         ),
         child: Column(

@@ -1,3 +1,6 @@
+## 1.1.0+17 - Opcão para poder escolher themas diferentes
+- Opcão para poder escolher themas diferentes
+
 ## 0.0.16 - Incluir scala e layout do display
 - Incluir opção de sugestões quando o tipo for String
 

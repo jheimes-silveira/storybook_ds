@@ -1,7 +1,5 @@
-import 'package:device_frame/device_frame.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
-import 'package:input_slider/input_slider.dart';
-import 'package:input_slider/input_slider_form.dart';
 import 'package:storybook_ds/src/models/multiple_theme_settings.dart';
 
 import '../../models/dto/attribute_dto.dart';
@@ -43,9 +41,6 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
     if (_showDeviceInDisplay == false) _showSettings = false;
   }
 
-  double _displayWidth = 412;
-  double _displayHeight = 732;
-
   @protected
   @mustCallSuper
   void onUpdateAttributes(List<AttributeDto> attributes) {
@@ -61,10 +56,9 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height * 0.8;
+    final height = MediaQuery.of(context).size.height * 0.85;
 
     return Scaffold(
-      appBar: _buildAppBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -85,62 +79,13 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
                   ),
                 ),
                 Expanded(
-                  child: Stack(
-                    children: [
-                      SingleChildScrollView(
-                        child: _buildDevice(context, height),
-                      ),
-                      _buildSettingsDimensionDeviceInDisplay(context),
-                    ],
+                  child: SingleChildScrollView(
+                    child: _buildDevice(context, height),
                   ),
                 ),
               ],
             ),
             _buildPreviewCode(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSettingsDimensionDeviceInDisplay(BuildContext context) {
-    return Positioned(
-      right: 0,
-      top: 0,
-      child: AnimatedContainer(
-        padding: const EdgeInsets.only(right: 32, top: 32),
-        height: showSettings ? MediaQuery.of(context).size.height * 0.4 : 0.0,
-        duration: const Duration(milliseconds: 500),
-        child: InputSliderForm(
-          leadingWeight: 1,
-          sliderWeight: 20,
-          filled: true,
-          vertical: true,
-          children: [
-            InputSlider(
-              onChange: (value) {
-                setState(() {
-                  _displayWidth = value;
-                });
-              },
-              min: 150.0,
-              max: 3000.0,
-              defaultValue: 412,
-              leading: const Icon(Icons.width_normal_rounded),
-              leadingWeight: 2,
-            ),
-            InputSlider(
-              onChange: (value) {
-                setState(() {
-                  _displayHeight = value;
-                });
-              },
-              leading: const Icon(Icons.height_rounded),
-              leadingWeight: 2,
-              min: 250.0,
-              max: 3000.0,
-              defaultValue: 732,
-            ),
           ],
         ),
       ),
@@ -280,29 +225,42 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
 
   Widget _buildDevice(BuildContext context, double height) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 32),
-        child: SizedBox(
-          height: height,
-          child: showDeviceInDisplay
-              ? DeviceFrame(
-                  isFrameVisible: true,
-                  device: DeviceInfo.genericPhone(
-                    screenSize: Size(
-                      _displayWidth,
-                      _displayHeight,
-                    ),
-                    name: 'Medium',
-                    id: 'medium',
-                    platform: TargetPlatform.windows,
-                  ),
-                  screen: Builder(
-                    builder: (deviceContext) =>
-                        buildComponentWidget(deviceContext),
-                  ),
-                )
-              : buildComponentWidget(context),
+      child: SizedBox(
+        height: height,
+        child: DevicePreview(
+          enabled: true,
+          isToolbarVisible: true,
+          tools: [
+            DeviceSection(),
+            AccessibilitySection(),
+            SettingsSection(),
+          ],
+          builder: (context2) => MaterialApp(
+            useInheritedMediaQuery: true,
+            builder: DevicePreview.appBuilder,
+            theme: Theme.of(context),
+            debugShowCheckedModeBanner: false,
+            home: buildComponentWidget(context2),
+          ),
         ),
+        // child: showDeviceInDisplay
+        //     ? DeviceFrame(
+        //         isFrameVisible: true,
+        //         device: DeviceInfo.genericPhone(
+        //           screenSize: Size(
+        //             _displayWidth,
+        //             _displayHeight,
+        //           ),
+        //           name: 'Medium',
+        //           id: 'medium',
+        //           platform: TargetPlatform.windows,
+        //         ),
+        //         screen: Builder(
+        //           builder: (deviceContext) =>
+        //               buildComponentWidget(deviceContext),
+        //         ),
+        //       )
+        //     : buildComponentWidget(context),
       ),
     );
   }
