@@ -26,8 +26,8 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       ),
       ThemeSettings(
         title: 'Custom theme 1',
-        light: customThemeLight,
-        dark: customThemeDark,
+        light: MyThemeExemple.customThemeLight,
+        dark: MyThemeExemple.customThemeDark,
       ),
       ThemeSettings(
         title: 'Custom theme 2',

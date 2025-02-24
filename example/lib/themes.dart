@@ -1,68 +1,74 @@
 import 'package:flutter/material.dart';
 
-final ThemeData customThemeDark = ThemeData.dark().copyWith(
-  buttonTheme: const ButtonThemeData(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.zero, // Cantos quadrados para botões
-    ),
-  ),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // Cantos quadrados para ElevatedButton
+class MyThemeExemple {
+  static final ThemeData customThemeDark = ThemeData.dark().copyWith(
+    buttonTheme: const ButtonThemeData(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para botões
       ),
     ),
-  ),
-  textButtonTheme: TextButtonThemeData(
-    style: TextButton.styleFrom(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // Cantos quadrados para TextButton
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.zero, // Cantos quadrados para ElevatedButton
+        ),
       ),
     ),
-  ),
-  outlinedButtonTheme: OutlinedButtonThemeData(
-    style: OutlinedButton.styleFrom(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // Cantos quadrados para OutlinedButton
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero, // Cantos quadrados para TextButton
+        ),
       ),
     ),
-  ),
-  cardTheme: const CardTheme(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.zero, // Cantos quadrados para Cards
-    ),
-  ),
-);
-final ThemeData customThemeLight = ThemeData.light().copyWith(
-  buttonTheme: const ButtonThemeData(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.zero, // Cantos quadrados para botões
-    ),
-  ),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // Cantos quadrados para ElevatedButton
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.zero, // Cantos quadrados para OutlinedButton
+        ),
       ),
     ),
-  ),
-  textButtonTheme: TextButtonThemeData(
-    style: TextButton.styleFrom(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // Cantos quadrados para TextButton
+    cardTheme: const CardTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para Cards
       ),
     ),
-  ),
-  outlinedButtonTheme: OutlinedButtonThemeData(
-    style: OutlinedButton.styleFrom(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // Cantos quadrados para OutlinedButton
+  );
+  static final ThemeData customThemeLight = ThemeData.light().copyWith(
+    buttonTheme: const ButtonThemeData(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para botões
       ),
     ),
-  ),
-  cardTheme: const CardTheme(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.zero, // Cantos quadrados para Cards
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.zero, // Cantos quadrados para ElevatedButton
+        ),
+      ),
     ),
-  ),
-);
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero, // Cantos quadrados para TextButton
+        ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.zero, // Cantos quadrados para OutlinedButton
+        ),
+      ),
+    ),
+    cardTheme: const CardTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Cantos quadrados para Cards
+      ),
+    ),
+  );
+}
