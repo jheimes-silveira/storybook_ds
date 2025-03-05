@@ -3,7 +3,7 @@ import 'package:storybook_ds/src/widgets/custom_chip_selected.dart';
 
 import '../../storybook_ds.dart';
 
-class AttributesThemeWidget extends StatelessWidget {
+class AttributesThemeWidget extends StatefulWidget {
   final MultipleThemeSettings themeSettings;
   final void Function(
     MultipleThemeSettings multipleThemeSettings,
@@ -15,6 +15,11 @@ class AttributesThemeWidget extends StatelessWidget {
     required this.onUpdateTheme,
   });
 
+  @override
+  State<AttributesThemeWidget> createState() => _AttributesThemeWidgetState();
+}
+
+class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -39,13 +44,13 @@ class AttributesThemeWidget extends StatelessWidget {
                   tilePadding: const EdgeInsets.only(left: 8, right: 8),
                   expandedAlignment: Alignment.centerLeft,
                   title: _buildNameTheme(
-                    themeSettings.selectedThemes.title,
+                    widget.themeSettings.selectedThemes.title,
                     context,
                   ),
-                  trailing: themeSettings.selectedThemes.switchThemeMode
+                  trailing: widget.themeSettings.selectedThemes.switchThemeMode
                       ? _buildVariableOptionTypeBool(
-                          themeSettings,
-                          onUpdateTheme,
+                          widget.themeSettings,
+                          widget.onUpdateTheme,
                         )
                       : null,
                   children: [
@@ -54,8 +59,8 @@ class AttributesThemeWidget extends StatelessWidget {
                         Expanded(
                           child: _buildChangeAction(
                             context,
-                            themeSettings,
-                            onUpdateTheme,
+                            widget.themeSettings,
+                            widget.onUpdateTheme,
                           ),
                         ),
                       ],
@@ -114,7 +119,9 @@ class AttributesThemeWidget extends StatelessWidget {
                 onTap: () {
                   e2.setCurrentTheme(themeSettings.selectedThemes.isDarkMode);
                   themeSettings.selectedThemes = e2;
-                  onUpdateTheme(themeSettings);
+                  setState(() {
+                    onUpdateTheme(themeSettings);
+                  });
                 },
               ),
             )
@@ -139,7 +146,9 @@ class AttributesThemeWidget extends StatelessWidget {
           selected: !themeSettings.selectedThemes.isDarkMode,
           onTap: () {
             themeSettings.selectedThemes.setCurrentTheme(false);
-            onUpdateTheme(themeSettings);
+            setState(() {
+              onUpdateTheme(themeSettings);
+            });
           },
         ),
         CustomChipSelected(
@@ -147,7 +156,9 @@ class AttributesThemeWidget extends StatelessWidget {
           selected: themeSettings.selectedThemes.isDarkMode,
           onTap: () {
             themeSettings.selectedThemes.setCurrentTheme(true);
-            onUpdateTheme(themeSettings);
+            setState(() {
+              onUpdateTheme(themeSettings);
+            });
           },
         ),
       ],

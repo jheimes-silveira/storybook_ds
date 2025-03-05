@@ -3,7 +3,7 @@ import 'package:storybook_ds/src/widgets/custom_chip_selected.dart';
 
 import '../../storybook_ds.dart';
 
-class AttributesVariantWidget extends StatelessWidget {
+class AttributesVariantWidget extends StatefulWidget {
   final List<AttributeDto> attributes;
   final Function(List<AttributeDto> attributes, AttributeDto attribute)?
       onAttributes;
@@ -14,9 +14,14 @@ class AttributesVariantWidget extends StatelessWidget {
     required this.onAttributes,
     this.constructor,
   });
-// create some values
-// ValueChanged<Color> callback
 
+  @override
+  State<AttributesVariantWidget> createState() =>
+      _AttributesVariantWidgetState();
+}
+
+class _AttributesVariantWidgetState extends State<AttributesVariantWidget> {
+// create some values
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -26,9 +31,11 @@ class AttributesVariantWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             _buildTitle(context),
-            ...attributes
+            ...widget.attributes
                 .where(
-                  (e) => e.builders.isEmpty || e.builders.contains(constructor),
+                  (e) =>
+                      e.builders.isEmpty ||
+                      e.builders.contains(widget.constructor),
                 )
                 .map(
                   (e) => Padding(
@@ -60,12 +67,13 @@ class AttributesVariantWidget extends StatelessWidget {
                             _buildIsRequired(e, context),
                             const SizedBox(width: 8),
                             if (_canBuildVariableOptionTypeBool(e))
-                              _buildVariableOptionTypeBool(e, attributes),
+                              _buildVariableOptionTypeBool(
+                                  e, widget.attributes),
                           ],
                         ),
                         // leading: Container(),
                         trailing: _canBuildVariableOptionTypeBool(e)
-                            ? _isVariableNubable(e, attributes)
+                            ? _isVariableNubable(e, widget.attributes)
                             : (_canBuildVariableOption(e)
                                 ? null
                                 : const SizedBox()),
@@ -78,10 +86,10 @@ class AttributesVariantWidget extends StatelessWidget {
                                   child: _buildChangeAction(
                                     context,
                                     e,
-                                    attributes,
+                                    widget.attributes,
                                   ),
                                 ),
-                                _isVariableNubable(e, attributes),
+                                _isVariableNubable(e, widget.attributes),
                               ],
                             ),
                         ],
@@ -169,15 +177,17 @@ class AttributesVariantWidget extends StatelessWidget {
               controller: c,
               enabled: e.selectedValue?.value == null ? false : true,
               onChanged: (text) {
-                if (onAttributes != null) {
+                if (widget.onAttributes != null) {
                   e.selectedValue = e.selectedValue?.copyWith(
                     value: text,
                   );
-                  onAttributes!(attributes, e);
-                  e.onChangeValue?.call(e);
-                  c.selection = TextSelection.fromPosition(
-                    TextPosition(offset: c.selection.baseOffset),
-                  );
+                  setState(() {
+                    widget.onAttributes!(attributes, e);
+                    e.onChangeValue?.call(e);
+                    c.selection = TextSelection.fromPosition(
+                      TextPosition(offset: c.selection.baseOffset),
+                    );
+                  });
                 }
               },
             ),
@@ -195,11 +205,13 @@ class AttributesVariantWidget extends StatelessWidget {
                           label: e2.textInSelectedOptions,
                           selected: e.selectedValue?.value == e2.value,
                           onTap: () {
-                            if (onAttributes != null) {
+                            if (widget.onAttributes != null) {
                               e.selectedValue = e2;
 
-                              onAttributes!(attributes, e);
-                              e.onChangeValue?.call(e);
+                              setState(() {
+                                widget.onAttributes!(attributes, e);
+                                e.onChangeValue?.call(e);
+                              });
                             }
                           }),
                     )
@@ -237,9 +249,10 @@ class AttributesVariantWidget extends StatelessWidget {
                     } else {
                       e.selectedValue?.value = v.toInt();
                     }
-
-                    onAttributes!(attributes, e);
-                    e.onChangeValue?.call(e);
+                    setState(() {
+                      widget.onAttributes!(attributes, e);
+                      e.onChangeValue?.call(e);
+                    });
                   },
                 ),
               ),
@@ -275,11 +288,13 @@ class AttributesVariantWidget extends StatelessWidget {
                     label: e2.textInSelectedOptions,
                     selected: e.selectedValue?.value == e2.value,
                     onTap: () {
-                      if (onAttributes != null) {
+                      if (widget.onAttributes != null) {
                         e.selectedValue = e2;
 
-                        onAttributes!(attributes, e);
-                        e.onChangeValue?.call(e);
+                        setState(() {
+                          widget.onAttributes!(attributes, e);
+                          e.onChangeValue?.call(e);
+                        });
                       }
                     }),
               )
@@ -317,8 +332,10 @@ class AttributesVariantWidget extends StatelessWidget {
         value: e.selectedValue?.value == null ? false : true,
         onChanged: (value) {
           e.selectedValue = value ? (e.variableOptions![0]) : null;
-          onAttributes!(attributes, e);
-          e.onChangeValue?.call(e);
+          setState(() {
+            widget.onAttributes!(attributes, e);
+            e.onChangeValue?.call(e);
+          });
         },
       );
     }
@@ -338,7 +355,9 @@ class AttributesVariantWidget extends StatelessWidget {
           value: e.selectedValue?.value ?? false,
           onChanged: (value) {
             e.selectedValue?.value = value;
-            onAttributes!(attributes, e);
+            setState(() {
+              widget.onAttributes!(attributes, e);
+            });
           },
         ),
       ),

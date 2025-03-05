@@ -5,11 +5,11 @@ class CustomChipSelected extends StatelessWidget {
   final bool selected;
   final Function() onTap;
   const CustomChipSelected({
-    Key? key,
+    super.key,
     required this.label,
     required this.selected,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +17,6 @@ class CustomChipSelected extends StatelessWidget {
       onTap: onTap,
       child: Chip(
         label: Text(label),
-        backgroundColor: Colors.white,
-        labelStyle: TextStyle(
-          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
           side: const BorderSide(
@@ -30,8 +26,6 @@ class CustomChipSelected extends StatelessWidget {
         ),
         avatar: selected
             ? CircleAvatar(
-                backgroundColor: Colors.green[100],
-                foregroundColor: Colors.green,
                 child: const Icon(
                   Icons.check,
                   size: 13,

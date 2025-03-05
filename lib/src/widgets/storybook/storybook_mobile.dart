@@ -99,9 +99,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
       constructor: selectedConstructor,
       nameObjectInDisplay: nameObjectInDisplay,
       onSelectedConstructor: (String? constructor) {
-        setState(() {
-          selectedConstructor = constructor;
-        });
+        selectedConstructor = constructor;
       },
       updatePreviewCode: updatePreviewCode,
     );

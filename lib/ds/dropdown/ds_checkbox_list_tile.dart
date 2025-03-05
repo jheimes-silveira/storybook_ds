@@ -7,12 +7,12 @@ class DSCheckboxListTile extends StatelessWidget {
   final EdgeInsets? padding;
 
   const DSCheckboxListTile({
-    Key? key,
+    super.key,
     required this.label,
     required this.value,
     required this.onChanged,
     this.padding,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
