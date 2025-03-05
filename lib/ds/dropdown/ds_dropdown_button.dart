@@ -24,7 +24,7 @@ class DSDropdownButton<T> extends StatefulWidget {
   final String? label;
 
   const DSDropdownButton({
-    Key? key,
+    super.key,
     this.hintText = '',
     this.items = const [],
     this.initSelected = const [],
@@ -42,7 +42,7 @@ class DSDropdownButton<T> extends StatefulWidget {
     this.search = false,
     this.error,
     this.label,
-  }) : super(key: key);
+  });
 
   factory DSDropdownButton.singleSelection({
     required List<DSDropdownMenuItem<T?>> items,
@@ -186,7 +186,7 @@ class _DropdownContent<T> extends StatefulWidget {
   final void Function(List<DSDropdownMenuItem<T?>>) onChanged;
 
   const _DropdownContent({
-    Key? key,
+    super.key,
     this.items = const [],
     this.initSelected = const [],
     this.isMultiSelection = false,
@@ -196,7 +196,7 @@ class _DropdownContent<T> extends StatefulWidget {
     required this.search,
     required this.dropdownMaxHeight,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   State<_DropdownContent> createState() => _DropdownContentState<T>();

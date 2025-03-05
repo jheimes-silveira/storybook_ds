@@ -103,43 +103,12 @@ class ContentWidget extends StatelessWidget {
           .then((_) => onSelectedConstructor(builders[0]));
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Construtores",
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            alignment: WrapAlignment.start,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            spacing: 8,
-            runAlignment: WrapAlignment.start,
-            runSpacing: 8,
-            children: builders
-                .map(
-                  (e2) => CustomChipSelected(
-                      label: e2 ?? 'default',
-                      selected: constructor == e2,
-                      onTap: () {
-                        if (onAttributes != null) {
-                          onSelectedConstructor(e2);
-
-                          final attribute = attributes.firstWhere(
-                            (element) => element.builders.contains(e2),
-                            orElse: () => attributes.first,
-                          );
-                          onAttributes!(attributes, attribute);
-                        }
-                      }),
-                )
-                .toList(),
-          ),
-        ],
-      ),
+    return Builders(
+      builders: builders,
+      attributes: attributes,
+      initConstructor: constructor,
+      onAttributes: onAttributes,
+      onSelectedConstructor: onSelectedConstructor,
     );
   }
 
@@ -161,6 +130,82 @@ class ContentWidget extends StatelessWidget {
     return AttributesThemeWidget(
       themeSettings: multipleThemeSettings,
       onUpdateTheme: onUpdateTheme!,
+    );
+  }
+}
+
+class Builders extends StatefulWidget {
+  const Builders({
+    super.key,
+    required this.builders,
+    required this.initConstructor,
+    required this.onAttributes,
+    required this.attributes,
+    required this.onSelectedConstructor,
+  });
+
+  final List<String?> builders;
+  final String? initConstructor;
+  final Function(List<AttributeDto> attributes, AttributeDto currentAtribute)?
+      onAttributes;
+  final List<AttributeDto> attributes;
+  final Function(String? constructor) onSelectedConstructor;
+
+  @override
+  State<Builders> createState() => _BuildersState();
+}
+
+class _BuildersState extends State<Builders> {
+  late String? _constructor;
+
+  @override
+  void initState() {
+    _constructor = widget.initConstructor;
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Construtores",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            alignment: WrapAlignment.start,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            spacing: 8,
+            runAlignment: WrapAlignment.start,
+            runSpacing: 8,
+            children: widget.builders
+                .map(
+                  (e2) => CustomChipSelected(
+                    label: e2 ?? 'default',
+                    selected: _constructor == e2,
+                    onTap: () {
+                      if (widget.onAttributes != null) {
+                        setState(() {
+                          _constructor = e2;
+                          widget.onSelectedConstructor(e2);
+
+                          final attribute = widget.attributes.firstWhere(
+                            (element) => element.builders.contains(e2),
+                            orElse: () => widget.attributes.first,
+                          );
+                          widget.onAttributes!(widget.attributes, attribute);
+                        });
+                      }
+                    },
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
     );
   }
 }

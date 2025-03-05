@@ -1,3 +1,6 @@
+## 1.2.0+18 - Melhorias em recursos visuais 
+- Melhorias em recursos visuais 
+
 ## 1.1.0+17 - Opcão para poder escolher themas diferentes
 - Opcão para poder escolher themas diferentes
 

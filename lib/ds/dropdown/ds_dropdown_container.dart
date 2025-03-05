@@ -17,7 +17,7 @@ class DSDropdownContainer extends StatefulWidget {
   final String? label;
 
   const DSDropdownContainer({
-    Key? key,
+    super.key,
     required this.child,
     this.text,
     this.hintText = '',
@@ -29,7 +29,7 @@ class DSDropdownContainer extends StatefulWidget {
     this.constraints,
     this.error,
     this.label,
-  }) : super(key: key);
+  });
 
   @override
   State<DSDropdownContainer> createState() => _DSDropdownContainerState();

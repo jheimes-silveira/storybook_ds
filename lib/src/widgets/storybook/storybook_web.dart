@@ -1,5 +1,10 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/src/device_preview/device_preview.dart';
+import 'package:storybook_ds/src/device_preview/model/tools_panel_model.dart';
+import 'package:storybook_ds/src/device_preview/views/tool_panel/sections/accessibility.dart';
+import 'package:storybook_ds/src/device_preview/views/tool_panel/sections/device.dart';
+import 'package:storybook_ds/src/device_preview/views/tool_panel/sections/section.dart';
+import 'package:storybook_ds/src/device_preview/views/tool_panel/sections/settings.dart';
 import 'package:storybook_ds/src/models/multiple_theme_settings.dart';
 
 import '../../models/dto/attribute_dto.dart';
@@ -53,18 +58,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: height,
-                  child: SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 450,
-                        minWidth: 450,
-                      ),
-                      child: _buildContent(),
-                    ),
-                  ),
-                ),
+              
                 Expanded(
                   child: SingleChildScrollView(
                     child: _buildDevice(context, height),
@@ -83,10 +77,8 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
     return ContentWidget(
       multipleThemeSettings: multipleThemeSettings,
       onUpdateTheme: (MultipleThemeSettings multipleThemeSettings) {
-        setState(() {
-          this.multipleThemeSettings = multipleThemeSettings;
-          onUpdateTheme(multipleThemeSettings);
-        });
+        this.multipleThemeSettings = multipleThemeSettings;
+        onUpdateTheme(multipleThemeSettings);
       },
       attributes: attributes,
       onAttributes: (attributes, attribute) {
@@ -178,11 +170,22 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
         child: DevicePreview(
           enabled: true,
           isToolbarVisible: true,
-          tools: [
-            DeviceSection(),
-            AccessibilitySection(),
-            SettingsSection(),
-          ],
+          toolsPanelRight: ToolsPanelModel(
+            tools: [
+              const DeviceSection(),
+              const AccessibilitySection(),
+              const SettingsSection(),
+            ],
+          ),
+          toolsPanelLeft: ToolsPanelModel(
+            tools: [
+              ToolPanelSection(
+                title: '',
+                children: [_buildContent()],
+              ),
+            ],
+            panelWidth: 400,
+          ),
           builder: (context2) => MaterialApp(
             useInheritedMediaQuery: true,
             builder: DevicePreview.appBuilder,
