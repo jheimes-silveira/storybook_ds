@@ -1,3 +1,6 @@
+## 1.2.0+19 - Melhorias em recursos visuais 
+- Resolvendo problema de abertura de modais quando tela completa
+
 ## 1.2.0+18 - Melhorias em recursos visuais 
 - Melhorias em recursos visuais 
 
