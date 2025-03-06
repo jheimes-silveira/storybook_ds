@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:storybook_ds/src/device_preview/views/theme.dart';
@@ -84,9 +83,6 @@ class _BottomToolbar extends StatelessWidget {
   final ToolsPanelModel toolsPanelLeft;
   @override
   Widget build(BuildContext context) {
-    final isEnabled = context.select(
-      (DevicePreviewStore store) => store.data.isEnabled,
-    );
     return Material(
       child: ListTile(
         leading: Row(
@@ -94,12 +90,12 @@ class _BottomToolbar extends StatelessWidget {
           children: [
             if (toolsPanelLeft.tools.isNotEmpty)
               IconButton(
-                onPressed: isEnabled ? () => showPanel(toolsPanelLeft) : null,
+                onPressed: () => showPanel(toolsPanelLeft),
                 icon: const Icon(Icons.tune),
               ),
             if (toolsPanelRight.tools.isNotEmpty)
               IconButton(
-                onPressed: isEnabled ? () => showPanel(toolsPanelRight) : null,
+                onPressed: () => showPanel(toolsPanelRight),
                 icon: const Icon(Icons.tune),
               ),
           ],
