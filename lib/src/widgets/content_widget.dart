@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/src/models/multiple_theme_settings.dart';
+import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 import 'package:storybook_ds/src/widgets/attributes_variant_widget.dart';
 
 import '../models/dto/attribute_dto.dart';
@@ -25,6 +26,7 @@ class ContentWidget extends StatelessWidget {
 
   final Function(String? constructor) onSelectedConstructor;
   final String Function() updatePreviewCode;
+  final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
 
   const ContentWidget({
     super.key,
@@ -38,6 +40,7 @@ class ContentWidget extends StatelessWidget {
     this.constructor,
     this.multipleThemeSettings,
     this.onUpdateTheme,
+    this.extraAttributesConfigCustom,
   });
 
   @override
@@ -56,6 +59,11 @@ class ContentWidget extends StatelessWidget {
             _buildTitle(context),
             _buildDescription(context),
             _buildBuilders(context, attributes),
+            if (extraAttributesConfigCustom != null)
+              ...[
+                const SizedBox(height: 12),
+                extraAttributesConfigCustom!(context)
+              ],
             _buildAttributesTheme(multipleThemeSettings),
             _buildAttributesVariant(attributes),
             // _buildPreviewCode(context),
@@ -163,6 +171,7 @@ class _BuildersState extends State<Builders> {
     _constructor = widget.initConstructor;
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Padding(

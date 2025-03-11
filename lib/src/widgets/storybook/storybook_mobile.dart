@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 import '../../utils/utils.dart';
@@ -26,6 +27,8 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
   /// Constrói o widget do componente.
   Widget buildComponentWidget(BuildContext context);
 
+  OnBuildExtraAttributesConfigCustom? get extraAttributesConfigCustom;
+
   getWhereAttribut(String name) {
     final attribute = attributes.where((e) => e.name == name).first;
     return attribute.selectedValue?.value;
@@ -49,16 +52,20 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
           backgroundColor: Colors.white,
           elevation: 0,
           automaticallyImplyLeading: false,
-          bottom: const TabBar(
+          bottom: TabBar(
             labelColor: Colors.black,
             tabs: <Widget>[
-              Tab(
+              if (extraAttributesConfigCustom != null)
+                const Tab(
+                  text: 'Atributos Extra',
+                ),
+              const Tab(
                 text: 'Atributos',
               ),
-              Tab(
+              const Tab(
                 text: 'Componente',
               ),
-              Tab(
+              const Tab(
                 text: 'Código',
               ),
             ],
@@ -66,6 +73,10 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
         ),
         body: TabBarView(
           children: <Widget>[
+            if (extraAttributesConfigCustom != null)
+              Center(
+                child: extraAttributesConfigCustom!(context),
+              ),
             Center(
               child: _buildContent(),
             ),

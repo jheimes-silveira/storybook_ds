@@ -328,7 +328,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.1.0+17"
+    version: "1.2.1+19"
   stream_channel:
     dependency: transitive
     description:

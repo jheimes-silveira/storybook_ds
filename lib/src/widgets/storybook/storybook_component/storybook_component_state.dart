@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 class StoryBookComponentState extends StatefulWidget {
@@ -13,6 +14,7 @@ class StoryBookComponentState extends StatefulWidget {
     this.multipleThemeSettings,
     this.backgroundColor,
     this.onUpdateTheme,
+    this.extraAttributesConfigCustom,
   });
   final Widget child;
   final String title;
@@ -25,6 +27,7 @@ class StoryBookComponentState extends StatefulWidget {
   final void Function(
     MultipleThemeSettings multipleThemeSettings,
   )? onUpdateTheme;
+  final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
 
   @override
   Storybook<StoryBookComponentState> createState() =>
@@ -38,6 +41,7 @@ class StoryBookComponentState extends StatefulWidget {
         controller: controller,
         multipleThemeSettings: multipleThemeSettings,
         backgroundColor: backgroundColor,
+        extraAttributesConfigCustom: extraAttributesConfigCustom,
       );
 }
 
@@ -55,6 +59,9 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
   @override
   final MultipleThemeSettings? multipleThemeSettings;
 
+  @override
+  OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
+
   final Color? backgroundColor;
   final StoryBookComponentController? controller;
 
@@ -67,6 +74,7 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
     required this.controller,
     required this.multipleThemeSettings,
     required this.backgroundColor,
+    this.extraAttributesConfigCustom,
   });
 
   @override
