@@ -47,9 +47,10 @@ class StoryBookComponentController
 class StoryBookComponent extends StatefulWidget {
   const StoryBookComponent({
     super.key,
-    required this.child,
     required this.title,
     required this.nameObjectInDisplay,
+    this.child,
+    this.builder,
     this.attributes = const [],
     this.description = '',
     this.multipleThemeSettings,
@@ -57,9 +58,10 @@ class StoryBookComponent extends StatefulWidget {
     this.backgroundColor,
     this.onUpdateTheme,
     this.extraAttributesConfigCustom,
-  });
+  }) : assert(child != null || builder != null, 'child or builder is required');
 
-  final Widget child;
+  final Widget? child;
+  final WidgetBuilder? builder;
   final String title;
   final String description;
   final List<AttributeDto> attributes;
@@ -95,6 +97,7 @@ class _StoryBookComponenState extends State<StoryBookComponent> {
         backgroundColor: widget.backgroundColor,
         onUpdateTheme: widget.onUpdateTheme,
         extraAttributesConfigCustom: widget.extraAttributesConfigCustom,
+        builder: widget.builder,
         child: widget.child,
       );
 }

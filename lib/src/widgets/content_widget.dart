@@ -205,6 +205,7 @@ class _BuildersState extends State<Builders> {
                             (element) => element.builders.contains(e2),
                             orElse: () => widget.attributes.first,
                           );
+                          attribute.onChangeValue?.call(attribute);
                           widget.onAttributes!(widget.attributes, attribute);
                         });
                       }

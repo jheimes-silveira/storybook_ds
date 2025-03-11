@@ -8,6 +8,7 @@ class AttributesVariantWidget extends StatefulWidget {
   final Function(List<AttributeDto> attributes, AttributeDto attribute)?
       onAttributes;
   final String? constructor;
+
   const AttributesVariantWidget({
     super.key,
     required this.attributes,
@@ -24,83 +25,77 @@ class _AttributesVariantWidgetState extends State<AttributesVariantWidget> {
 // create some values
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (_, constraints) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            _buildTitle(context),
-            ...widget.attributes
-                .where(
-                  (e) =>
-                      e.builders.isEmpty ||
-                      e.builders.contains(widget.constructor),
-                )
-                .map(
-                  (e) => Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          width: 1,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      child: ExpansionTile(
-                        childrenPadding: const EdgeInsets.only(left: 8),
-                        tilePadding: const EdgeInsets.only(left: 8, right: 8),
-                        expandedAlignment: Alignment.centerLeft,
-                        onExpansionChanged: (value) async {
-                          if (e.variableOptionType is HtmlType) {
-                            final html = (e.variableOptionType as HtmlType);
-                            html.canUpdateOnChange = false;
-                          }
-                        },
-                        title: Row(
-                          children: [
-                            _buildTypeDescription(e, context),
-                            const SizedBox(width: 8),
-                            _buildNameDescription(e, context),
-                            const SizedBox(width: 8),
-                            _buildIsRequired(e, context),
-                            const SizedBox(width: 8),
-                            if (_canBuildVariableOptionTypeBool(e))
-                              _buildVariableOptionTypeBool(
-                                  e, widget.attributes),
-                          ],
-                        ),
-                        // leading: Container(),
-                        trailing: _canBuildVariableOptionTypeBool(e)
-                            ? _isVariableNubable(e, widget.attributes)
-                            : (_canBuildVariableOption(e)
-                                ? null
-                                : const SizedBox()),
-
-                        children: [
-                          if (!_canBuildVariableOptionTypeBool(e))
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildChangeAction(
-                                    context,
-                                    e,
-                                    widget.attributes,
-                                  ),
-                                ),
-                                _isVariableNubable(e, widget.attributes),
-                              ],
-                            ),
-                        ],
-                      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        _buildTitle(context),
+        ...widget.attributes
+            .where(
+              (e) =>
+                  e.builders.isEmpty || e.builders.contains(widget.constructor),
+            )
+            .map(
+              (e) => Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      width: 1,
+                      color: Colors.grey,
                     ),
                   ),
+                  child: ExpansionTile(
+                    childrenPadding: const EdgeInsets.only(left: 8),
+                    tilePadding: const EdgeInsets.only(left: 8, right: 8),
+                    expandedAlignment: Alignment.centerLeft,
+                    onExpansionChanged: (value) async {
+                      if (e.variableOptionType is HtmlType) {
+                        final html = (e.variableOptionType as HtmlType);
+                        html.canUpdateOnChange = false;
+                      }
+                    },
+                    title: Row(
+                      children: [
+                        _buildTypeDescription(e, context),
+                        const SizedBox(width: 8),
+                        _buildNameDescription(e, context),
+                        const SizedBox(width: 8),
+                        _buildIsRequired(e, context),
+                        const SizedBox(width: 8),
+                        if (_canBuildVariableOptionTypeBool(e))
+                          _buildVariableOptionTypeBool(e, widget.attributes),
+                      ],
+                    ),
+                    // leading: Container(),
+                    trailing: _canBuildVariableOptionTypeBool(e)
+                        ? _isVariableNubable(e, widget.attributes)
+                        : (_canBuildVariableOption(e)
+                            ? null
+                            : const SizedBox()),
+
+                    children: [
+                      if (!_canBuildVariableOptionTypeBool(e))
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildChangeAction(
+                                context,
+                                e,
+                                widget.attributes,
+                              ),
+                            ),
+                            _isVariableNubable(e, widget.attributes),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
-            const SizedBox(height: 150),
-          ],
-        );
-      },
+              ),
+            ),
+        const SizedBox(height: 150),
+      ],
     );
   }
 
@@ -357,6 +352,7 @@ class _AttributesVariantWidgetState extends State<AttributesVariantWidget> {
             e.selectedValue?.value = value;
             setState(() {
               widget.onAttributes!(attributes, e);
+              e.onChangeValue?.call(e);
             });
           },
         ),
