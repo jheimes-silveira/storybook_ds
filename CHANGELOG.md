@@ -1,3 +1,6 @@
+## 1.2.3+20 - Add builder support to StoryBookComponent and clean up exports
+- Introduced an optional `builder` parameter to `StoryBookComponent` and ensured either `child` or `builder` is required. Refactored exports in `storybook_ds.dart` for better organization and consistency. Also included minor fixes to attribute handling and updated pubspec.lock to version 1.2.2+19.
+
 ## 1.2.0+19 - Melhorias em recursos visuais 
 - Resolvendo problema de abertura de modais quando tela completa
 

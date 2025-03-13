@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 import 'custom_card.dart';
@@ -327,4 +328,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
 
   @override
   String title = 'Custom Card';
+
+  @override
+  OnBuildExtraAttributesConfigCustom? get extraAttributesConfigCustom => null;
 }

@@ -6,6 +6,7 @@ import 'package:storybook_ds/src/device_preview/views/tool_panel/sections/device
 import 'package:storybook_ds/src/device_preview/views/tool_panel/sections/section.dart';
 import 'package:storybook_ds/src/device_preview/views/tool_panel/sections/settings.dart';
 import 'package:storybook_ds/src/models/multiple_theme_settings.dart';
+import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 
 import '../../models/dto/attribute_dto.dart';
 import '../../utils/utils.dart';
@@ -33,6 +34,8 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
   /// Constrói o widget do componente.
   Widget buildComponentWidget(BuildContext context);
 
+  OnBuildExtraAttributesConfigCustom? get extraAttributesConfigCustom;
+
   @protected
   @mustCallSuper
   void onUpdateAttributes(List<AttributeDto> attributes) {
@@ -58,7 +61,6 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              
                 Expanded(
                   child: SingleChildScrollView(
                     child: _buildDevice(context, height),
@@ -94,6 +96,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
         });
       },
       updatePreviewCode: updatePreviewCode,
+      extraAttributesConfigCustom: this.extraAttributesConfigCustom,
     );
   }
 

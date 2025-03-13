@@ -4,17 +4,20 @@ import 'package:storybook_ds/storybook_ds.dart';
 class StoryBookComponentState extends StatefulWidget {
   const StoryBookComponentState({
     super.key,
-    required this.child,
     required this.title,
     required this.description,
     required this.attributes,
     required this.nameObjectInDisplay,
+    this.child,
+    this.builder,
     this.controller,
     this.multipleThemeSettings,
     this.backgroundColor,
     this.onUpdateTheme,
-  });
-  final Widget child;
+    this.extraAttributesConfigCustom,
+  }) : assert(child != null || builder != null, 'child or builder is required');
+  final Widget? child;
+  final WidgetBuilder? builder;
   final String title;
   final String description;
   final List<AttributeDto> attributes;
@@ -25,6 +28,7 @@ class StoryBookComponentState extends StatefulWidget {
   final void Function(
     MultipleThemeSettings multipleThemeSettings,
   )? onUpdateTheme;
+  final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
 
   @override
   Storybook<StoryBookComponentState> createState() =>
@@ -38,11 +42,15 @@ class StoryBookComponentState extends StatefulWidget {
         controller: controller,
         multipleThemeSettings: multipleThemeSettings,
         backgroundColor: backgroundColor,
+        extraAttributesConfigCustom: extraAttributesConfigCustom,
+        builder: builder,
       );
 }
 
 class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
-  final Widget child;
+  final Widget? child;
+  final WidgetBuilder? builder;
+
   @override
   final String title;
   @override
@@ -55,11 +63,13 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
   @override
   final MultipleThemeSettings? multipleThemeSettings;
 
+  @override
+  OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
+
   final Color? backgroundColor;
   final StoryBookComponentController? controller;
 
   _StoryBookComponentStateState({
-    required this.child,
     required this.title,
     required this.description,
     required this.attributes,
@@ -67,6 +77,9 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
     required this.controller,
     required this.multipleThemeSettings,
     required this.backgroundColor,
+    this.child,
+    this.builder,
+    this.extraAttributesConfigCustom,
   });
 
   @override
@@ -78,6 +91,6 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
 
   @override
   Widget buildComponentWidget(BuildContext context) {
-    return child;
+    return builder?.call(context) ?? child ?? const Placeholder();
   }
 }

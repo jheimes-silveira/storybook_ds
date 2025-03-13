@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 import 'storybook_component_state.dart';
@@ -46,18 +47,21 @@ class StoryBookComponentController
 class StoryBookComponent extends StatefulWidget {
   const StoryBookComponent({
     super.key,
-    required this.child,
     required this.title,
     required this.nameObjectInDisplay,
+    this.child,
+    this.builder,
     this.attributes = const [],
     this.description = '',
     this.multipleThemeSettings,
     this.controller,
     this.backgroundColor,
     this.onUpdateTheme,
-  });
+    this.extraAttributesConfigCustom,
+  }) : assert(child != null || builder != null, 'child or builder is required');
 
-  final Widget child;
+  final Widget? child;
+  final WidgetBuilder? builder;
   final String title;
   final String description;
   final List<AttributeDto> attributes;
@@ -68,6 +72,7 @@ class StoryBookComponent extends StatefulWidget {
   final void Function(
     MultipleThemeSettings multipleThemeSettings,
   )? onUpdateTheme;
+  final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
 
   @override
   State<StoryBookComponent> createState() => _StoryBookComponenState();
@@ -91,6 +96,8 @@ class _StoryBookComponenState extends State<StoryBookComponent> {
         multipleThemeSettings: widget.multipleThemeSettings,
         backgroundColor: widget.backgroundColor,
         onUpdateTheme: widget.onUpdateTheme,
+        extraAttributesConfigCustom: widget.extraAttributesConfigCustom,
+        builder: widget.builder,
         child: widget.child,
       );
 }
