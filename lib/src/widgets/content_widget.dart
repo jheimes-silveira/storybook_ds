@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/src/models/multiple_theme_settings.dart';
 import 'package:storybook_ds/src/utils/typedef_storybook.dart';
-import 'package:storybook_ds/src/widgets/attributes_variant_widget.dart';
+import 'package:storybook_ds/src/widgets/attributes_variant/attributes_variant_widget.dart';
 
 import '../models/dto/attribute_dto.dart';
 import 'attributes_theme_widget.dart';
@@ -25,7 +25,7 @@ class ContentWidget extends StatelessWidget {
   )? onAttributes;
 
   final Function(String? constructor) onSelectedConstructor;
-  final String Function() updatePreviewCode;
+  final String Function(List<AttributeDto> attributes) updatePreviewCode;
   final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
 
   const ContentWidget({
@@ -125,6 +125,7 @@ class ContentWidget extends StatelessWidget {
       attributes: attributes,
       onAttributes: onAttributes,
       constructor: constructor,
+      title: '',
     );
   }
 

@@ -1,5 +1,5 @@
+import 'package:example/utils_attribute.dart';
 import 'package:flutter/material.dart';
-import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 import 'custom_card.dart';
@@ -115,6 +115,11 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       type: 'bool?',
       selectedValue: VariableOption(value: false),
     ),
+    AttributeDto(
+      name: 'enabled',
+      type: 'bool',
+      selectedValue: VariableOption(value: true),
+    ),
     _factoryAttributeDtoString(
       name: 'description',
       selectedValue:
@@ -166,6 +171,30 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
         'inline',
         'outline',
       ],
+    ),
+    AttributeDto.objectInObject(
+      name: 'setting',
+      type: 'SettingCustomCard?',
+      children: [
+        UtilsAttribute.color(
+          name: 'color',
+          canBeNull: true,
+        ),
+        UtilsAttribute.color(
+          name: 'textColor',
+        ),
+      ],
+      builders: [
+        null,
+        'inline',
+        'outline',
+      ],
+      selectedValue: VariableOption(
+        value: SettingCustomCard(
+          color: Colors.red,
+          textColor: Colors.black,
+        ),
+      ),
     ),
     AttributeDto(
       name: 'textNegative',

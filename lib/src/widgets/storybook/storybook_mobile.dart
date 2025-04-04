@@ -134,7 +134,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
                       children: [
                         Expanded(
                           child: SelectableText(
-                            updatePreviewCode(),
+                            updatePreviewCode(attributes),
                             style:
                                 Theme.of(context).textTheme.bodyLarge?.copyWith(
                                       color: Colors.white,
@@ -154,7 +154,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
             child: IconButton(
               color: Colors.white,
               onPressed: () {
-                Utils.copyClipboard(updatePreviewCode());
+                Utils.copyClipboard(updatePreviewCode(attributes));
               },
               icon: const Icon(Icons.copy, size: 20),
             ),
@@ -166,7 +166,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
 
   @protected
   @mustCallSuper
-  String updatePreviewCode() {
+  String updatePreviewCode(List<AttributeDto> attributes) {
     final atributes = attributes
         .where(
           (e) {
@@ -176,7 +176,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
             return constructor && !ignoreInDisplay;
           },
         )
-        .map((e) => "\n    ${e.name}: ${e.toStringValue},")
+        .map((e) => "\n    ${e.name}: ${e},")
         .join();
     final constructor =
         selectedConstructor == null ? '' : '.$selectedConstructor';

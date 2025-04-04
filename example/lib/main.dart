@@ -1,8 +1,10 @@
+import 'package:example/main.reflectable.dart';
 import 'package:flutter/material.dart';
 
 import 'custom_card_storybook.dart';
 
 void main() {
+   initializeReflectable();
   runApp(const MyApp());
 }
 

@@ -75,6 +75,32 @@ class AttributeDto {
       onChangeValue: onChangeValue,
     );
   }
+  factory AttributeDto.objectInObject({
+    required String type,
+    required String name,
+    required VariableOption selectedValue,
+    String? description,
+    List<String?> builders = const [],
+    bool required = false,
+    VariableOption? defaultValue,
+    OnChangeValue? onChangeValue,
+    List<AttributeDto> children = const [],
+    List<VariableOption>? variableOptions,
+  }) {
+    variableOptions ??= [selectedValue];
+    return AttributeDto._raw(
+      type: type,
+      name: name,
+      variableOptions: variableOptions,
+      selectedValue: selectedValue,
+      defaultValue: defaultValue,
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: ObjectInObjectType(children: children),
+      onChangeValue: onChangeValue,
+    );
+  }
   factory AttributeDto.string({
     required String name,
     bool canBeNull = false,
@@ -99,6 +125,7 @@ class AttributeDto {
       onChangeValue: onChangeValue,
     );
   }
+
   factory AttributeDto.function({
     required dynamic function,
     required String name,
@@ -186,13 +213,6 @@ class AttributeDto {
     required this.defaultValue,
     required this.onChangeValue,
   });
-
-  String get toStringValue {
-    if (type.contains('String') && selectedValue?.value != null) {
-      return '\'${selectedValue?.textInDisplay ?? selectedValue?.value}\'';
-    }
-    return '${selectedValue?.textInDisplay ?? selectedValue?.value}';
-  }
 }
 
 abstract class VariableOptionType {}
@@ -217,18 +237,18 @@ class RangeIntIntervalType extends VariableOptionType {
   int begin;
   int end;
   RangeIntIntervalType(
-      this.begin,
-      this.end,
-      );
+    this.begin,
+    this.end,
+  );
 }
 
 class RangeDoubleIntervalType extends VariableOptionType {
   double begin;
   double end;
   RangeDoubleIntervalType(
-      this.begin,
-      this.end,
-      );
+    this.begin,
+    this.end,
+  );
 }
 
 class HtmlType extends VariableOptionType {
@@ -238,6 +258,13 @@ class HtmlType extends VariableOptionType {
 class WrapType extends VariableOptionType {}
 
 class DefaultType extends VariableOptionType {}
+
+class ObjectInObjectType extends VariableOptionType {
+  List<AttributeDto> children;
+  ObjectInObjectType({
+    required this.children,
+  });
+}
 
 class VariableOption {
   dynamic value;

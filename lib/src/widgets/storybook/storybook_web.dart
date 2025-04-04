@@ -51,7 +51,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height * 0.85;
+    final height = MediaQuery.of(context).size.height * 0.97;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -95,7 +95,12 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
           selectedConstructor = constructor;
         });
       },
-      updatePreviewCode: updatePreviewCode,
+      updatePreviewCode: (att) {
+        return updatePreviewCode(
+          att,
+          selectedConstructor: selectedConstructor,
+        );
+      },
       extraAttributesConfigCustom: this.extraAttributesConfigCustom,
     );
   }
@@ -118,7 +123,10 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
                       children: [
                         Expanded(
                           child: SelectableText(
-                            updatePreviewCode(),
+                            updatePreviewCode(
+                              attributes,
+                              selectedConstructor: selectedConstructor,
+                            ),
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyLarge
@@ -138,7 +146,10 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
             child: IconButton(
               color: Colors.white,
               onPressed: () {
-                Utils.copyClipboard(updatePreviewCode());
+                Utils.copyClipboard(updatePreviewCode(
+                  attributes,
+                  selectedConstructor: selectedConstructor,
+                ));
               },
               icon: const Icon(Icons.copy, size: 20),
             ),
@@ -150,7 +161,12 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
 
   @protected
   @mustCallSuper
-  String updatePreviewCode() {
+  String updatePreviewCode(
+    List<AttributeDto> attributes, {
+    String? newNameClass,
+    String? selectedConstructor,
+    int level = 0,
+  }) {
     final attributesString = attributes
         .where((e) {
           final constructor =
@@ -158,12 +174,29 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
           final ignoreInDisplay = e.selectedValue?.ignoreInDisplay ?? true;
           return constructor && !ignoreInDisplay;
         })
-        .map((e) => "\n    ${e.name}: ${e.toStringValue},")
+        .map((e) =>
+            "\n${breakSpaceLevel(level + 1)}${e.name}: ${toStringValue(e, level)},")
         .join();
     final constructor =
         selectedConstructor == null ? '' : '.$selectedConstructor';
-    final nameClass = nameObjectInDisplay;
-    return "$nameClass$constructor($attributesString\n)";
+    final nameClass = newNameClass ?? nameObjectInDisplay;
+    return "$nameClass$constructor($attributesString\n${breakSpaceLevel(level)})";
+  }
+
+  String toStringValue(AttributeDto attribute, int level) {
+    if (attribute.type.contains('String') &&
+        attribute.selectedValue?.value != null) {
+      return '\'${attribute.selectedValue?.textInDisplay ?? attribute.selectedValue?.value}\'';
+    }
+    if (attribute.variableOptionType is ObjectInObjectType) {
+      return updatePreviewCode(
+        (attribute.variableOptionType as ObjectInObjectType).children,
+        newNameClass: attribute.selectedValue?.value.runtimeType.toString(),
+        level: level + 1,
+        selectedConstructor: null, //TODO obter um construtor de sub object
+      );
+    }
+    return '${attribute.selectedValue?.textInDisplay ?? attribute.selectedValue?.value}';
   }
 
   Widget _buildDevice(BuildContext context, double height) {
@@ -199,5 +232,13 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
         ),
       ),
     );
+  }
+
+  String breakSpaceLevel(int level) {
+    String space = '';
+    for (int i = 0; i < level; i++) {
+      space += '    ';
+    }
+    return space;
   }
 }

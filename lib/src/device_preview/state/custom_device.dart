@@ -83,6 +83,7 @@ class CustomDeviceIdentifier implements DeviceIdentifier {
   DeviceType get type => data.type;
 
   @override
+  // ignore: non_nullable_equals_parameter
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other is DeviceIdentifier &&

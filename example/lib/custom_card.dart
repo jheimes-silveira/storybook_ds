@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/storybook_ds.dart';
+
 
 extension EStyleCustomCard on StyleCustomCard {
   Color? get color {
@@ -33,6 +35,18 @@ enum StyleCustomCard {
   inline,
 }
 
+@reflectable
+class SettingCustomCard {
+  final Color? color;
+  final Color textColor;
+
+  SettingCustomCard({
+    required this.textColor,
+    this.color,
+  });
+}
+
+@reflectable
 class CustomCard extends StatefulWidget {
   final String title;
   final String? description;
@@ -120,7 +134,6 @@ class _CustomCardState extends State<CustomCard> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-         
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
