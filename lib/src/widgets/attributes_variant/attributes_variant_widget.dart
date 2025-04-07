@@ -39,7 +39,8 @@ class _AttributesVariantWidgetState extends State<AttributesVariantWidget> {
         ...widget.attributes
             .where(
               (e) =>
-                  e.builders.isEmpty || e.builders.contains(widget.constructor),
+                  e.builders.isEmpty ||
+                  e.builders.contains(widget.constructor ?? ''),
             )
             .map(
               (e) => Padding(

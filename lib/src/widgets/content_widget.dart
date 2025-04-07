@@ -24,7 +24,7 @@ class ContentWidget extends StatelessWidget {
     AttributeDto currentAtribute,
   )? onAttributes;
 
-  final Function(String? constructor) onSelectedConstructor;
+  final Function(String constructor) onSelectedConstructor;
   final String Function(List<AttributeDto> attributes) updatePreviewCode;
   final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
 
@@ -59,11 +59,10 @@ class ContentWidget extends StatelessWidget {
             _buildTitle(context),
             _buildDescription(context),
             _buildBuilders(context, attributes),
-            if (extraAttributesConfigCustom != null)
-              ...[
-                const SizedBox(height: 12),
-                extraAttributesConfigCustom!(context)
-              ],
+            if (extraAttributesConfigCustom != null) ...[
+              const SizedBox(height: 12),
+              extraAttributesConfigCustom!(context)
+            ],
             _buildAttributesTheme(multipleThemeSettings),
             _buildAttributesVariant(attributes),
             // _buildPreviewCode(context),
@@ -91,7 +90,7 @@ class ContentWidget extends StatelessWidget {
   }
 
   _buildBuilders(BuildContext context, List<AttributeDto> attributes) {
-    List<String?> builders = [];
+    List<String> builders = [];
     for (var e in attributes) {
       if (e.builders.isNotEmpty) {
         for (var e2 in e.builders) {
@@ -99,8 +98,8 @@ class ContentWidget extends StatelessWidget {
             builders.add(e2);
           }
         }
-      } else if (!builders.contains(null)) {
-        builders.insert(0, null);
+      } else if (!builders.contains('')) {
+        builders.insert(0, '');
       }
     }
 
@@ -153,12 +152,12 @@ class Builders extends StatefulWidget {
     required this.onSelectedConstructor,
   });
 
-  final List<String?> builders;
+  final List<String> builders;
   final String? initConstructor;
   final Function(List<AttributeDto> attributes, AttributeDto currentAtribute)?
       onAttributes;
   final List<AttributeDto> attributes;
-  final Function(String? constructor) onSelectedConstructor;
+  final Function(String constructor) onSelectedConstructor;
 
   @override
   State<Builders> createState() => _BuildersState();
@@ -194,7 +193,7 @@ class _BuildersState extends State<Builders> {
             children: widget.builders
                 .map(
                   (e2) => CustomChipSelected(
-                    label: e2 ?? 'default',
+                    label: e2.isEmpty ? 'default' : e2,
                     selected: _constructor == e2,
                     onTap: () {
                       if (widget.onAttributes != null) {

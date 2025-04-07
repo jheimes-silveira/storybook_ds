@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 import 'storybook_component_state.dart';

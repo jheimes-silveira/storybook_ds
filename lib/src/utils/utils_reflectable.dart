@@ -10,9 +10,8 @@ class AppReflectable extends Reflectable {
           reflectedTypeCapability,
           metadataCapability,
           typeRelationsCapability,
-          metadataCapability,
-          typeRelationsCapability,
-          instanceInvokeCapability,
+          invokingCapability,
+          newInstanceCapability,
         );
 }
 
@@ -29,20 +28,20 @@ class UtilsReflectable {
     }
   }
 
-  static String? getFieldType(dynamic obj, String fieldName) {
+  static Type? getFieldType(dynamic obj, String fieldName) {
     var instanceMirror = reflectable.reflect(obj);
     var classMirror = instanceMirror.type;
     var variableMirror = classMirror.declarations[fieldName];
     if (variableMirror is VariableMirror) {
       var fieldType = variableMirror.dynamicReflectedType;
 
-      return fieldType.toString();
+      return fieldType;
     } else {
       return null;
     }
   }
 
-  static dynamic updateValue<T>(
+  static dynamic updateValue(
     dynamic obj, {
     required String nameVariavel,
     required dynamic novoValor,
@@ -71,5 +70,25 @@ class UtilsReflectable {
     var newInstance = classMirror.newInstance('', [], parameterValues);
 
     return newInstance;
+  }
+
+  static List<String> findConstructors(
+    dynamic obj, {
+    required String valiable,
+  }) {
+    var instanceMirror = reflectable.reflect(obj);
+    var classMirror = instanceMirror.type;
+
+    var construtores = classMirror.declarations.values
+        .whereType<MethodMirror>()
+        .where((m) => m.isConstructor);
+    List<String> constructors = [];
+    for (var construtor in construtores) {
+      var parametros = construtor.parameters;
+      if (parametros.any((param) => param.simpleName == valiable)) {
+        constructors.add(construtor.constructorName);
+      }
+    }
+    return constructors;
   }
 }

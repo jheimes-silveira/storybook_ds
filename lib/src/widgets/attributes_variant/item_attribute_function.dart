@@ -54,9 +54,7 @@ class _ItemAttributeFunctionState extends State<ItemAttributeFunction> {
     AttributeDto e,
     List<AttributeDto> attributes,
   ) {
-    if (e.variableOptionType is HtmlType) {
-      return const SizedBox();
-    }
+
     if (e.type.contains('?')) {
       return Switch(
         value: e.selectedValue?.value == null ? false : true,

@@ -14,7 +14,7 @@ import '../content_widget.dart';
 
 abstract class Storybook<T extends StatefulWidget> extends State<T> {
   /// Construtor selecionado, porem quando não possui nenhum construtor selecionado o padão é null
-  String? selectedConstructor;
+  String selectedConstructor = '';
 
   /// Título do Storybook.
   String get title;
@@ -90,7 +90,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
       title: title,
       constructor: selectedConstructor,
       nameObjectInDisplay: nameObjectInDisplay,
-      onSelectedConstructor: (String? constructor) {
+      onSelectedConstructor: (String constructor) {
         setState(() {
           selectedConstructor = constructor;
         });
@@ -163,8 +163,8 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
   @mustCallSuper
   String updatePreviewCode(
     List<AttributeDto> attributes, {
+    required String selectedConstructor,
     String? newNameClass,
-    String? selectedConstructor,
     int level = 0,
   }) {
     final attributesString = attributes
@@ -177,10 +177,13 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
         .map((e) =>
             "\n${breakSpaceLevel(level + 1)}${e.name}: ${toStringValue(e, level)},")
         .join();
-    final constructor =
-        selectedConstructor == null ? '' : '.$selectedConstructor';
+    final constructor = selectedConstructor =
+        selectedConstructor.isEmpty ? '' : '.$selectedConstructor';
     final nameClass = newNameClass ?? nameObjectInDisplay;
-    return "$nameClass$constructor($attributesString\n${breakSpaceLevel(level)})";
+
+    final att = "$attributesString${attributesString.isNotEmpty ? '\n' : ''}";
+    final codeBreak = attributesString.isNotEmpty ? breakSpaceLevel(level) : '';
+    return "$nameClass$constructor($att$codeBreak)";
   }
 
   String toStringValue(AttributeDto attribute, int level) {
@@ -193,7 +196,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
         (attribute.variableOptionType as ObjectInObjectType).children,
         newNameClass: attribute.selectedValue?.value.runtimeType.toString(),
         level: level + 1,
-        selectedConstructor: null, //TODO obter um construtor de sub object
+        selectedConstructor: '', //TODO obter um construtor de sub object
       );
     }
     return '${attribute.selectedValue?.textInDisplay ?? attribute.selectedValue?.value}';

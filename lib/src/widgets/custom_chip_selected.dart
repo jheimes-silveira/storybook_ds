@@ -25,8 +25,8 @@ class CustomChipSelected extends StatelessWidget {
           ),
         ),
         avatar: selected
-            ? CircleAvatar(
-                child: const Icon(
+            ? const CircleAvatar(
+                child: Icon(
                   Icons.check,
                   size: 13,
                 ),
