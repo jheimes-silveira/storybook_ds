@@ -605,7 +605,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.2.2+20"
+    version: "1.2.3+21"
   stream_channel:
     dependency: transitive
     description:
