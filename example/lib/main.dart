@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'custom_card_storybook.dart';
 
 void main() {
-   initializeReflectable();
+  initializeReflectable();
   runApp(const MyApp());
-}
+} 
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);

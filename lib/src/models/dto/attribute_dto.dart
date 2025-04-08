@@ -138,6 +138,7 @@ class AttributeDto {
     Enum? selectedValue,
     Enum? defaultValue,
   }) {
+
     return AttributeDto._raw(
       type: '${values[0].runtimeType}${canBeNull ? '?' : ''}',
       name: name,

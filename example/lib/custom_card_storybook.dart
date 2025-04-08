@@ -272,7 +272,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
               if (selectedConstructor.isEmpty)
                 CustomCard(
                   title: getWhereAttribut('title'),
-                  style: getWhereAttribut('style'),
+                  style: getWhereAttribut('style') ?? StyleCustomCard.inline,
                   description: getWhereAttribut('description'),
                   onNegative:
                       getWhereAttribut('onNegative') != null ? () {} : null,

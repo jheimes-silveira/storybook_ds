@@ -45,7 +45,10 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
   void onUpdateTheme(MultipleThemeSettings multipleThemeSettings) {}
 
   dynamic getWhereAttribut(String name) {
-    final attribute = attributes.firstWhere((e) => e.name == name);
+    final attribute = attributes.firstWhere(
+      (e) => e.name == name,
+      orElse: () => AttributeDto(type: '', name: ''),
+    );
     return attribute.selectedValue?.value;
   }
 

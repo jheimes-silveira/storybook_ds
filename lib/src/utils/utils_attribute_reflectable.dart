@@ -83,10 +83,17 @@ class UtilsAttributeReflectable {
             ),
           );
         } else if (value is Enum) {
-          var classMirror = reflectable.reflectType(type!) as ClassMirror;
+          List<Enum> enumValues = [];
 
-          List<Enum> enumValues =
-              classMirror.invokeGetter('values') as List<Enum>;
+          try {
+            var classMirror = reflectable.reflectType(type!) as ClassMirror;
+            enumValues = classMirror.invokeGetter('values') as List<Enum>;
+          } catch (e) {
+            enumValues = [value];
+          }
+          if (enumValues.isEmpty) {
+            continue;
+          }
           attributes.add(
             AttributeDto.enumType(
               name: name,
