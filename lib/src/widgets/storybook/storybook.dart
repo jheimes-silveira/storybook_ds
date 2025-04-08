@@ -44,6 +44,8 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
 
   void onUpdateTheme(MultipleThemeSettings multipleThemeSettings) {}
 
+  void onUpdateSelectedConstructor(String constructor) {}
+
   dynamic getWhereAttribut(String name) {
     final attribute = attributes.firstWhere(
       (e) => e.name == name,
@@ -96,6 +98,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
       onSelectedConstructor: (String constructor) {
         setState(() {
           selectedConstructor = constructor;
+          onUpdateSelectedConstructor(constructor);
         });
       },
       updatePreviewCode: (att) {
