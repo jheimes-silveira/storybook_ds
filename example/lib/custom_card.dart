@@ -29,6 +29,7 @@ extension EStyleCustomCard on StyleCustomCard {
   }
 }
 
+@reflectable
 enum StyleCustomCard {
   outline,
   inline,

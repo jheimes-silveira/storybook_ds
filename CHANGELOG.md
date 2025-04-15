@@ -1,5 +1,5 @@
 ## 1.2.4+21 - Add builder support to StoryBookComponent and clean up exports
-- ...
+- We are excited to announce version 1.2.4+21 of our library, which brings a powerful new option for your components! Now, in addition to primitive data, you can use complex objects with the `AttributeDto.objectInObject` functionality. This update allows greater flexibility and richness in building your components, making it easier to integrate more elaborate data structures.
 
 ## 1.2.3+20 - Add builder support to StoryBookComponent and clean up exports
 - Introduced an optional `builder` parameter to `StoryBookComponent` and ensured either `child` or `builder` is required. Refactored exports in `storybook_ds.dart` for better organization and consistency. Also included minor fixes to attribute handling and updated pubspec.lock to version 1.2.2+19.
