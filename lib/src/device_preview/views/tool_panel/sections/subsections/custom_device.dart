@@ -82,6 +82,7 @@ List<Widget> buildCustomDeviceTiles(BuildContext context) {
                   title: 'Change Width',
                 ).then((value) {
                   if (value == null) return;
+                  // ignore: use_build_context_synchronously
                   final store = context.read<DevicePreviewStore>();
                   store.updateCustomDevice(
                     customDevice.copyWith(
@@ -118,6 +119,7 @@ List<Widget> buildCustomDeviceTiles(BuildContext context) {
                   title: 'Change Height',
                 ).then((value) {
                   if (value == null) return;
+                  // ignore: use_build_context_synchronously
                   final store = context.read<DevicePreviewStore>();
                   store.updateCustomDevice(
                     customDevice.copyWith(

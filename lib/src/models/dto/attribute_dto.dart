@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:storybook_ds/src/utils/utils.dart';
 
 typedef OnChangeValue = void Function(AttributeDto value);
 
@@ -8,7 +9,7 @@ class AttributeDto {
   final String name;
   final String? description;
   final List<VariableOption>? variableOptions;
-  final List<String?> builders;
+  final List<String> builders;
   final VariableOptionType variableOptionType;
   final bool required;
   final VariableOption? defaultValue;
@@ -21,7 +22,7 @@ class AttributeDto {
     required String name,
     String? description,
     List<VariableOption>? variableOptions,
-    List<String?> builders = const [],
+    List<String> builders = const [''],
     bool required = false,
     VariableOption? selectedValue,
     VariableOption? defaultValue,
@@ -53,7 +54,7 @@ class AttributeDto {
     bool canBeNull = false,
     required String name,
     String? description,
-    List<String?> builders = const [],
+    List<String> builders = const [''],
     bool required = false,
     int? selectedValue,
     int? defaultValue,
@@ -75,11 +76,38 @@ class AttributeDto {
       onChangeValue: onChangeValue,
     );
   }
+  factory AttributeDto.objectInObject({
+    required String type,
+    required String name,
+    required VariableOption selectedValue,
+    String? description,
+    bool canBeNull = false,
+    List<String> builders = const [''],
+    bool required = false,
+    VariableOption? defaultValue,
+    OnChangeValue? onChangeValue,
+    List<AttributeDto> children = const [],
+    List<VariableOption>? variableOptions,
+  }) {
+    variableOptions ??= [selectedValue];
+    return AttributeDto._raw(
+      type: '$type${canBeNull ? '?' : ''}',
+      name: name,
+      variableOptions: variableOptions,
+      selectedValue: selectedValue,
+      defaultValue: defaultValue,
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: ObjectInObjectType(children: children),
+      onChangeValue: onChangeValue,
+    );
+  }
   factory AttributeDto.string({
     required String name,
     bool canBeNull = false,
     String? description,
-    List<String?> builders = const [],
+    List<String> builders = const [''],
     bool required = false,
     String? mask,
     String? selectedValue,
@@ -99,12 +127,56 @@ class AttributeDto {
       onChangeValue: onChangeValue,
     );
   }
+  factory AttributeDto.enumType({
+    required String name,
+    required List<Enum> values,
+    bool canBeNull = false,
+    String? description,
+    List<String> builders = const [''],
+    bool required = false,
+    void Function(AttributeDto)? onChangeValue,
+    Enum? selectedValue,
+    Enum? defaultValue,
+  }) {
+
+    return AttributeDto._raw(
+      type: '${values[0].runtimeType}${canBeNull ? '?' : ''}',
+      name: name,
+      variableOptions: values
+          .map((e) => VariableOption(
+                value: e,
+                textInDisplay: '$e',
+                textInSelectedOptions: e.name,
+              ))
+          .toList(),
+      selectedValue: selectedValue != null
+          ? VariableOption(
+              value: selectedValue,
+              textInDisplay: '$selectedValue',
+              textInSelectedOptions: selectedValue.name,
+            )
+          : VariableOption(value: null),
+      defaultValue: defaultValue != null
+          ? VariableOption(
+              value: defaultValue,
+              textInDisplay: '$defaultValue',
+              textInSelectedOptions: defaultValue.name,
+            )
+          : VariableOption(value: null),
+      builders: builders,
+      description: description,
+      required: required,
+      variableOptionType: EnumType(),
+      onChangeValue: onChangeValue,
+    );
+  }
+
   factory AttributeDto.function({
     required dynamic function,
     required String name,
     bool canBeNull = false,
     String? description,
-    List<String?> builders = const [],
+    List<String> builders = const [''],
     bool required = false,
     OnChangeValue? onChangeValue,
   }) {
@@ -127,7 +199,7 @@ class AttributeDto {
     required String name,
     bool canBeNull = false,
     String? description,
-    List<String?> builders = const [],
+    List<String> builders = const [''],
     bool required = false,
     double? selectedValue,
     double? defaultValue,
@@ -154,17 +226,34 @@ class AttributeDto {
     required String name,
     bool canBeNull = false,
     String? description,
-    List<String?> builders = const [],
+    List<String> builders = const [''],
     bool required = false,
     Color? selectedValue,
     Color? defaultValue,
+    List<Color> variableOptions = const [],
     OnChangeValue? onChangeValue,
   }) {
+    final options = variableOptions
+        .map((e) => VariableOption(
+              value: e,
+              textInSelectedOptions: Utils.colorToHex(e),
+            ))
+        .toList();
+    if (options.isEmpty && selectedValue != null) {
+      options.add(VariableOption(
+        value: selectedValue,
+        textInSelectedOptions: Utils.colorToHex(selectedValue),
+      ));
+    }
     return AttributeDto._raw(
       type: 'Color${canBeNull ? '?' : ''}',
       name: name,
-      variableOptions: [VariableOption(value: Colors.white)],
-      selectedValue: VariableOption(value: selectedValue),
+      variableOptions: options,
+      selectedValue: VariableOption(
+        value: selectedValue,
+        textInSelectedOptions:
+            selectedValue != null ? Utils.colorToHex(selectedValue) : null,
+      ),
       defaultValue: VariableOption(value: defaultValue),
       builders: builders,
       description: description,
@@ -186,13 +275,6 @@ class AttributeDto {
     required this.defaultValue,
     required this.onChangeValue,
   });
-
-  String get toStringValue {
-    if (type.contains('String') && selectedValue?.value != null) {
-      return '\'${selectedValue?.textInDisplay ?? selectedValue?.value}\'';
-    }
-    return '${selectedValue?.textInDisplay ?? selectedValue?.value}';
-  }
 }
 
 abstract class VariableOptionType {}
@@ -211,24 +293,26 @@ class StringType extends VariableOptionType {
   });
 }
 
+class EnumType extends VariableOptionType {}
+
 class ColorType extends VariableOptionType {}
 
 class RangeIntIntervalType extends VariableOptionType {
   int begin;
   int end;
   RangeIntIntervalType(
-      this.begin,
-      this.end,
-      );
+    this.begin,
+    this.end,
+  );
 }
 
 class RangeDoubleIntervalType extends VariableOptionType {
   double begin;
   double end;
   RangeDoubleIntervalType(
-      this.begin,
-      this.end,
-      );
+    this.begin,
+    this.end,
+  );
 }
 
 class HtmlType extends VariableOptionType {
@@ -238,6 +322,13 @@ class HtmlType extends VariableOptionType {
 class WrapType extends VariableOptionType {}
 
 class DefaultType extends VariableOptionType {}
+
+class ObjectInObjectType extends VariableOptionType {
+  List<AttributeDto> children;
+  ObjectInObjectType({
+    required this.children,
+  });
+}
 
 class VariableOption {
   dynamic value;

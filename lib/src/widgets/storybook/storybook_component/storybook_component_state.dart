@@ -15,6 +15,7 @@ class StoryBookComponentState extends StatefulWidget {
     this.backgroundColor,
     this.onUpdateTheme,
     this.extraAttributesConfigCustom,
+    this.onSelectedConstructor,
   }) : assert(child != null || builder != null, 'child or builder is required');
   final Widget? child;
   final WidgetBuilder? builder;
@@ -29,7 +30,7 @@ class StoryBookComponentState extends StatefulWidget {
     MultipleThemeSettings multipleThemeSettings,
   )? onUpdateTheme;
   final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
-
+  final Function(String constructor)? onSelectedConstructor;
   @override
   Storybook<StoryBookComponentState> createState() =>
       // ignore: no_logic_in_create_state
@@ -44,6 +45,7 @@ class StoryBookComponentState extends StatefulWidget {
         backgroundColor: backgroundColor,
         extraAttributesConfigCustom: extraAttributesConfigCustom,
         builder: builder,
+        onSelectedConstructor: onSelectedConstructor,
       );
 }
 
@@ -61,6 +63,7 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
   final String nameObjectInDisplay;
 
   @override
+  // ignore: overridden_fields
   final MultipleThemeSettings? multipleThemeSettings;
 
   @override
@@ -68,7 +71,7 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
 
   final Color? backgroundColor;
   final StoryBookComponentController? controller;
-
+  final Function(String constructor)? onSelectedConstructor;
   _StoryBookComponentStateState({
     required this.title,
     required this.description,
@@ -80,7 +83,16 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
     this.child,
     this.builder,
     this.extraAttributesConfigCustom,
+    this.onSelectedConstructor,
   });
+
+  @override
+  void onUpdateSelectedConstructor(String constructor) {
+    super.onUpdateSelectedConstructor(constructor);
+    if (widget.onSelectedConstructor != null) {
+      widget.onSelectedConstructor!(constructor);
+    }
+  }
 
   @override
   void onUpdateTheme(MultipleThemeSettings multipleThemeSettings) {
