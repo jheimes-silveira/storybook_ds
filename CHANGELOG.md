@@ -1,8 +1,14 @@
-## 1.2.4+21 - Add builder support to StoryBookComponent and clean up exports
-- We are excited to announce version 1.2.4+21 of our library, which brings a powerful new option for your components! Now, in addition to primitive data, you can use complex objects with the `AttributeDto.objectInObject` functionality. This update allows greater flexibility and richness in building your components, making it easier to integrate more elaborate data structures.
+## 1.2.3+22 - Atualização de versões de bibliotecas e melhor compatibilidade com Flutter 3.38
+- Atualização das versões das bibliotecas de dependências para melhor compatibilidade com Flutter 3.38
+- Removida dependência da biblioteca `collection`, substituída por função local `groupBy` para reduzir dependências externas
+- Atualizadas as seguintes bibliotecas: `shared_preferences` para ^2.5.0, `build_runner` para ^2.4.15, `freezed` para ^2.5.8, `json_serializable` para ^6.9.0, `freezed_annotation` para ^2.4.4
+- Melhorias na compatibilidade e estabilidade do pacote
 
-## 1.2.3+20 - Add builder support to StoryBookComponent and clean up exports
-- Introduced an optional `builder` parameter to `StoryBookComponent` and ensured either `child` or `builder` is required. Refactored exports in `storybook_ds.dart` for better organization and consistency. Also included minor fixes to attribute handling and updated pubspec.lock to version 1.2.2+19.
+## 1.2.4+21 - Adicionar suporte de builder ao StoryBookComponent e limpeza de exports
+- Estamos animados em anunciar a versão 1.2.4+21 da nossa biblioteca, que traz uma nova opção poderosa para seus componentes! Agora, além de dados primitivos, você pode usar objetos complexos com a funcionalidade `AttributeDto.objectInObject`. Esta atualização permite maior flexibilidade e riqueza na construção de seus componentes, facilitando a integração de estruturas de dados mais elaboradas.
+
+## 1.2.3+20 - Adicionar suporte de builder ao StoryBookComponent e limpeza de exports
+- Introduzido parâmetro opcional `builder` ao `StoryBookComponent` e garantido que `child` ou `builder` seja obrigatório. Refatorados exports em `storybook_ds.dart` para melhor organização e consistência. Também incluídas correções menores no tratamento de atributos e atualizado pubspec.lock para versão 1.2.2+19.
 
 ## 1.2.0+19 - Melhorias em recursos visuais 
 - Resolvendo problema de abertura de modais quando tela completa
@@ -29,7 +35,7 @@
 - Incluir tabela com valores das variaveis do componente
 
 ## 0.0.9 - Incluir visualização de Wrap 
-- Experimental BREAKING CHANGE mudanças em implementação da `class` storybook
+- Experimental MUDANÇA QUEBRANTE: mudanças em implementação da `class` storybook
 
 ## 0.0.8 - Incluir visualização de Wrap 
 - Incluir visualização de Wrap
@@ -40,5 +46,5 @@
 ## 0.0.5 - Edição de documentação de utilização
 - Documentação de utilização
 
-## 0.0.1 - First Publication
-- Publish package 
+## 0.0.1 - Primeira Publicação
+- Publicação do pacote 
