@@ -2,27 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 extension EStyleCustomCard on StyleCustomCard {
-  Color? get color {
+  /// Retorna a cor de fundo baseada no tema atual
+  Color? color(BuildContext context) {
     if (this == StyleCustomCard.inline) {
-      return Colors.white;
+      // Para inline, usa a cor de superfície do tema
+      return Theme.of(context).colorScheme.surface;
     }
-
-    return Colors.grey;
+    // Para outline, usa a cor primária com opacidade
+    return Theme.of(context).colorScheme.primary.withOpacity(0.1);
   }
 
-  Color? get textColor {
+  /// Retorna a cor do texto baseada no tema atual
+  Color? textColor(BuildContext context) {
     if (this == StyleCustomCard.inline) {
-      return Colors.black;
+      // Para inline, usa a cor de texto sobre superfície
+      return Theme.of(context).colorScheme.onSurface;
     }
-
-    return Colors.white;
+    // Para outline, usa a cor de texto sobre superfície
+    return Theme.of(context).colorScheme.onSurface;
   }
 
-  BoxBorder? get border {
+  /// Retorna a borda baseada no tema atual
+  BoxBorder? border(BuildContext context) {
     if (this == StyleCustomCard.inline) {
+      final brightness = Theme.of(context).brightness;
+      final borderColor = brightness == Brightness.dark
+          ? const Color(0xFF4CAF50)
+              .withOpacity(0.3) // Verde suave no tema escuro
+          : const Color(0xFF2E7D32)
+              .withOpacity(0.2); // Verde suave no tema claro
       return Border.all(
-        color: Colors.grey[500]!,
-        width: 1,
+        color: borderColor,
+        width: 1.5,
       );
     }
     return null;
@@ -129,13 +140,24 @@ class CustomCard extends StatefulWidget {
 class _CustomCardState extends State<CustomCard> {
   @override
   Widget build(BuildContext context) {
+    final cardColor = widget.style.color(context);
+    final border = widget.style.border(context);
+
     return Card(
+      color: cardColor,
+      elevation: 0, // Remove elevação padrão para usar a do tema
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // Alinhado com os temas
+        side: widget.style == StyleCustomCard.inline && border != null
+            ? (border as Border).top
+            : BorderSide.none,
+      ),
       child: Container(
         width: widget.width,
         height: widget.height,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20), // Padding maior para mais respiro
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -154,25 +176,27 @@ class _CustomCardState extends State<CustomCard> {
   }
 
   Widget _buildTitle() {
+    final textColor = widget.style.textColor(context);
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Text(
         widget.title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
-              color: widget.style.textColor,
+              color: textColor,
             ),
       ),
     );
   }
 
   Widget _buildDescription() {
+    final textColor = widget.style.textColor(context);
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Text(
         widget.description!,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: widget.style.textColor,
+              color: textColor,
             ),
       ),
     );

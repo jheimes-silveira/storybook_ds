@@ -44,7 +44,7 @@ class UtilsAttributeReflectable {
 
         if (type == String) {
           attributes.add(
-            _factoryAttributeDtoString(
+            factoryAttributeDtoString(
               name: name,
               selectedValue: value ?? '',
               builders: builders,
@@ -153,7 +153,10 @@ class UtilsAttributeReflectable {
     return functionPattern.hasMatch(typeString);
   }
 
-  static _factoryAttributeDtoString({
+  /// Factory method to create an AttributeDto for String type with predefined options.
+  ///
+  /// Returns an [AttributeDto] configured for String input with various text length options.
+  static AttributeDto factoryAttributeDtoString({
     required String name,
     String? selectedValue,
     bool canBeNull = false,
