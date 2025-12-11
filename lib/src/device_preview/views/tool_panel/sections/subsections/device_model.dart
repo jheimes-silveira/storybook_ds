@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +8,16 @@ import 'package:storybook_ds/src/device_preview/views/tool_panel/widgets/target_
 import '../section.dart';
 
 part 'custom_device.dart';
+
+/// Agrupa uma lista de elementos por uma chave retornada pela função fornecida.
+Map<K, List<T>> groupBy<T, K>(Iterable<T> iterable, K Function(T) key) {
+  final map = <K, List<T>>{};
+  for (final element in iterable) {
+    final k = key(element);
+    map.putIfAbsent(k, () => <T>[]).add(element);
+  }
+  return map;
+}
 
 /// A page for picking a simulated device model.
 class DeviceModelPicker extends StatefulWidget {
@@ -99,9 +108,8 @@ class _DeviceModelPickerState extends State<DeviceModelPicker>
 
 class _PlatformModelPicker extends StatelessWidget {
   const _PlatformModelPicker({
-    Key? key,
     required this.platform,
-  }) : super(key: key);
+  });
 
   final TargetPlatform platform;
 
@@ -181,9 +189,9 @@ class _TypeSectionHeader extends StatelessWidget {
 
 class DeviceTile extends StatelessWidget {
   const DeviceTile({
-    Key? key,
+    super.key,
     required this.info,
-  }) : super(key: key);
+  });
 
   final DeviceInfo info;
 

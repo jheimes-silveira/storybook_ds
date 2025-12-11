@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 import 'custom_card.dart';
@@ -31,7 +30,7 @@ final ThemeData customThemeDark = ThemeData.dark().copyWith(
       ),
     ),
   ),
-  cardTheme: const CardTheme(
+  cardTheme: const CardThemeData(
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.zero, // Cantos quadrados para Cards
     ),
@@ -64,7 +63,7 @@ final ThemeData customThemeLight = ThemeData.light().copyWith(
       ),
     ),
   ),
-  cardTheme: const CardTheme(
+  cardTheme: const CardThemeData(
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.zero, // Cantos quadrados para Cards
     ),
