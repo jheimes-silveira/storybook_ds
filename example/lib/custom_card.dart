@@ -71,6 +71,8 @@ class CustomCard extends StatefulWidget {
   final String? textNegative;
   final double? width;
   final double? height;
+  final bool hidden;
+  final bool enabled;
 
   const CustomCard({
     required this.title,
@@ -83,6 +85,8 @@ class CustomCard extends StatefulWidget {
     this.width,
     this.height,
     this.settings,
+    this.hidden = false,
+    this.enabled = true,
     Key? key,
   }) : super(key: key);
 
@@ -96,6 +100,8 @@ class CustomCard extends StatefulWidget {
     final String? textNegative,
     final double? width,
     final double? height,
+    final bool hidden = false,
+    final bool enabled = true,
   }) {
     return CustomCard(
       title: title,
@@ -107,6 +113,8 @@ class CustomCard extends StatefulWidget {
       textNegative: textNegative,
       width: width,
       height: height,
+      hidden: hidden,
+      enabled: enabled,
     );
   }
   factory CustomCard.inline({
@@ -119,6 +127,8 @@ class CustomCard extends StatefulWidget {
     final String? textNegative,
     final double? width,
     final double? height,
+    final bool hidden = false,
+    final bool enabled = true,
   }) {
     return CustomCard(
       title: title,
@@ -130,6 +140,8 @@ class CustomCard extends StatefulWidget {
       textNegative: textNegative,
       width: width,
       height: height,
+      hidden: hidden,
+      enabled: enabled,
     );
   }
 
@@ -143,7 +155,7 @@ class _CustomCardState extends State<CustomCard> {
     final cardColor = widget.style.color(context);
     final border = widget.style.border(context);
 
-    return Card(
+    Widget cardContent = Card(
       color: cardColor,
       elevation: 0, // Remove elevação padrão para usar a do tema
       shape: RoundedRectangleBorder(
@@ -168,11 +180,21 @@ class _CustomCardState extends State<CustomCard> {
               Expanded(child: _buildDescription()),
             if (widget.description != null && widget.height == null)
               _buildDescription(),
-            _buildButtonAction(),
+            if (!widget.hidden) _buildButtonAction(),
           ],
         ),
       ),
     );
+
+    // Aplica opacidade de 50% quando enabled for false
+    if (!widget.enabled) {
+      cardContent = Opacity(
+        opacity: 0.5,
+        child: cardContent,
+      );
+    }
+
+    return cardContent;
   }
 
   Widget _buildTitle() {

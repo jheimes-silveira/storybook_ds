@@ -212,7 +212,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
     ),
     AttributeDto(
       name: 'hidden',
-      type: 'bool?',
+      type: 'bool',
       selectedValue: VariableOption(value: false),
     ),
     AttributeDto(
@@ -327,6 +327,8 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
                   textPositive: getWhereAttribut('textPositive'),
                   height: getWhereAttribut('height'),
                   width: getWhereAttribut('width'),
+                  hidden: getWhereAttribut('hidden') ?? false,
+                  enabled: getWhereAttribut('enabled') ?? true,
                 ),
               if (selectedConstructor == 'inline')
                 CustomCard.inline(
@@ -340,6 +342,8 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
                   textPositive: getWhereAttribut('textPositive'),
                   height: getWhereAttribut('height'),
                   width: getWhereAttribut('width'),
+                  hidden: getWhereAttribut('hidden') ?? false,
+                  enabled: getWhereAttribut('enabled') ?? true,
                 ),
               if (selectedConstructor == 'outline')
                 CustomCard.outline(
@@ -353,6 +357,8 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
                   textPositive: getWhereAttribut('textPositive'),
                   height: getWhereAttribut('height'),
                   width: getWhereAttribut('width'),
+                  hidden: getWhereAttribut('hidden') ?? false,
+                  enabled: getWhereAttribut('enabled') ?? true,
                 ),
             ],
           ),
