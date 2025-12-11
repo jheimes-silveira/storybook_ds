@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+/// Constants for device widget styling
+class _DeviceWidgetConstants {
+  static const double borderRadius = 8.0;
+  static const double borderWidth = 4.0;
+}
+
+/// A widget that displays a component within a device frame.
 class DeviceWidget extends StatefulWidget {
   final Widget Function(BuildContext context) buildComponentWidget;
   final EdgeInsets? margin;
@@ -26,9 +33,11 @@ class _DeviceWidgetState extends State<DeviceWidget> {
       width: widget.width,
       height: widget.height,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(
+          _DeviceWidgetConstants.borderRadius,
+        ),
         border: Border.all(
-          width: 4,
+          width: _DeviceWidgetConstants.borderWidth,
           color: Colors.black,
         ),
       ),

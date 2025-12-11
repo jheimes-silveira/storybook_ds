@@ -3,6 +3,16 @@ import 'package:flutter/material.dart';
 import '../../../storybook_ds.dart';
 import 'attribute_variant.dart';
 
+/// Constants for attributes variant widget styling
+class _AttributesVariantWidgetConstants {
+  static const double topPadding = 16.0;
+  static const double bottomPadding = 16.0;
+  static const double itemTopPadding = 8.0;
+  static const double bottomSpacing = 16.0;
+  static const double borderRadius = 8.0;
+  static const double borderWidth = 1.0;
+}
+
 class AttributesVariantWidget extends StatefulWidget {
   final List<AttributeDto> attributes;
   final bool enabledBorder;
@@ -28,7 +38,6 @@ class AttributesVariantWidget extends StatefulWidget {
 }
 
 class _AttributesVariantWidgetState extends State<AttributesVariantWidget> {
-// create some values
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -44,13 +53,17 @@ class _AttributesVariantWidgetState extends State<AttributesVariantWidget> {
             )
             .map(
               (e) => Padding(
-                padding: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.only(
+                  top: _AttributesVariantWidgetConstants.itemTopPadding,
+                ),
                 child: Container(
                   decoration: widget.enabledBorder
                       ? BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(
+                            _AttributesVariantWidgetConstants.borderRadius,
+                          ),
                           border: Border.all(
-                            width: 1,
+                            width: _AttributesVariantWidgetConstants.borderWidth,
                             color: Colors.grey,
                           ),
                         )
@@ -63,16 +76,19 @@ class _AttributesVariantWidgetState extends State<AttributesVariantWidget> {
                 ),
               ),
             ),
-        const SizedBox(height: 16),
+        const SizedBox(
+          height: _AttributesVariantWidgetConstants.bottomSpacing,
+        ),
       ],
     );
   }
 
-  Padding _buildTitle(String title) {
+  /// Builds the title widget.
+  Widget _buildTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(
-        top: 16.0,
-        bottom: 16.0,
+        top: _AttributesVariantWidgetConstants.topPadding,
+        bottom: _AttributesVariantWidgetConstants.bottomPadding,
       ),
       child: Text(
         title,

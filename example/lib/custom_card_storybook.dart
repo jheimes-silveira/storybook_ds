@@ -235,11 +235,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       name: 'onPositive',
       type: 'Function()?',
       selectedValue: VariableOption(value: '(){}'),
-      builders: [
-        '',
-        'inline',
-        'outline',
-      ],
+      builders: [''],
     ),
     AttributeDto(
       name: 'textPositive',
@@ -247,21 +243,13 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       variableOptions: [
         VariableOption(value: 'Continuar'),
       ],
-      builders: [
-        '',
-        'inline',
-        'outline',
-      ],
+      builders: [''],
     ),
     AttributeDto(
       name: 'onNegative',
       type: 'Function()?',
       selectedValue: VariableOption(value: '(){}'),
-      builders: [
-        '',
-        'inline',
-        'outline',
-      ],
+      builders: [''],
     ),
     AttributeDto.objectInObject(
       name: 'setting',
@@ -275,11 +263,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
           name: 'textColor',
         ),
       ],
-      builders: [
-        '',
-        'inline',
-        'outline',
-      ],
+      builders: [''],
       selectedValue: VariableOption(
         value: SettingCustomCard(
           color: Colors.red,
@@ -293,11 +277,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       variableOptions: [
         VariableOption(value: 'Fechar'),
       ],
-      builders: [
-        '',
-        'inline',
-        'outline',
-      ],
+      builders: [''],
     ),
     AttributeDto.rangeDoubleInterval(
       name: 'width',
@@ -305,11 +285,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       end: 400,
       canBeNull: true,
       selectedValue: null,
-      builders: [
-        '',
-        'inline',
-        'outline',
-      ],
+      builders: [''],
     ),
     AttributeDto.rangeDoubleInterval(
       name: 'height',
@@ -317,11 +293,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       end: 600,
       canBeNull: true,
       selectedValue: null,
-      builders: [
-        '',
-        'inline',
-        'outline',
-      ],
+      builders: [''],
     ),
   ];
   @override

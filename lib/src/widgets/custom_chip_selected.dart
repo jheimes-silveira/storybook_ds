@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// Constants for chip styling
+class _CustomChipSelectedConstants {
+  static const double borderRadius = 24.0;
+  static const double borderWidth = 1.0;
+  static const double iconSize = 13.0;
+  static const String defaultLabel = 'default';
+}
+
+/// A customizable chip widget with selection state.
 class CustomChipSelected extends StatelessWidget {
   final String label;
   final bool selected;
@@ -18,17 +27,19 @@ class CustomChipSelected extends StatelessWidget {
       child: Chip(
         label: Text(label),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(
+            _CustomChipSelectedConstants.borderRadius,
+          ),
           side: const BorderSide(
             color: Colors.grey,
-            width: 1,
+            width: _CustomChipSelectedConstants.borderWidth,
           ),
         ),
         avatar: selected
             ? const CircleAvatar(
                 child: Icon(
                   Icons.check,
-                  size: 13,
+                  size: _CustomChipSelectedConstants.iconSize,
                 ),
               )
             : null,

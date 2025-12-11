@@ -3,6 +3,15 @@ import 'package:storybook_ds/src/models/dto/attribute_dto.dart';
 
 import '../custom_chip_selected.dart';
 
+/// Constants for string attribute item styling
+class _ItemAttributeStringConstants {
+  static const double rightPadding = 16.0;
+  static const double bottomPadding = 16.0;
+  static const double topPadding = 8.0;
+  static const double borderRadius = 8.0;
+  static const double chipSpacing = 8.0;
+}
+
 class ItemAttributeString extends StatefulWidget {
   final AttributeDto attribute;
   final List<AttributeDto> attributes;
@@ -22,18 +31,23 @@ class ItemAttributeString extends StatefulWidget {
 }
 
 class _ItemAttributeStringState extends State<ItemAttributeString> {
-  final input = TextEditingController();
+  late final TextEditingController _inputController;
+
   @override
   void initState() {
     super.initState();
-
-    input.text = widget.attribute.selectedValue?.value ?? '';
-
-    input.selection = TextSelection.fromPosition(
-      TextPosition(
-        offset: input.text.length,
-      ),
+    _inputController = TextEditingController(
+      text: widget.attribute.selectedValue?.value ?? '',
     );
+    _inputController.selection = TextSelection.fromPosition(
+      TextPosition(offset: _inputController.text.length),
+    );
+  }
+
+  @override
+  void dispose() {
+    _inputController.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,16 +57,18 @@ class _ItemAttributeStringState extends State<ItemAttributeString> {
         Expanded(
           child: _buildChangeAction(),
         ),
-        _isVariableNubable(widget.attribute, widget.attributes),
+        _buildNullableSwitch(),
       ],
     );
   }
 
+  /// Builds the change action widget with text field and options.
   Widget _buildChangeAction() {
-    final e = widget.attribute;
-    final attributes = widget.attributes;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16, right: 16.0),
+      padding: const EdgeInsets.only(
+        bottom: _ItemAttributeStringConstants.bottomPadding,
+        right: _ItemAttributeStringConstants.rightPadding,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,51 +76,35 @@ class _ItemAttributeStringState extends State<ItemAttributeString> {
           TextField(
             decoration: const InputDecoration(
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(_ItemAttributeStringConstants.borderRadius),
+                ),
                 borderSide: BorderSide(color: Colors.grey),
               ),
             ),
-            key: Key(e.name),
-            controller: input,
-            enabled: e.selectedValue?.value == null ? false : true,
-            onChanged: (text) {
-              if (widget.onAttributes != null) {
-                e.selectedValue = e.selectedValue?.copyWith(
-                  value: text,
-                );
-                setState(() {
-                  widget.onAttributes!(attributes, e);
-                  e.onChangeValue?.call(e);
-                  input.selection = TextSelection.fromPosition(
-                    TextPosition(offset: input.selection.baseOffset),
-                  );
-                });
-              }
-            },
+            key: Key(widget.attribute.name),
+            controller: _inputController,
+            enabled: widget.attribute.selectedValue?.value != null,
+            onChanged: (text) => _handleTextChange(text),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 16, top: 8),
+            padding: const EdgeInsets.only(
+              bottom: _ItemAttributeStringConstants.bottomPadding,
+              top: _ItemAttributeStringConstants.topPadding,
+            ),
             child: Wrap(
               alignment: WrapAlignment.start,
               crossAxisAlignment: WrapCrossAlignment.start,
-              spacing: 8,
+              spacing: _ItemAttributeStringConstants.chipSpacing,
               runAlignment: WrapAlignment.start,
-              runSpacing: 8,
-              children: e.variableOptions!
+              runSpacing: _ItemAttributeStringConstants.chipSpacing,
+              children: widget.attribute.variableOptions!
                   .map(
-                    (e2) => CustomChipSelected(
-                        label: e2.textInSelectedOptions,
-                        selected: e.selectedValue?.value == e2.value,
-                        onTap: () {
-                          if (widget.onAttributes != null) {
-                            e.selectedValue = e2;
-                            input.text = e2.value;
-                            setState(() {
-                              widget.onAttributes!(attributes, e);
-                              e.onChangeValue?.call(e);
-                            });
-                          }
-                        }),
+                    (option) => CustomChipSelected(
+                      label: option.textInSelectedOptions,
+                      selected: widget.attribute.selectedValue?.value == option.value,
+                      onTap: () => _handleOptionTap(option),
+                    ),
                   )
                   .toList(),
             ),
@@ -114,26 +114,58 @@ class _ItemAttributeStringState extends State<ItemAttributeString> {
     );
   }
 
-  Widget _isVariableNubable(
-    AttributeDto e,
-    List<AttributeDto> attributes,
-  ) {
-    if (e.variableOptionType is HtmlType) {
-      return const SizedBox();
+  /// Builds the nullable switch widget if the attribute is nullable.
+  Widget _buildNullableSwitch() {
+    if (widget.attribute.variableOptionType is HtmlType) {
+      return const SizedBox.shrink();
     }
-    if (e.type.contains('?')) {
+    
+    if (widget.attribute.type.contains('?')) {
       return Switch(
-        value: e.selectedValue?.value == null ? false : true,
-        onChanged: (value) {
-          e.selectedValue = value ? (e.variableOptions![0]) : null;
-          setState(() {
-            widget.onAttributes!(attributes, e);
-            e.onChangeValue?.call(e);
-          });
-        },
+        value: widget.attribute.selectedValue?.value != null,
+        onChanged: (value) => _handleNullableSwitchChange(value),
       );
     }
 
-    return const SizedBox();
+    return const SizedBox.shrink();
+  }
+
+  /// Handles text field value change.
+  void _handleTextChange(String text) {
+    if (widget.onAttributes == null) return;
+
+    widget.attribute.selectedValue = widget.attribute.selectedValue?.copyWith(
+      value: text,
+    );
+    setState(() {
+      widget.onAttributes!(widget.attributes, widget.attribute);
+      widget.attribute.onChangeValue?.call(widget.attribute);
+      _inputController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _inputController.selection.baseOffset),
+      );
+    });
+  }
+
+  /// Handles option chip tap.
+  void _handleOptionTap(VariableOption option) {
+    if (widget.onAttributes == null) return;
+
+    widget.attribute.selectedValue = option;
+    _inputController.text = option.value;
+    setState(() {
+      widget.onAttributes!(widget.attributes, widget.attribute);
+      widget.attribute.onChangeValue?.call(widget.attribute);
+    });
+  }
+
+  /// Handles nullable switch change.
+  void _handleNullableSwitchChange(bool value) {
+    widget.attribute.selectedValue = value 
+        ? widget.attribute.variableOptions!.first 
+        : null;
+    setState(() {
+      widget.onAttributes!(widget.attributes, widget.attribute);
+      widget.attribute.onChangeValue?.call(widget.attribute);
+    });
   }
 }

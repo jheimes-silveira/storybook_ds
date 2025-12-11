@@ -7,6 +7,16 @@ import '../models/dto/attribute_dto.dart';
 import 'attributes_theme_widget.dart';
 import 'custom_chip_selected.dart';
 
+/// Constants for spacing and layout
+class _ContentWidgetConstants {
+  static const double topMargin = 48.0;
+  static const double horizontalMargin = 24.0;
+  static const double titleTopPadding = 24.0;
+  static const double buildersTopPadding = 16.0;
+  static const double extraAttributesSpacing = 12.0;
+  static const int delayedConstructorMs = 50;
+}
+
 class ContentWidget extends StatelessWidget {
   final String title;
   final String description;
@@ -48,9 +58,9 @@ class ContentWidget extends StatelessWidget {
     return SingleChildScrollView(
       child: Container(
         margin: const EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 48,
+          left: _ContentWidgetConstants.horizontalMargin,
+          right: _ContentWidgetConstants.horizontalMargin,
+          top: _ContentWidgetConstants.topMargin,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,21 +70,23 @@ class ContentWidget extends StatelessWidget {
             _buildDescription(context),
             _buildBuilders(context, attributes),
             if (extraAttributesConfigCustom != null) ...[
-              const SizedBox(height: 12),
-              extraAttributesConfigCustom!(context)
+              const SizedBox(height: _ContentWidgetConstants.extraAttributesSpacing),
+              extraAttributesConfigCustom!(context),
             ],
             _buildAttributesTheme(multipleThemeSettings),
             _buildAttributesVariant(attributes),
-            // _buildPreviewCode(context),
           ],
         ),
       ),
     );
   }
 
-  Padding _buildDescription(BuildContext context) {
+  /// Builds the description widget.
+  Widget _buildDescription(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 24.0),
+      padding: const EdgeInsets.only(
+        top: _ContentWidgetConstants.titleTopPadding,
+      ),
       child: SelectableText(
         description,
         style: Theme.of(context).textTheme.bodyMedium,
@@ -82,32 +94,24 @@ class ContentWidget extends StatelessWidget {
     );
   }
 
-  Text _buildTitle(BuildContext context) {
+  /// Builds the title widget.
+  Widget _buildTitle(BuildContext context) {
     return Text(
       title,
       style: Theme.of(context).textTheme.headlineSmall,
     );
   }
 
-  _buildBuilders(BuildContext context, List<AttributeDto> attributes) {
-    List<String> builders = [];
-    for (var e in attributes) {
-      if (e.builders.isNotEmpty) {
-        for (var e2 in e.builders) {
-          if (!builders.contains(e2)) {
-            builders.add(e2);
-          }
-        }
-      } else if (!builders.contains('')) {
-        builders.insert(0, '');
-      }
-    }
+  /// Builds the constructors selection widget.
+  Widget _buildBuilders(BuildContext context, List<AttributeDto> attributes) {
+    final builders = _extractUniqueBuilders(attributes);
 
-    if (builders.isNotEmpty &&
-        !builders.contains(null) &&
-        constructor == null) {
-      Future.delayed(const Duration(milliseconds: 50))
-          .then((_) => onSelectedConstructor(builders[0]));
+    if (builders.isNotEmpty && constructor == null) {
+      Future.delayed(
+        const Duration(
+          milliseconds: _ContentWidgetConstants.delayedConstructorMs,
+        ),
+      ).then((_) => onSelectedConstructor(builders.first));
     }
 
     return Builders(
@@ -119,6 +123,28 @@ class ContentWidget extends StatelessWidget {
     );
   }
 
+  /// Extracts unique builders from attributes list.
+  List<String> _extractUniqueBuilders(List<AttributeDto> attributes) {
+    final builders = <String>{};
+    
+    for (final attribute in attributes) {
+      if (attribute.builders.isNotEmpty) {
+        builders.addAll(attribute.builders);
+      } else {
+        builders.add('');
+      }
+    }
+    
+    final result = builders.toList();
+    if (result.contains('')) {
+      result.remove('');
+      result.insert(0, '');
+    }
+    
+    return result;
+  }
+
+  /// Builds the attributes variant widget.
   Widget _buildAttributesVariant(List<AttributeDto> attributes) {
     return AttributesVariantWidget(
       attributes: attributes,
@@ -128,11 +154,12 @@ class ContentWidget extends StatelessWidget {
     );
   }
 
+  /// Builds the attributes theme widget if themes are available.
   Widget _buildAttributesTheme(MultipleThemeSettings? multipleThemeSettings) {
     if (multipleThemeSettings == null ||
         multipleThemeSettings.selectableThemes.isEmpty ||
         onUpdateTheme == null) {
-      return const SizedBox();
+      return const SizedBox.shrink();
     }
 
     return AttributesThemeWidget(
@@ -168,22 +195,24 @@ class _BuildersState extends State<Builders> {
 
   @override
   void initState() {
-    _constructor = widget.initConstructor;
     super.initState();
+    _constructor = widget.initConstructor;
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.only(
+        top: _ContentWidgetConstants.buildersTopPadding,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Construtores",
+            'Construtores',
             style: Theme.of(context).textTheme.titleLarge,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: _ContentWidgetConstants.buildersTopPadding),
           Wrap(
             alignment: WrapAlignment.start,
             crossAxisAlignment: WrapCrossAlignment.start,
@@ -195,21 +224,7 @@ class _BuildersState extends State<Builders> {
                   (e2) => CustomChipSelected(
                     label: e2.isEmpty ? 'default' : e2,
                     selected: _constructor == e2,
-                    onTap: () {
-                      if (widget.onAttributes != null) {
-                        setState(() {
-                          _constructor = e2;
-                          widget.onSelectedConstructor(e2);
-
-                          final attribute = widget.attributes.firstWhere(
-                            (element) => element.builders.contains(e2),
-                            orElse: () => widget.attributes.first,
-                          );
-                          attribute.onChangeValue?.call(attribute);
-                          widget.onAttributes!(widget.attributes, attribute);
-                        });
-                      }
-                    },
+                    onTap: () => _handleConstructorTap(e2),
                   ),
                 )
                 .toList(),
@@ -217,5 +232,22 @@ class _BuildersState extends State<Builders> {
         ],
       ),
     );
+  }
+
+  /// Handles constructor chip tap.
+  void _handleConstructorTap(String constructor) {
+    if (widget.onAttributes == null) return;
+
+    setState(() {
+      _constructor = constructor;
+      widget.onSelectedConstructor(constructor);
+
+      final attribute = widget.attributes.firstWhere(
+        (element) => element.builders.contains(constructor),
+        orElse: () => widget.attributes.first,
+      );
+      attribute.onChangeValue?.call(attribute);
+      widget.onAttributes!(widget.attributes, attribute);
+    });
   }
 }

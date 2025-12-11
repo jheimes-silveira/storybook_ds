@@ -3,6 +3,21 @@ import 'package:storybook_ds/src/widgets/custom_chip_selected.dart';
 
 import '../../storybook_ds.dart';
 
+/// Constants for spacing and layout
+class _AttributesThemeWidgetConstants {
+  static const double titleTopPadding = 16.0;
+  static const double titleBottomPadding = 16.0;
+  static const double changeActionTopPadding = 8.0;
+  static const double changeActionBottomPadding = 16.0;
+  static const double expansionTilePadding = 8.0;
+  static const double borderRadius = 8.0;
+  static const double borderWidth = 1.0;
+  static const double chipSpacing = 8.0;
+  static const String lightModeLabel = 'light';
+  static const String darkModeLabel = 'dark';
+  static const String themeTitle = 'Thema';
+}
+
 class AttributesThemeWidget extends StatefulWidget {
   final MultipleThemeSettings themeSettings;
   final void Function(
@@ -30,18 +45,27 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
           children: [
             _buildTitle(context),
             Padding(
-              padding: const EdgeInsets.only(top: 8.0),
+              padding: const EdgeInsets.only(
+                top: _AttributesThemeWidgetConstants.expansionTilePadding,
+              ),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(
+                    _AttributesThemeWidgetConstants.borderRadius,
+                  ),
                   border: Border.all(
-                    width: 1,
+                    width: _AttributesThemeWidgetConstants.borderWidth,
                     color: Colors.grey,
                   ),
                 ),
                 child: ExpansionTile(
-                  childrenPadding: const EdgeInsets.only(left: 8),
-                  tilePadding: const EdgeInsets.only(left: 8, right: 8),
+                  childrenPadding: const EdgeInsets.only(
+                    left: _AttributesThemeWidgetConstants.expansionTilePadding,
+                  ),
+                  tilePadding: const EdgeInsets.only(
+                    left: _AttributesThemeWidgetConstants.expansionTilePadding,
+                    right: _AttributesThemeWidgetConstants.expansionTilePadding,
+                  ),
                   expandedAlignment: Alignment.centerLeft,
                   title: _buildNameTheme(
                     widget.themeSettings.selectedThemes.title,
@@ -75,19 +99,21 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
     );
   }
 
-  Padding _buildTitle(BuildContext context) {
+  /// Builds the title widget.
+  Widget _buildTitle(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-        top: 16.0,
-        bottom: 16.0,
+        top: _AttributesThemeWidgetConstants.titleTopPadding,
+        bottom: _AttributesThemeWidgetConstants.titleBottomPadding,
       ),
       child: Text(
-        "Thema",
+        _AttributesThemeWidgetConstants.themeTitle,
         style: Theme.of(context).textTheme.titleLarge,
       ),
     );
   }
 
+  /// Builds the theme name widget.
   Widget _buildNameTheme(String title, BuildContext context) {
     return Text(
       title,
@@ -98,31 +124,33 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
     );
   }
 
+  /// Builds the theme selection action widget.
   Widget _buildChangeAction(
     BuildContext context,
     MultipleThemeSettings themeSettings,
     void Function(MultipleThemeSettings multipleThemeSettings) onUpdateTheme,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16, top: 8),
+      padding: const EdgeInsets.only(
+        bottom: _AttributesThemeWidgetConstants.changeActionBottomPadding,
+        top: _AttributesThemeWidgetConstants.changeActionTopPadding,
+      ),
       child: Wrap(
         alignment: WrapAlignment.start,
         crossAxisAlignment: WrapCrossAlignment.start,
-        spacing: 8,
+        spacing: _AttributesThemeWidgetConstants.chipSpacing,
         runAlignment: WrapAlignment.start,
-        runSpacing: 8,
+        runSpacing: _AttributesThemeWidgetConstants.chipSpacing,
         children: themeSettings.selectableThemes
             .map(
               (e2) => CustomChipSelected(
                 label: e2.title,
                 selected: themeSettings.selectedThemes.title == e2.title,
-                onTap: () {
-                  e2.setCurrentTheme(themeSettings.selectedThemes.isDarkMode);
-                  themeSettings.selectedThemes = e2;
-                  setState(() {
-                    onUpdateTheme(themeSettings);
-                  });
-                },
+                onTap: () => _handleThemeSelection(
+                  e2,
+                  themeSettings,
+                  onUpdateTheme,
+                ),
               ),
             )
             .toList(),
@@ -130,6 +158,7 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
     );
   }
 
+  /// Builds the theme mode toggle widget (light/dark).
   Widget _buildVariableOptionTypeBool(
     MultipleThemeSettings themeSettings,
     void Function(MultipleThemeSettings multipleThemeSettings) onUpdateTheme,
@@ -137,31 +166,54 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
     return Wrap(
       alignment: WrapAlignment.start,
       crossAxisAlignment: WrapCrossAlignment.start,
-      spacing: 8,
+      spacing: _AttributesThemeWidgetConstants.chipSpacing,
       runAlignment: WrapAlignment.start,
-      runSpacing: 8,
+      runSpacing: _AttributesThemeWidgetConstants.chipSpacing,
       children: [
         CustomChipSelected(
-          label: 'light',
+          label: _AttributesThemeWidgetConstants.lightModeLabel,
           selected: !themeSettings.selectedThemes.isDarkMode,
-          onTap: () {
-            themeSettings.selectedThemes.setCurrentTheme(false);
-            setState(() {
-              onUpdateTheme(themeSettings);
-            });
-          },
+          onTap: () => _handleThemeModeChange(
+            false,
+            themeSettings,
+            onUpdateTheme,
+          ),
         ),
         CustomChipSelected(
-          label: 'dark',
+          label: _AttributesThemeWidgetConstants.darkModeLabel,
           selected: themeSettings.selectedThemes.isDarkMode,
-          onTap: () {
-            themeSettings.selectedThemes.setCurrentTheme(true);
-            setState(() {
-              onUpdateTheme(themeSettings);
-            });
-          },
+          onTap: () => _handleThemeModeChange(
+            true,
+            themeSettings,
+            onUpdateTheme,
+          ),
         ),
       ],
     );
+  }
+
+  /// Handles theme selection change.
+  void _handleThemeSelection(
+    ThemeSettings theme,
+    MultipleThemeSettings themeSettings,
+    void Function(MultipleThemeSettings) onUpdateTheme,
+  ) {
+    theme.setCurrentTheme(themeSettings.selectedThemes.isDarkMode);
+    themeSettings.selectedThemes = theme;
+    setState(() {
+      onUpdateTheme(themeSettings);
+    });
+  }
+
+  /// Handles theme mode change (light/dark).
+  void _handleThemeModeChange(
+    bool isDarkMode,
+    MultipleThemeSettings themeSettings,
+    void Function(MultipleThemeSettings) onUpdateTheme,
+  ) {
+    themeSettings.selectedThemes.setCurrentTheme(isDarkMode);
+    setState(() {
+      onUpdateTheme(themeSettings);
+    });
   }
 }
