@@ -411,6 +411,12 @@ class _DevicePreviewState extends State<DevicePreview> {
   }
 
   @override
+  void dispose() {
+    _onScreenshot?.close();
+    super.dispose();
+  }
+
+  @override
   void didUpdateWidget(covariant DevicePreview oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.storage != widget.storage && widget.storage != null) {

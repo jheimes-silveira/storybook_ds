@@ -1,33 +1,32 @@
-import 'package:example/main.reflectable.dart';
 import 'package:flutter/material.dart';
 
 import 'custom_card_storybook.dart';
 
 void main() {
-  initializeReflectable();
-  runApp(const MyApp());
-} 
-
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  State<MyApp> createState() => _MyAppState();
+  runApp(const StorybookDemoApp());
 }
 
-class _MyAppState extends State<MyApp> {
-  ThemeData theme = ThemeData.light();
+class StorybookDemoApp extends StatefulWidget {
+  const StorybookDemoApp({super.key});
+
+  @override
+  State<StorybookDemoApp> createState() => _StorybookDemoAppState();
+}
+
+class _StorybookDemoAppState extends State<StorybookDemoApp> {
+  ThemeData _appTheme = ThemeData.light();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: theme,
+      title: 'Storybook DS — exemplo',
+      theme: _appTheme,
       debugShowCheckedModeBanner: false,
-      home: CustomCardStorybook(onChangeTheme: (ThemeData theme) {
-        setState(() {
-          this.theme = theme;
-        });
-      }),
+      home: CustomCardStorybook(
+        onThemeChanged: (ThemeData next) {
+          setState(() => _appTheme = next);
+        },
+      ),
     );
   }
 }

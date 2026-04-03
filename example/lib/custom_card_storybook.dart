@@ -1,182 +1,27 @@
-import 'package:example/utils_attribute.dart';
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
 import 'custom_card.dart';
+import 'sample_themes.dart';
+import 'storybook_example_attributes.dart';
 
-// Tema escuro inspirado na Petlove - Design acolhedor e suave
-final ThemeData customThemeDark = ThemeData.dark().copyWith(
-  // Cores principais inspiradas na Petlove - tons suaves e acolhedores
-  colorScheme: const ColorScheme.dark(
-    primary: Color(0xFF4CAF50), // Verde Petlove suave
-    secondary: Color(0xFF81C784), // Verde secundário claro
-    surface: Color(0xFF2C2C2C), // Superfície escura suave
-    background: Color(0xFF1A1A1A), // Fundo escuro acolhedor
-    error: Color(0xFFE57373), // Vermelho suave
-    onPrimary: Colors.white, // Texto sobre primária
-    onSecondary: Colors.white, // Texto sobre secundária
-    onSurface: Color(0xFFE0E0E0), // Texto claro sobre superfície
-    onBackground: Color(0xFFE0E0E0), // Texto claro sobre fundo
-    onError: Colors.white, // Texto sobre erro
-  ),
-  scaffoldBackgroundColor: const Color(0xFF1A1A1A), // Fundo da tela
-  cardColor: const Color(0xFF2C2C2C), // Cor dos cards
-  cardTheme: CardThemeData(
-    color: const Color(0xFF2C2C2C),
-    elevation: 2,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12), // Bordas arredondadas suaves
-    ),
-  ),
-  // Estilos de botões com design Petlove
-  buttonTheme: ButtonThemeData(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8), // Bordas arredondadas
-    ),
-  ),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFF4CAF50), // Verde Petlove
-      foregroundColor: Colors.white,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-    ),
-  ),
-  textButtonTheme: TextButtonThemeData(
-    style: TextButton.styleFrom(
-      foregroundColor: const Color(0xFF81C784), // Verde claro
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-    ),
-  ),
-  outlinedButtonTheme: OutlinedButtonThemeData(
-    style: OutlinedButton.styleFrom(
-      foregroundColor: const Color(0xFF4CAF50),
-      side: const BorderSide(color: Color(0xFF4CAF50), width: 1.5),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-    ),
-  ),
-  // Tipografia limpa e moderna
-  textTheme: const TextTheme(
-    titleLarge: TextStyle(
-      color: Color(0xFFE0E0E0),
-      fontWeight: FontWeight.w700,
-      fontSize: 22,
-    ),
-    titleMedium: TextStyle(
-      color: Color(0xFFE0E0E0),
-      fontWeight: FontWeight.w600,
-      fontSize: 18,
-    ),
-    bodyLarge: TextStyle(
-      color: Color(0xFFBDBDBD),
-      fontSize: 16,
-    ),
-    bodyMedium: TextStyle(
-      color: Color(0xFFBDBDBD),
-      fontSize: 14,
-    ),
-  ),
-);
+/// Nomes dos construtores expostos no storybook, alinhados a [CustomCard]:
+/// - `''` → `CustomCard(...)` (construtor padrão)
+/// - `'inline'` → `CustomCard.inline(...)`
+/// - `'outline'` → `CustomCard.outline(...)`
+const _cardBuildersAll = <String>['', 'inline', 'outline'];
 
-// Tema claro inspirado na Petlove - Design limpo, acolhedor e profissional
-final ThemeData customThemeLight = ThemeData.light().copyWith(
-  // Cores principais inspiradas na Petlove - tons neutros e acolhedores
-  colorScheme: const ColorScheme.light(
-    primary: Color(0xFF2E7D32), // Verde Petlove principal
-    secondary: Color(0xFF4CAF50), // Verde secundário
-    surface: Colors.white, // Superfície branca limpa
-    background: Color(0xFFFAFAFA), // Fundo cinza muito claro (acolhedor)
-    error: Color(0xFFD32F2F), // Vermelho
-    onPrimary: Colors.white, // Texto sobre primária
-    onSecondary: Colors.white, // Texto sobre secundária
-    onSurface: Color(0xFF212121), // Texto escuro sobre superfície
-    onBackground: Color(0xFF212121), // Texto escuro sobre fundo
-    onError: Colors.white, // Texto sobre erro
-  ),
-  scaffoldBackgroundColor: const Color(0xFFFAFAFA), // Fundo da tela acolhedor
-  cardColor: Colors.white, // Cor dos cards
-  cardTheme: CardThemeData(
-    color: Colors.white,
-    elevation: 1,
-    shadowColor: Colors.black.withOpacity(0.05), // Sombra suave
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12), // Bordas arredondadas suaves
-    ),
-  ),
-  // Estilos de botões com design Petlove
-  buttonTheme: ButtonThemeData(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8), // Bordas arredondadas
-    ),
-  ),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFF2E7D32), // Verde Petlove
-      foregroundColor: Colors.white,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-    ),
-  ),
-  textButtonTheme: TextButtonThemeData(
-    style: TextButton.styleFrom(
-      foregroundColor: const Color(0xFF2E7D32), // Verde Petlove
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-    ),
-  ),
-  outlinedButtonTheme: OutlinedButtonThemeData(
-    style: OutlinedButton.styleFrom(
-      foregroundColor: const Color(0xFF2E7D32),
-      side: const BorderSide(color: Color(0xFF2E7D32), width: 1.5),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-    ),
-  ),
-  // Tipografia limpa e moderna
-  textTheme: const TextTheme(
-    titleLarge: TextStyle(
-      color: Color(0xFF212121),
-      fontWeight: FontWeight.w700,
-      fontSize: 22,
-    ),
-    titleMedium: TextStyle(
-      color: Color(0xFF212121),
-      fontWeight: FontWeight.w600,
-      fontSize: 18,
-    ),
-    bodyLarge: TextStyle(
-      color: Color(0xFF424242),
-      fontSize: 16,
-    ),
-    bodyMedium: TextStyle(
-      color: Color(0xFF616161),
-      fontSize: 14,
-    ),
-  ),
-);
+/// Só o construtor padrão (ex.: parâmetro ausente nas fábricas `inline` / `outline`).
+const _cardBuilderDefaultOnly = <String>[''];
 
+/// Página de story do [CustomCard].
 class CustomCardStorybook extends StatefulWidget {
-  final Function(ThemeData theme) onChangeTheme;
   const CustomCardStorybook({
-    Key? key,
-    required this.onChangeTheme,
-  }) : super(key: key);
+    super.key,
+    required this.onThemeChanged,
+  });
+
+  final ValueChanged<ThemeData> onThemeChanged;
 
   @override
   Storybook<CustomCardStorybook> createState() => _CustomCardStorybookState();
@@ -184,58 +29,88 @@ class CustomCardStorybook extends StatefulWidget {
 
 class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
   @override
-  MultipleThemeSettings? multipleThemeSettings = MultipleThemeSettings(
-    selectableThemes: [
-      ThemeSettings(
-        title: 'Principal',
-        light: ThemeData.light(),
-        dark: ThemeData.dark(),
-      ),
-      ThemeSettings(
-        title: 'Custom theme 1',
-        light: customThemeLight,
-        dark: customThemeDark,
-      ),
-      ThemeSettings(
-        title: 'Custom theme 2',
-        light: ThemeData.light(),
-      ),
-    ],
-  );
+  void initState() {
+    super.initState();
+    multipleThemeSettings = MultipleThemeSettings(
+      selectableThemes: [
+        ThemeSettings(
+          title: 'Sistema (Material padrão)',
+          light: ThemeData.light(useMaterial3: true),
+          dark: ThemeData.dark(useMaterial3: true),
+        ),
+        ThemeSettings(
+          title: 'M3 — Sálvia (claro / escuro)',
+          light: buildSampleM3Theme(
+            seedColor: sampleSeedSage,
+            brightness: Brightness.light,
+          ),
+          dark: buildSampleM3Theme(
+            seedColor: sampleSeedSage,
+            brightness: Brightness.dark,
+          ),
+        ),
+        ThemeSettings(
+          title: 'M3 — Oceano (claro / escuro)',
+          light: buildSampleM3Theme(
+            seedColor: sampleSeedOcean,
+            brightness: Brightness.light,
+          ),
+          dark: buildSampleM3Theme(
+            seedColor: sampleSeedOcean,
+            brightness: Brightness.dark,
+          ),
+        ),
+        ThemeSettings(
+          title: 'M3 — Uva (somente claro)',
+          light: buildSampleM3Theme(
+            seedColor: sampleSeedPlum,
+            brightness: Brightness.light,
+          ),
+        ),
+      ],
+    );
+  }
+
+  T? _knob<T>(String name) => getWhereAttribut(name) as T?;
 
   @override
-  List<AttributeDto> attributes = [
-    UtilsAttributeReflectable.factoryAttributeDtoString(
+  late final List<AttributeDto> attributes = [
+    StorybookAttributeFactories.factoryAttributeDtoString(
       name: 'title',
       selectedValue: 'Lorem justo clita tempor labore',
       required: true,
+      builders: _cardBuildersAll,
     ),
     AttributeDto(
       name: 'hidden',
       type: 'bool',
       selectedValue: VariableOption(value: false),
+      builders: _cardBuildersAll,
     ),
     AttributeDto(
       name: 'enabled',
       type: 'bool',
       selectedValue: VariableOption(value: true),
+      builders: _cardBuildersAll,
     ),
-    UtilsAttributeReflectable.factoryAttributeDtoString(
+    StorybookAttributeFactories.factoryAttributeDtoString(
       name: 'description',
       selectedValue:
           'Est diam aliquyam dolores et est takimata et, dolore dolores sed dolores vero diam justo stet nonumy',
       canBeNull: true,
+      builders: _cardBuildersAll,
     ),
     AttributeDto.enumType(
-      name: 'style',
-      selectedValue: StyleCustomCard.inline,
-      values: StyleCustomCard.values,
+      name: 'variant',
+      selectedValue: CustomCardVariant.inline,
+      values: CustomCardVariant.values,
+      builders: _cardBuilderDefaultOnly,
     ),
     AttributeDto(
       name: 'onPositive',
       type: 'Function()?',
       selectedValue: VariableOption(value: '(){}'),
-      builders: [''],
+      builders: _cardBuildersAll,
     ),
     AttributeDto(
       name: 'textPositive',
@@ -243,30 +118,37 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       variableOptions: [
         VariableOption(value: 'Continuar'),
       ],
-      builders: [''],
+      builders: _cardBuildersAll,
     ),
     AttributeDto(
       name: 'onNegative',
       type: 'Function()?',
       selectedValue: VariableOption(value: '(){}'),
-      builders: [''],
+      builders: _cardBuildersAll,
     ),
     AttributeDto.objectInObject(
-      name: 'setting',
-      type: 'SettingCustomCard?',
+      name: 'settings',
+      type: 'CustomCardSettings?',
+      merge: (instance, fieldName, newValue) => mergeCustomCardSettings(
+        instance as CustomCardSettings,
+        fieldName,
+        newValue,
+      ),
       children: [
-        UtilsAttribute.color(
-          name: 'color',
+        StorybookExampleAttributes.colorPicker(
+          name: 'backgroundColor',
           canBeNull: true,
+          builders: _cardBuildersAll,
         ),
-        UtilsAttribute.color(
+        StorybookExampleAttributes.colorPicker(
           name: 'textColor',
+          builders: _cardBuildersAll,
         ),
       ],
-      builders: [''],
+      builders: _cardBuildersAll,
       selectedValue: VariableOption(
-        value: SettingCustomCard(
-          color: Colors.red,
+        value: const CustomCardSettings(
+          backgroundColor: null,
           textColor: Colors.black,
         ),
       ),
@@ -277,7 +159,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       variableOptions: [
         VariableOption(value: 'Fechar'),
       ],
-      builders: [''],
+      builders: _cardBuildersAll,
     ),
     AttributeDto.rangeDoubleInterval(
       name: 'width',
@@ -285,7 +167,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       end: 400,
       canBeNull: true,
       selectedValue: null,
-      builders: [''],
+      builders: _cardBuildersAll,
     ),
     AttributeDto.rangeDoubleInterval(
       name: 'height',
@@ -293,90 +175,96 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       end: 600,
       canBeNull: true,
       selectedValue: null,
-      builders: [''],
+      builders: _cardBuildersAll,
     ),
   ];
+
   @override
-  void onUpdateTheme(MultipleThemeSettings multipleThemeSettings) {
-    widget.onChangeTheme(multipleThemeSettings.selectedThemes.currentTheme());
+  String get description =>
+      'Magna et nonumy dolor duo sanctus sed est stet voluptua, dolor ipsum et et aliquyam amet et. Sed diam et.';
+
+  @override
+  String get nameObjectInDisplay => 'CustomCard';
+
+  @override
+  String get title => 'Custom Card';
+
+  @override
+  OnBuildExtraAttributesConfigCustom? get extraAttributesConfigCustom => null;
+
+  @override
+  void onUpdateTheme(MultipleThemeSettings settings) {
+    widget.onThemeChanged(settings.selectedThemes.currentTheme());
+  }
+
+  CustomCard _cardDefaultConstructor() {
+    return CustomCard(
+      title: _knob<String>('title') ?? '',
+      variant: _knob<CustomCardVariant>('variant') ?? CustomCardVariant.inline,
+      description: _knob<String>('description'),
+      settings: _knob<CustomCardSettings>('settings'),
+      onNegative: _knob<dynamic>('onNegative') != null ? () {} : null,
+      textNegative: _knob<String>('textNegative'),
+      onPositive: _knob<dynamic>('onPositive') != null ? () {} : null,
+      textPositive: _knob<String>('textPositive'),
+      height: _knob<double>('height'),
+      width: _knob<double>('width'),
+      hidden: _knob<bool>('hidden') ?? false,
+      enabled: _knob<bool>('enabled') ?? true,
+    );
+  }
+
+  CustomCard _cardInlineFactory() {
+    return CustomCard.inline(
+      title: _knob<String>('title') ?? '',
+      description: _knob<String>('description'),
+      settings: _knob<CustomCardSettings>('settings'),
+      onNegative: _knob<dynamic>('onNegative') != null ? () {} : null,
+      textNegative: _knob<String>('textNegative'),
+      onPositive: _knob<dynamic>('onPositive') != null ? () {} : null,
+      textPositive: _knob<String>('textPositive'),
+      height: _knob<double>('height'),
+      width: _knob<double>('width'),
+      hidden: _knob<bool>('hidden') ?? false,
+      enabled: _knob<bool>('enabled') ?? true,
+    );
+  }
+
+  CustomCard _cardOutlineFactory() {
+    return CustomCard.outline(
+      title: _knob<String>('title') ?? '',
+      description: _knob<String>('description'),
+      settings: _knob<CustomCardSettings>('settings'),
+      onNegative: _knob<dynamic>('onNegative') != null ? () {} : null,
+      textNegative: _knob<String>('textNegative'),
+      onPositive: _knob<dynamic>('onPositive') != null ? () {} : null,
+      textPositive: _knob<String>('textPositive'),
+      height: _knob<double>('height'),
+      width: _knob<double>('width'),
+      hidden: _knob<bool>('hidden') ?? false,
+      enabled: _knob<bool>('enabled') ?? true,
+    );
   }
 
   @override
   Widget buildComponentWidget(BuildContext context) {
-    final theme = Theme.of(context);
-    final backgroundColor = theme.scaffoldBackgroundColor;
+    final canvasColor = Theme.of(context).scaffoldBackgroundColor;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: canvasColor,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (selectedConstructor.isEmpty)
-                CustomCard(
-                  title: getWhereAttribut('title'),
-                  style: getWhereAttribut('style') ?? StyleCustomCard.inline,
-                  description: getWhereAttribut('description'),
-                  onNegative:
-                      getWhereAttribut('onNegative') != null ? () {} : null,
-                  textNegative: getWhereAttribut('textNegative'),
-                  onPositive:
-                      getWhereAttribut('onPositive') != null ? () {} : null,
-                  textPositive: getWhereAttribut('textPositive'),
-                  height: getWhereAttribut('height'),
-                  width: getWhereAttribut('width'),
-                  hidden: getWhereAttribut('hidden') ?? false,
-                  enabled: getWhereAttribut('enabled') ?? true,
-                ),
-              if (selectedConstructor == 'inline')
-                CustomCard.inline(
-                  title: getWhereAttribut('title'),
-                  description: getWhereAttribut('description'),
-                  onNegative:
-                      getWhereAttribut('onNegative') != null ? () {} : null,
-                  textNegative: getWhereAttribut('textNegative'),
-                  onPositive:
-                      getWhereAttribut('onPositive') != null ? () {} : null,
-                  textPositive: getWhereAttribut('textPositive'),
-                  height: getWhereAttribut('height'),
-                  width: getWhereAttribut('width'),
-                  hidden: getWhereAttribut('hidden') ?? false,
-                  enabled: getWhereAttribut('enabled') ?? true,
-                ),
-              if (selectedConstructor == 'outline')
-                CustomCard.outline(
-                  title: getWhereAttribut('title'),
-                  description: getWhereAttribut('description'),
-                  onNegative:
-                      getWhereAttribut('onNegative') != null ? () {} : null,
-                  textNegative: getWhereAttribut('textNegative'),
-                  onPositive:
-                      getWhereAttribut('onPositive') != null ? () {} : null,
-                  textPositive: getWhereAttribut('textPositive'),
-                  height: getWhereAttribut('height'),
-                  width: getWhereAttribut('width'),
-                  hidden: getWhereAttribut('hidden') ?? false,
-                  enabled: getWhereAttribut('enabled') ?? true,
-                ),
+              if (selectedConstructor.isEmpty) _cardDefaultConstructor(),
+              if (selectedConstructor == 'inline') _cardInlineFactory(),
+              if (selectedConstructor == 'outline') _cardOutlineFactory(),
             ],
           ),
         ),
       ),
     );
   }
-
-  @override
-  String description =
-      'Magna et nonumy dolor duo sanctus sed est stet voluptua, dolor ipsum et et aliquyam amet et. Sed diam et.';
-
-  @override
-  String nameObjectInDisplay = 'CustomCard';
-
-  @override
-  String title = 'Custom Card';
-
-  @override
-  OnBuildExtraAttributesConfigCustom? get extraAttributesConfigCustom => null;
 }

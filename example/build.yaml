@@ -1,0 +1,6 @@
+targets:
+  $default:
+    builders:
+      storybook_ds_builder|storybookModelBuilder:
+        generate_for:
+          - lib/custom_card.dart

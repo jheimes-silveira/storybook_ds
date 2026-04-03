@@ -1,142 +1,202 @@
 # Storybook Design System
 
-Um storybook para apresentação de Widgets de Design System.
+Flutter package to build a **storybook** for your Design System: attribute panel, live preview, and generated code snippet.
 
-Confira no [Exemplo](https://showroom-ds.web.app/#/).
+**Live demo:** [showroom-ds.web.app](https://showroom-ds.web.app/#/)
 
-## Começar
-Execute o comando:
+**Reference implementation:** [`example/lib/`](example/lib/) — especially [`custom_card_storybook.dart`](example/lib/custom_card_storybook.dart) and [`main.dart`](example/lib/main.dart).
+
+---
+
+## Install
 
 ```bash
 flutter pub add storybook_ds
 ```
 
-Ou adicione manualmente:
-
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
-  storybook:
+  storybook_ds: ^1.2.5
 ```
-
-## Uso
-Importe o projeto dentro do seu arquivo:
 
 ```dart
 import 'package:storybook_ds/storybook_ds.dart';
 ```
 
-Crie um **StatefulWidget** para o componente que deseja apresentar. <br> Em seguida, substitua a classe **State** por **Storybook**:
+---
+
+## Step-by-step: add a story screen
+
+This follows the same structure as the `CustomCard` example.
+
+### 1. Host the story in your app
+
+Wrap the story with `MaterialApp`. If the story can change the global theme, keep `ThemeData` in state (see `main.dart`):
 
 ```dart
-class ButtonPage extends StatefulWidget {
-  const ButtonPage({super.key});
+home: MyWidgetStorybook(
+  onThemeChanged: (ThemeData next) {
+    setState(() => _appTheme = next);
+  },
+),
+```
+
+### 2. Create the story `StatefulWidget`
+
+```dart
+class MyWidgetStorybook extends StatefulWidget {
+  const MyWidgetStorybook({super.key, required this.onThemeChanged});
+
+  final ValueChanged<ThemeData> onThemeChanged;
 
   @override
-  Storybook<ButtonPage> createState() => _ButtonPageState();
+  Storybook<MyWidgetStorybook> createState() => _MyWidgetStorybookState();
 }
-
-class _ButtonPageState extends Storybook<ButtonPage> {...
 ```
 
-Remova a classe **build** da sua classe Storybook. <br> Adicione os overrides:
+### 3. `State` extends `Storybook<...>`
 
-**Title**: título da tela. Obs: use o nome do componente de preferência.
+Implement:
+
+| Member | Purpose |
+|--------|---------|
+| `String get title` | Panel title |
+| `String get description` | Short description |
+| `String get nameObjectInDisplay` | Class name in the code snippet (e.g. `CustomCard`) |
+| `List<AttributeDto> attributes` | Panel controls |
+| `Widget buildComponentWidget(BuildContext)` | Widget shown in the preview |
+
+Minimal getters:
+
 ```dart
 @override
-String get title => "DS Button";
-```
+String get title => 'My widget';
 
-**NameObjectInDisplay**: nome da classe do componente que será chamado no código e que será apresentado no display do storybook. <br> Display é a parte do storybook onde é mostrado o código do componente.
-```dart
 @override
-String get nameObjectInDisplay => "DSButton";
-```
+String get description => 'Short description for DS consumers.';
 
-**Atributs**: Adicione os atributos do seu componente. Esses são representados pela classe **AtributeDto** (mais detalhes a seguir).
-```dart
 @override
-List<AtributeDto> atributs = [
-    AtributeDto(
-      type: 'Function()',
-      name: 'onPressed',
-      required: true,
-      builders: ['elevated', 'outline', 'text'],
-    ),
-    AtributeDto(
-      type: 'String',
-      name: 'text',
-      required: true,
-      selectedValue: VariableOption(value: 'Custom Buttom'),
-      builders: ['elevated', 'outline', 'text'],
-    ),
-    AtributeDto(
-      type: 'Color?',
-      name: 'color',
-      builders: ['elevated'],
-      selectedValue: VariableOption(value: null),
-      variableOptions: [
-        VariableOption(
-          value: Colors.amber,
-          textInDisplay: 'Colors.amber',
-          textInSelectedOptions: 'amber',
-        ),
-        VariableOption(
-          value: Colors.black,
-          textInDisplay: 'Colors.black',
-          textInSelectedOptions: 'black',
-        ),
-      ],
-    ),
-  ];
+String get nameObjectInDisplay => 'MyWidget';
 ```
 
-### AtributeDto:
-**AtributeDto** é a classe usada para mapear cada um dos atributos do seu componente. Suas principais funcionalidades são:
-* *Type* define qual o tipo do atributo ("String", "Function()", "bool", "double", "dynamic", etc). Caso o atributo seja *nullable*, adicione a interrogação (ex: "double?").
-* *Name* define o nome do atributo, e será usado pela classe Storybook para mapear os atributos da classe. (Ex: "isLoading", "value", "onPressed", etc).
-* *Required* define se o atributo é obrigatório.
-* *SelectedValue* define qual o valor inicial do seu componente no storybook. É definido pela classe **VariableOption**.
-* *VariableOptions* é uma lista de elementos "**VariableOption**" que permite ao usuário do storybook interagir com o componente, alternando entre as opções de valores para aquele atributo. Usado para exemplificar ao usuário a funcionalidade daquele atributo, e como ele afeta o estado do componente.
-* *Builders* é uma lista de Strings que define a quais construtores o seu componente está presente.
-  * Por exemplo, um botão cujos construtores são "DSButton.elevated(...)" e "DSButton.outlined(...)", caso seu elemento pertença aos dois construtores, defina builders como: ["elevated", "outlined"].
-  * Caso seu componente tenha um construtor default, e seu atributo esteja presente nesse construtor, adicione *null* à lista: [null, "elevated", "outlined"];
+### 4. Define `attributes`
 
-### buildComponentWidget:
-Ainda na classe **Storybook** do seu componente, retorne uma classe *Scaffold* com seu componente como filho, para que ele seja apresentado no storybook ao usuário. <br> 
-Utilize a função **getWhereAtribut()** para recuperar o valor de um atributo de acordo com o nome dele (*name*), e atribua ao seu componente. Assim, conforme o usuário manipular o storybook, as mudanças irão se aplicar ao componente automaticamente. <br>
-Verifique qual o construtor selecionado por meio da variável **selectedConstructor** e retorne o componente com o construtor correspondente.
+Each `AttributeDto` is one control. **`name`** is the key for **`getWhereAttribut('name')`**.
+
+Use factories where useful: `AttributeDto.enumType`, `AttributeDto.rangeDoubleInterval`, `AttributeDto.objectInObject`, `StorybookAttributeFactories.factoryAttributeDtoString`, etc.
+
+### 5. The `builders` field
+
+A **list of strings** saying which constructors/factories include that attribute:
+
+| Value | Meaning |
+|--------|---------|
+| `''` | **Default** (unnamed) constructor |
+| `'inline'`, `'outline'`, … | Same labels you compare against **`selectedConstructor`** |
+
+Use **`''`**, not `null`, for the default.  
+If you omit `builders`, many factories default to `['']` (default constructor only).
+
+**Tip:** file-level constants avoid typos, as in the example:
+
+```dart
+const _all = ['', 'inline', 'outline'];
+const _defaultOnly = [''];
+```
+
+Attributes that exist **only** on the default constructor use `builders: _defaultOnly`.
+
+### 6. Implement `buildComponentWidget`
+
+1. Read values with **`getWhereAttribut('attributeName')`** (cast when needed).
+2. Branch on **`selectedConstructor`**:
+   - **`selectedConstructor.isEmpty`** → default constructor (same as `''` in `builders`).
+   - **`selectedConstructor == 'inline'`** → named factory `inline`, etc.
+
+Same pattern as the example:
+
 ```dart
 @override
 Widget buildComponentWidget(BuildContext context) {
-  Widget child;
-  if (selectedConstructor == 'elevated') {
-    child = DSButton.elevated(
-      text: getWhereAtribut('text'),
-      loading: getWhereAtribut('loading'),
-      color: getWhereAtribut('color'),
-      onPressed: () {},
-    );
-  }
-  else if (selectedConstructor == 'outline') {
-    child = DSButton.outline(
-      text: getWhereAtribut('text'),
-      loading: getWhereAtribut('loading'),
-      onPressed: () {},
-    );
-  }
-  else {
-    child = DSButton(
-      text: getWhereAtribut('text'),
-      onPressed: () {},
-    );
-  }
-
   return Scaffold(
     body: Center(
-      child: child,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (selectedConstructor.isEmpty) _buildDefault(),
+          if (selectedConstructor == 'inline') _buildInline(),
+          if (selectedConstructor == 'outline') _buildOutline(),
+        ],
+      ),
     ),
   );
 }
 ```
+
+Optional helper: `T? _knob<T>(String name) => getWhereAttribut(name) as T?;`
+
+### 7. Optional themes (`MultipleThemeSettings`)
+
+Assign **`multipleThemeSettings` in `initState`** (field is provided by base `Storybook`):
+
+```dart
+@override
+void initState() {
+  super.initState();
+  multipleThemeSettings = MultipleThemeSettings(
+    selectableThemes: [
+      ThemeSettings(
+        title: 'Light / dark',
+        light: ThemeData.light(useMaterial3: true),
+        dark: ThemeData.dark(useMaterial3: true),
+      ),
+    ],
+  );
+}
+```
+
+Forward the chosen theme in **`onUpdateTheme`**:
+
+```dart
+@override
+void onUpdateTheme(MultipleThemeSettings settings) {
+  widget.onThemeChanged(settings.selectedThemes.currentTheme());
+}
+```
+
+---
+
+## Nested objects in the panel
+
+For `AttributeDto.objectInObject`, pass **`merge`**: `(instance, fieldName, newValue)` returning the updated object. Implement by hand or generate with **`@StorybookModel()`** and **`storybook_ds_builder`** (see [`example/build.yaml`](example/build.yaml) and [`builder/`](builder/)).
+
+---
+
+## No `reflectable`
+
+This package **does not** use `reflectable`. Build your `AttributeDto` list manually (or generate only the `merge` helper). See [`CHANGELOG.md`](CHANGELOG.md).
+
+---
+
+## Reflection-free code generation (optional)
+
+Flutter has no `dart:mirrors` on mobile/web. For **`merge`** helpers:
+
+1. Add **`storybook_ds_builder`** + **`build_runner`** as `dev_dependencies`.
+2. Restrict `build.yaml` `generate_for` to files with `@StorybookModel` (see [`example/build.yaml`](example/build.yaml)).
+3. Annotate plain data classes, add `part '*.storybook.g.dart'`, run `dart run build_runner build --delete-conflicting-outputs`.
+4. Wire `mergeMyModel` into `AttributeDto.objectInObject`.
+
+If `pub get` fails between `build_runner` and the builder, pin **`build_runner: 2.4.13`** like [`example/pubspec.yaml`](example/pubspec.yaml).
+
+---
+
+## Cheat sheet
+
+1. `StatefulWidget` → `State extends Storybook<T>`.
+2. Implement `title`, `description`, `nameObjectInDisplay`, `attributes`, `buildComponentWidget`.
+3. `builders`: `''` = default; other strings = same tokens as `selectedConstructor`.
+4. `getWhereAttribut` + `selectedConstructor.isEmpty` / `== 'name'`.
+5. Themes: `initState` + `onUpdateTheme` when needed.

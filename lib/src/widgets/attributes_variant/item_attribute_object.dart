@@ -32,11 +32,17 @@ class _ItemAttributeObjectState extends State<ItemAttributeObject> {
               (widget.attribute.variableOptionType as ObjectInObjectType)
                   .children,
           onAttributes: (attributes, ettribute) {
-            final value = UtilsReflectable.updateValue(
-              widget.attribute.selectedValue?.value,
-              nameVariavel: ettribute.name,
-              novoValor: ettribute.selectedValue?.value,
-            );
+            final objectType = widget.attribute.variableOptionType
+                as ObjectInObjectType;
+            final merge = objectType.merge;
+            final current = widget.attribute.selectedValue?.value;
+            if (merge == null || current == null) {
+              throw StateError(
+                'AttributeDto.objectInObject exige `merge` para editar filhos. '
+                'Gere com @StorybookModel + build_runner ou informe merge manualmente.',
+              );
+            }
+            final value = merge(current, ettribute.name, ettribute.selectedValue?.value);
 
             widget.attribute.selectedValue =
                 widget.attribute.selectedValue?.copyWith(value: value);
