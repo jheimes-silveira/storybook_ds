@@ -1,16 +1,22 @@
-# example
+# Exemplo — storybook_ds
 
-A new Flutter project.
+Demonstra um story (`CustomCard`) **sem** `reflectable`: atributos declarados na mão, objeto aninhado com `merge` gerado por `@StorybookModel`.
 
-## Getting Started
+## Gerar código (`mergeCustomCardSettings`)
 
-This project is a starting point for a Flutter application.
+Após alterar `CustomCardSettings` ou a anotação `@StorybookModel`:
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+cd example
+dart run build_runner build --delete-conflicting-outputs
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Isso atualiza `lib/custom_card.storybook.g.dart`.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+O `build.yaml` restringe o gerador a `lib/custom_card.dart`. Se `pub get` falhar por conflito de versões, o projeto fixa `build_runner: 2.4.13` de propósito.
+
+## Executar
+
+```bash
+flutter run -d chrome
+```

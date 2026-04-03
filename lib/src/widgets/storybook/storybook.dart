@@ -107,11 +107,19 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
           selectedConstructor: selectedConstructor,
         );
       },
-      extraAttributesConfigCustom: this.extraAttributesConfigCustom,
+      extraAttributesConfigCustom: extraAttributesConfigCustom,
+    );
+  }
+
+  String _currentPreviewCode() {
+    return updatePreviewCode(
+      attributes,
+      selectedConstructor: selectedConstructor,
     );
   }
 
   Widget _buildPreviewCode() {
+    final code = _currentPreviewCode();
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Stack(
@@ -129,10 +137,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
                       children: [
                         Expanded(
                           child: SelectableText(
-                            updatePreviewCode(
-                              attributes,
-                              selectedConstructor: selectedConstructor,
-                            ),
+                            code,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyLarge
@@ -151,12 +156,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
             right: 8,
             child: IconButton(
               color: Colors.white,
-              onPressed: () {
-                Utils.copyClipboard(updatePreviewCode(
-                  attributes,
-                  selectedConstructor: selectedConstructor,
-                ));
-              },
+              onPressed: () => Utils.copyClipboard(code),
               icon: const Icon(Icons.copy, size: 20),
             ),
           ),
@@ -183,13 +183,13 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
         .map((e) =>
             "\n${breakSpaceLevel(level + 1)}${e.name}: ${toStringValue(e, level)},")
         .join();
-    final constructor = selectedConstructor =
+    final constructorSuffix =
         selectedConstructor.isEmpty ? '' : '.$selectedConstructor';
     final nameClass = newNameClass ?? nameObjectInDisplay;
 
     final att = "$attributesString${attributesString.isNotEmpty ? '\n' : ''}";
     final codeBreak = attributesString.isNotEmpty ? breakSpaceLevel(level) : '';
-    return "$nameClass$constructor($att$codeBreak)";
+    return "$nameClass$constructorSuffix($att$codeBreak)";
   }
 
   String toStringValue(AttributeDto attribute, int level) {
@@ -232,7 +232,6 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
             panelWidth: 400,
           ),
           builder: (context2) => MaterialApp(
-            useInheritedMediaQuery: true,
             builder: DevicePreview.appBuilder,
             theme: Theme.of(context),
             debugShowCheckedModeBanner: false,
@@ -244,10 +243,7 @@ abstract class Storybook<T extends StatefulWidget> extends State<T> {
   }
 
   String breakSpaceLevel(int level) {
-    String space = '';
-    for (int i = 0; i < level; i++) {
-      space += '    ';
-    }
-    return space;
+    if (level <= 0) return '';
+    return '    ' * level;
   }
 }

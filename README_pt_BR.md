@@ -1,176 +1,193 @@
 # Storybook Design System
 
-Storybook para apresentação de Widgets de Design System.
+Biblioteca Flutter para montar um **storybook** do seu Design System: painel de atributos, preview do componente e trecho de código gerado.
 
-Confira no [Exemplo](https://showroom-ds.web.app/#/).
+**Demonstração:** [showroom-ds.web.app](https://showroom-ds.web.app/#/)
 
-## Começar
-Execute o comando:
+**Código de referência:** pasta [`example/lib/`](example/lib/) — em especial [`custom_card_storybook.dart`](example/lib/custom_card_storybook.dart) e [`main.dart`](example/lib/main.dart).
+
+---
+
+## Instalação
 
 ```bash
 flutter pub add storybook_ds
 ```
 
-Ou adicione manualmente:
+No `pubspec.yaml`:
 
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
-  storybook: {{version}}
+  storybook_ds: ^1.2.5
 ```
 
-## Uso
-Importe o projeto dentro do seu arquivo:
+**Import:**
 
 ```dart
 import 'package:storybook_ds/storybook_ds.dart';
 ```
 
-Crie um StatefulWidget para o componente que deseja apresentar e substitua a classe **State** por **Storybook**: 
+---
+
+## Passo a passo: criar uma tela de story
+
+O fluxo abaixo espelha o exemplo do `CustomCard`.
+
+### 1. Colocar a story na árvore do app
+
+O `MaterialApp` precisa envolver a página de story. Se você trocar o tema global quando o usuário mudar o tema no storybook, guarde o `ThemeData` no estado (como em `main.dart`):
 
 ```dart
-class ButtonPage extends StatefulWidget {
-  const ButtonPage({super.key});
+home: MeuComponenteStorybook(
+  onThemeChanged: (ThemeData next) {
+    setState(() => _appTheme = next);
+  },
+),
+```
+
+### 2. Criar o `StatefulWidget` da story
+
+```dart
+class MeuComponenteStorybook extends StatefulWidget {
+  const MeuComponenteStorybook({super.key, required this.onThemeChanged});
+
+  final ValueChanged<ThemeData> onThemeChanged;
 
   @override
-  Storybook<ButtonPage> createState() => _ButtonPageState();
-}
-
-class _ButtonPageState extends Storybook<ButtonPage> {...
-```
-
-Adicione os overrides *obrigatorios*:
-
-Título da tela com o nome do componente.
-```dart
-@override
-String get title => 'DS Button';
-```
-
-Descrição explicativa do componente.
-```dart
-@override
-String get description => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.';
-```
-
-Nome da classe do componente que será chamado no código. Display é a parte do storybook onde é mostrado o código do componente.
-```dart
-@override
-String get nameObjectInDisplay => "DSButton";
-```
-
-Adicione os atributos do componente, que são representados pela classe AtributeDto (mais detalhes a seguir).
-Em builders, defina em quais construtores da classe o atributo estará presente, sendo null o construtor padrão.
-```dart
-@override
-List<AtributeDto> atributs() {
-  return [
-    AtributeDto(
-      type: 'Function()',
-      name: 'onPressed',
-      required: true,
-      builders: [null, 'elevated', 'outline'],
-    ),
-    AtributeDto(
-      type: 'String',
-      name: 'text',
-      required: true,
-      selectedValue: VariableOption(value: 'Custom Buttom'),
-      builders: ['elevated', 'outline'],
-    ),
-    AtributeDto(
-      type: 'bool',
-      name: 'loading',
-      selectedValue: VariableOption(value: false),
-      builders: ['elevated', 'outline'],
-    ),
-  ];
+  Storybook<MeuComponenteStorybook> createState() => _MeuComponenteStorybookState();
 }
 ```
 
-Configurações de Tema Múltiplo
-Visão Geral
-Podemos lidar com múltiplos temas dentro do projeto de apresentação. Você pode instanciar as configurações de tema múltiplo conforme mostrado abaixo.
+### 3. O `State` deve estender `Storybook<...>`
 
-Exemplo de Uso
-```dart
-  @override
-  MultipleThemeSettings? multipleThemeSettings = MultipleThemeSettings(
-    selectableThemes: [
-      ThemeSettings(
-        title: 'Thema 1',
-        light: ThemeData.light(),
-        dark: ThemeData.dark(),
-      ),
-    ],
-  );
-```
-Ao incluir este trecho, você pode selecionar qual tema aplicar no projeto. O tema selecionado é retornado na função onUpdateTheme.
+Implemente os pontos obrigatórios:
 
-Função de Atualização de Tema
-```dart
-  @override
-  void onUpdateTheme(MultipleThemeSettings multipleThemeSettings) {
-    // TODO: implement
-  }
-```
-## Detalhes das Configurações
+| O quê | Para que serve |
+|--------|----------------|
+| `String get title` | Título no painel |
+| `String get description` | Texto explicativo |
+| `String get nameObjectInDisplay` | Nome da classe no snippet de código (ex.: `CustomCard`) |
+| `List<AttributeDto> attributes` | Controles do painel (tipos, nomes, valores iniciais) |
+| `Widget buildComponentWidget(BuildContext)` | O widget real no preview |
 
-- **MultipleThemeSettings**: Classe que gerencia múltiplos temas.
-  - **selectableThemes**: Lista de temas disponíveis para seleção.
-- **ThemeSettings**: Classe que define as configurações de um tema específico.
-  - **title**: Título do tema.
-  - **light**: Configuração do tema claro.
-  - **dark**: Configuração do tema escuro.
+Exemplo mínimo de getters:
 
- **ThemeSettings**
- 
-| Nome                | Tipo          | Descrição                                                                 |
-|---------------------|---------------|---------------------------------------------------------------------------|
-| `ThemeSettings`     | `Constructor` | Construtor para inicializar as configurações de tema.                     |
-| `switchThemeMode`   | `bool`        | Retorna `true` se o tema escuro estiver disponível.                       |
-| `data`              | `dynamic`     | Retorna os dados adicionais associados ao tema.                           |
-| `title`             | `String`      | Retorna o título do tema.                                                 |
-| `light`             | `ThemeData`   | Retorna o tema claro.                                                     |
-| `dark`              | `ThemeData`   | Retorna o tema escuro, ou o tema claro se o escuro não estiver definido.  |
-| `isDarkMode`        | `bool`        | Retorna `true` se o modo escuro estiver ativado, caso contrário `false`.  |
-| `currentTheme()`    | `ThemeData`   | Retorna o tema atual com base no estado do modo escuro.                   |
-| `setCurrentTheme()` | `void`        | Define o tema atual com base no valor de `isDarkMode`.                    |
-
-Função chamada ao atualizar algum atributo.
 ```dart
 @override
-void onUpdateAtributs(List<AtributeDto> atributs) {
-    setState(() {
-        listAtributs = atributs;
-    });
-}
+String get title => 'Meu componente';
+
+@override
+String get description => 'Breve descrição para quem usa o DS.';
+
+@override
+String get nameObjectInDisplay => 'MeuWidget';
 ```
 
-Retorne o componente, e utilize a função getWhereAtribut() para recuperar o valor daquele atributo e atribuí-lo ao componente de forma dinâmica, assim a cada atualização de valores o componente será recarregado.
-Verifique qual o construtor selecionado por meio da variável selectedConstructor e retorne o componente por meio do construtor correspondente.
+### 4. Definir `attributes`
+
+Cada `AttributeDto` descreve um “knob”. O **nome** (`name`) é a chave usada em `getWhereAttribut('nome')`.
+
+Use fábricas quando fizer sentido: `AttributeDto.enumType`, `AttributeDto.rangeDoubleInterval`, `AttributeDto.objectInObject`, `StorybookAttributeFactories.factoryAttributeDtoString`, etc.
+
+### 5. Campo `builders`
+
+Lista de **strings** que diz em quais construtores/fábricas o atributo aparece:
+
+| Valor | Significado |
+|--------|-------------|
+| `''` | Construtor **padrão** (não nomeado) |
+| `'inline'`, `'outline'`, … | Identificador que você compara em `selectedConstructor` |
+
+**Regra:** use **`''`**, não `null`, para o padrão.  
+Se omitir `builders`, muitas fábricas assumem `['']` (só padrão).
+
+**Dica:** constantes no arquivo da story evitam erro de digitação, como no exemplo:
+
+```dart
+const _all = ['', 'inline', 'outline'];
+const _somentePadrao = [''];
+```
+
+Um atributo que **só existe no construtor padrão** (ex.: `variant` quando as fábricas já fixam a variante) usa `builders: _somentePadrao`.
+
+### 6. Implementar `buildComponentWidget`
+
+1. Leia valores com **`getWhereAttribut('nomeDoAtributo')`** (e faça cast se precisar).
+2. Use **`selectedConstructor`** para escolher qual construtor/fábrica montar:
+   - **`selectedConstructor.isEmpty`** → construtor padrão (equivalente a `''` em `builders`).
+   - **`selectedConstructor == 'inline'`** → fábrica `inline`, etc.
+
+Padrão igual ao exemplo:
+
 ```dart
 @override
 Widget buildComponentWidget(BuildContext context) {
-  if (selectedConstructor == 'elevated') {
-    return DSButton.elevated(
-      text: getWhereAttribut('text'),
-      loading: getWhereAttribut('loading'),
-      onPressed: () {},
-    );
-  }
-
-  if (selectedConstructor == 'outline') {
-    return DSButton.outline(
-      text: getWhereAttribut('text'),
-      loading: getWhereAttribut('loading'),
-      onPressed: () {},
-    );
-  }
-
-  return DSButton(
-    onPressed: () {},
+  return Scaffold(
+    body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (selectedConstructor.isEmpty) _buildPadrao(),
+          if (selectedConstructor == 'inline') _buildInline(),
+          if (selectedConstructor == 'outline') _buildOutline(),
+        ],
+      ),
+    ),
   );
 }
 ```
+
+Opcional: método auxiliar `T? _knob<T>(String name) => getWhereAttribut(name) as T?;` para deixar o código mais legível.
+
+### 7. Temas opcionais (`MultipleThemeSettings`)
+
+Se quiser troca de tema no storybook, atribua **`multipleThemeSettings`** no **`initState`** (o campo já existe na classe base `Storybook`):
+
+```dart
+@override
+void initState() {
+  super.initState();
+  multipleThemeSettings = MultipleThemeSettings(
+    selectableThemes: [
+      ThemeSettings(
+        title: 'Claro / escuro',
+        light: ThemeData.light(useMaterial3: true),
+        dark: ThemeData.dark(useMaterial3: true),
+      ),
+    ],
+  );
+}
+```
+
+Repasse o tema escolhido para o app em **`onUpdateTheme`**:
+
+```dart
+@override
+void onUpdateTheme(MultipleThemeSettings settings) {
+  widget.onThemeChanged(settings.selectedThemes.currentTheme());
+}
+```
+
+---
+
+## Objetos aninhados no painel
+
+Para `AttributeDto.objectInObject`, informe **`merge`**: uma função `(instância, nomeDoCampo, novoValor)` que devolve o objeto atualizado. Pode ser escrita à mão ou gerada com **`@StorybookModel()`** e o pacote **`storybook_ds_builder`** (veja [`example/build.yaml`](example/build.yaml) e pasta [`builder/`](builder/)).
+
+---
+
+## Sem `reflectable`
+
+O pacote **não usa** `reflectable`. Monte a lista de `AttributeDto` manualmente (ou gere só o `merge` com o builder). Detalhes: [`CHANGELOG.md`](CHANGELOG.md).
+
+---
+
+## Resumo rápido
+
+1. `StatefulWidget` → `State extends Storybook<T>`.
+2. `title`, `description`, `nameObjectInDisplay`, `attributes`, `buildComponentWidget`.
+3. `builders`: `''` = padrão; demais strings = mesmos rótulos que você testa em `selectedConstructor`.
+4. `getWhereAttribut` + `selectedConstructor.isEmpty` / `== 'nome'`.
+5. Temas: `initState` + `onUpdateTheme` se necessário.

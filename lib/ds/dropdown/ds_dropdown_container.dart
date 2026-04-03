@@ -43,7 +43,29 @@ class _DSDropdownContainerState extends State<DSDropdownContainer>
   late Animation<double> _expandAnimation;
   late Animation<double> _rotateAnimation;
   late DSDropdownController _controller;
+  late final bool _ownsController;
   String? _error;
+
+  void _onControllerChanged() {
+    if (_controller.error != _error) {
+      setState(() {
+        _error = _controller.error;
+      });
+    }
+
+    if (_controller.isOpened) {
+      _animationController.forward();
+      setState(() {
+        _floatingDropdown = _createFloatingDropdown();
+      });
+    } else {
+      _animationController.reverse().then(
+            (_) => setState(() {
+              _floatingDropdown.remove();
+            }),
+          );
+    }
+  }
 
   @override
   void initState() {
@@ -63,32 +85,17 @@ class _DSDropdownContainerState extends State<DSDropdownContainer>
       curve: Curves.ease,
     ));
 
-    _controller = widget.controller ?? DSDropdownController();
+    if (widget.controller != null) {
+      _controller = widget.controller!;
+      _ownsController = false;
+    } else {
+      _controller = DSDropdownController();
+      _ownsController = true;
+    }
 
     _error = widget.error ?? _controller.error;
 
-    _controller.addListener(
-      () {
-        if (_controller.error != _error) {
-          setState(() {
-            _error = _controller.error;
-          });
-        }
-
-        if (_controller.isOpened) {
-          _animationController.forward();
-          setState(() {
-            _floatingDropdown = _createFloatingDropdown();
-          });
-        } else {
-          _animationController.reverse().then(
-                (_) => setState(() {
-                  _floatingDropdown.remove();
-                }),
-              );
-        }
-      },
-    );
+    _controller.addListener(_onControllerChanged);
   }
 
   @override
@@ -104,7 +111,11 @@ class _DSDropdownContainerState extends State<DSDropdownContainer>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller.removeListener(_onControllerChanged);
+    _animationController.dispose();
+    if (_ownsController) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 

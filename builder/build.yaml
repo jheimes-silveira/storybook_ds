@@ -1,0 +1,10 @@
+builders:
+  storybookModelBuilder:
+    import: "package:storybook_ds_builder/builder.dart"
+    builder_factories:
+      - storybookModelBuilder
+    build_extensions:
+      ".dart":
+        - ".storybook.g.dart"
+    auto_apply: dependents
+    build_to: source

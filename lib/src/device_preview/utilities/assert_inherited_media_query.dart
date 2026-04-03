@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// Indicate whether [child] uses an inherited [MediaQuery].
 ///
@@ -10,10 +9,12 @@ bool isWidgetsAppUsingInheritedMediaQuery(
   Widget child, [
   bool fallback = true,
 ]) {
-  if (child is MaterialApp) return child.useInheritedMediaQuery;
-  if (child is CupertinoApp) return child.useInheritedMediaQuery;
-  if (child is WidgetsApp) return child.useInheritedMediaQuery;
-  if (child is WidgetsApp) return child.useInheritedMediaQuery;
+  // Flutter 3.7+: [MaterialApp]/[CupertinoApp] no longer override [MediaQuery];
+  // [useInheritedMediaQuery] exists only for compatibility and is ignored.
+  // DevicePreview already wraps the app in an explicit [MediaQuery].
+  if (child is MaterialApp || child is CupertinoApp || child is WidgetsApp) {
+    return true;
+  }
 
   if (child is ProxyWidget) {
     return isWidgetsAppUsingInheritedMediaQuery(child.child);

@@ -1,72 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:storybook_ds/storybook_ds.dart';
+import 'package:storybook_ds/annotations.dart';
 
-extension EStyleCustomCard on StyleCustomCard {
-  /// Retorna a cor de fundo baseada no tema atual
-  Color? color(BuildContext context) {
-    if (this == StyleCustomCard.inline) {
-      // Para inline, usa a cor de superfície do tema
-      return Theme.of(context).colorScheme.surface;
-    }
-    // Para outline, usa a cor primária com opacidade
-    return Theme.of(context).colorScheme.primary.withOpacity(0.1);
-  }
+part 'custom_card.storybook.g.dart';
 
-  /// Retorna a cor do texto baseada no tema atual
-  Color? textColor(BuildContext context) {
-    if (this == StyleCustomCard.inline) {
-      // Para inline, usa a cor de texto sobre superfície
-      return Theme.of(context).colorScheme.onSurface;
-    }
-    // Para outline, usa a cor de texto sobre superfície
-    return Theme.of(context).colorScheme.onSurface;
-  }
-
-  /// Retorna a borda baseada no tema atual
-  BoxBorder? border(BuildContext context) {
-    if (this == StyleCustomCard.inline) {
-      final brightness = Theme.of(context).brightness;
-      final borderColor = brightness == Brightness.dark
-          ? const Color(0xFF4CAF50)
-              .withOpacity(0.3) // Verde suave no tema escuro
-          : const Color(0xFF2E7D32)
-              .withOpacity(0.2); // Verde suave no tema claro
-      return Border.all(
-        color: borderColor,
-        width: 1.5,
-      );
-    }
-    return null;
-  }
-}
-
-@reflectable
-enum StyleCustomCard {
+/// Variante visual do card (layout / borda).
+enum CustomCardVariant {
   outline,
   inline,
 }
 
-@reflectable
-class SettingCustomCard {
-  final Color? color;
+extension CustomCardVariantTheming on CustomCardVariant {
+  /// Cor de fundo do card conforme variante e tema.
+  Color? backgroundFill(BuildContext context) {
+    if (this == CustomCardVariant.inline) {
+      return Theme.of(context).colorScheme.surface;
+    }
+    return Theme.of(context).colorScheme.primary.withValues(alpha: 0.1);
+  }
+
+  /// Cor do texto do conteúdo.
+  Color contentTextColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurface;
+  }
+
+  /// Borda apenas na variante [inline].
+  BoxBorder? borderForInline(BuildContext context) {
+    if (this != CustomCardVariant.inline) return null;
+    final brightness = Theme.of(context).brightness;
+    final borderColor = brightness == Brightness.dark
+        ? const Color(0xFF4CAF50).withValues(alpha: 0.3)
+        : const Color(0xFF2E7D32).withValues(alpha: 0.2);
+    return Border.all(color: borderColor, width: 1.5);
+  }
+}
+
+/// Cores opcionais do card (story: objeto aninhado).
+@StorybookModel()
+class CustomCardSettings {
+  final Color? backgroundColor;
   final Color? textColor;
 
-  SettingCustomCard({
+  const CustomCardSettings({
     this.textColor,
-    this.color,
+    this.backgroundColor,
   });
 }
 
-@reflectable
 class CustomCard extends StatefulWidget {
   final String title;
   final String? description;
-
-  final StyleCustomCard style;
-  final SettingCustomCard? settings;
-
-  final Function()? onPositive;
-  final Function()? onNegative;
+  final CustomCardVariant variant;
+  final CustomCardSettings? settings;
+  final VoidCallback? onPositive;
+  final VoidCallback? onNegative;
   final String? textPositive;
   final String? textNegative;
   final double? width;
@@ -75,9 +61,10 @@ class CustomCard extends StatefulWidget {
   final bool enabled;
 
   const CustomCard({
+    super.key,
     required this.title,
     this.description,
-    this.style = StyleCustomCard.outline,
+    this.variant = CustomCardVariant.outline,
     this.onPositive,
     this.onNegative,
     this.textPositive,
@@ -87,26 +74,26 @@ class CustomCard extends StatefulWidget {
     this.settings,
     this.hidden = false,
     this.enabled = true,
-    Key? key,
-  }) : super(key: key);
+  });
 
   factory CustomCard.outline({
     required String title,
-    final String? description,
-    final String? tag,
-    final Function()? onPositive,
-    final Function()? onNegative,
-    final String? textPositive,
-    final String? textNegative,
-    final double? width,
-    final double? height,
-    final bool hidden = false,
-    final bool enabled = true,
+    String? description,
+    CustomCardSettings? settings,
+    VoidCallback? onPositive,
+    VoidCallback? onNegative,
+    String? textPositive,
+    String? textNegative,
+    double? width,
+    double? height,
+    bool hidden = false,
+    bool enabled = true,
   }) {
     return CustomCard(
       title: title,
-      style: StyleCustomCard.outline,
+      variant: CustomCardVariant.outline,
       description: description,
+      settings: settings,
       onPositive: onPositive,
       onNegative: onNegative,
       textPositive: textPositive,
@@ -117,23 +104,25 @@ class CustomCard extends StatefulWidget {
       enabled: enabled,
     );
   }
+
   factory CustomCard.inline({
     required String title,
-    final String? description,
-    final String? tag,
-    final Function()? onPositive,
-    final Function()? onNegative,
-    final String? textPositive,
-    final String? textNegative,
-    final double? width,
-    final double? height,
-    final bool hidden = false,
-    final bool enabled = true,
+    String? description,
+    CustomCardSettings? settings,
+    VoidCallback? onPositive,
+    VoidCallback? onNegative,
+    String? textPositive,
+    String? textNegative,
+    double? width,
+    double? height,
+    bool hidden = false,
+    bool enabled = true,
   }) {
     return CustomCard(
       title: title,
-      style: StyleCustomCard.inline,
+      variant: CustomCardVariant.inline,
       description: description,
+      settings: settings,
       onPositive: onPositive,
       onNegative: onNegative,
       textPositive: textPositive,
@@ -152,22 +141,23 @@ class CustomCard extends StatefulWidget {
 class _CustomCardState extends State<CustomCard> {
   @override
   Widget build(BuildContext context) {
-    final cardColor = widget.style.color(context);
-    final border = widget.style.border(context);
+    final cardColor = widget.settings?.backgroundColor ??
+        widget.variant.backgroundFill(context);
+    final border = widget.variant.borderForInline(context);
 
     Widget cardContent = Card(
       color: cardColor,
-      elevation: 0, // Remove elevação padrão para usar a do tema
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12), // Alinhado com os temas
-        side: widget.style == StyleCustomCard.inline && border != null
+        borderRadius: BorderRadius.circular(12),
+        side: widget.variant == CustomCardVariant.inline && border != null
             ? (border as Border).top
             : BorderSide.none,
       ),
       child: Container(
         width: widget.width,
         height: widget.height,
-        padding: const EdgeInsets.all(20), // Padding maior para mais respiro
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -180,25 +170,22 @@ class _CustomCardState extends State<CustomCard> {
               Expanded(child: _buildDescription()),
             if (widget.description != null && widget.height == null)
               _buildDescription(),
-            if (!widget.hidden) _buildButtonAction(),
+            if (!widget.hidden) _buildActionsRow(),
           ],
         ),
       ),
     );
 
-    // Aplica opacidade de 50% quando enabled for false
     if (!widget.enabled) {
-      cardContent = Opacity(
-        opacity: 0.5,
-        child: cardContent,
-      );
+      cardContent = Opacity(opacity: 0.5, child: cardContent);
     }
 
     return cardContent;
   }
 
   Widget _buildTitle() {
-    final textColor = widget.style.textColor(context);
+    final textColor = widget.settings?.textColor ??
+        widget.variant.contentTextColor(context);
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Text(
@@ -212,7 +199,8 @@ class _CustomCardState extends State<CustomCard> {
   }
 
   Widget _buildDescription() {
-    final textColor = widget.style.textColor(context);
+    final textColor = widget.settings?.textColor ??
+        widget.variant.contentTextColor(context);
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Text(
@@ -224,7 +212,7 @@ class _CustomCardState extends State<CustomCard> {
     );
   }
 
-  Widget _buildButtonAction() {
+  Widget _buildActionsRow() {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Row(

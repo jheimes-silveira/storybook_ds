@@ -34,8 +34,10 @@ class StoryBookComponentController
   }
 
   dynamic getWhereAttribute(String name) {
-    final attribute = attributes.where((e) => e.name == name).first;
-    return attribute.selectedValue?.value;
+    for (final e in attributes) {
+      if (e.name == name) return e.selectedValue?.value;
+    }
+    return null;
   }
 
   void onUpdateAttributes(List<AttributeDto> attributes) {
@@ -79,12 +81,32 @@ class StoryBookComponent extends StatefulWidget {
 }
 
 class _StoryBookComponenState extends State<StoryBookComponent> {
-  late final StoryBookComponentController controller = widget.controller ??
-      StoryBookComponentController(
+  late final StoryBookComponentController _controller;
+  late final bool _ownsController;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.controller != null) {
+      _controller = widget.controller!;
+      _ownsController = false;
+    } else {
+      _controller = StoryBookComponentController(
         StoryBookComponentProperties(
           attributes: widget.attributes,
         ),
       );
+      _ownsController = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_ownsController) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => StoryBookComponentState(
@@ -92,13 +114,13 @@ class _StoryBookComponenState extends State<StoryBookComponent> {
         description: widget.description,
         attributes: widget.attributes,
         nameObjectInDisplay: widget.nameObjectInDisplay,
-        controller: widget.controller,
+        controller: _controller,
         multipleThemeSettings: widget.multipleThemeSettings,
         backgroundColor: widget.backgroundColor,
         onUpdateTheme: widget.onUpdateTheme,
         extraAttributesConfigCustom: widget.extraAttributesConfigCustom,
         builder: widget.builder,
-        child: widget.child,
         onSelectedConstructor: widget.onSelectedConstructor,
+        child: widget.child,
       );
 }

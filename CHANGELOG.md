@@ -1,3 +1,36 @@
+## [1.2.5] - 2026-04-03
+
+### Breaking changes
+
+- **Removida a dependência `reflectable`**. Não há mais reflexão em tempo de execução; em Flutter (AOT) isso não é suportado de forma nativa.
+- **`AttributeDto.objectInObject`** exige o parâmetro opcional **`merge`** (`StorybookNestedMerge`) para edição de objetos aninhados no painel. Sem `merge`, o fluxo que atualizava o filho via reflexão deixa de existir.
+- Removidos **`UtilsReflectable`**, **`UtilsAttributeReflectable`** e **`generateAttributes`**. Use lista manual de `AttributeDto` ou o gerador opcional `storybook_ds_builder` (repositório, pasta `builder/`) com **`@StorybookModel()`**.
+- **`StorybookAttributeFactories`** substitui o antigo `UtilsAttributeReflectable.factoryAttributeDtoString` (mesmo comportamento para strings longas de exemplo).
+
+### Added
+
+- **`lib/annotations.dart`**: anotação **`@StorybookModel()`** para geração de funções `merge*` (via `build_runner` + pacote `storybook_ds_builder`).
+- **`StorybookNestedMerge`** e campo **`merge`** em **`ObjectInObjectType`** / factory **`AttributeDto.objectInObject`**.
+- **`lib/src/utils/attribute_factories.dart`**: **`StorybookAttributeFactories`** exportado pelo pacote.
+- Documentação nos README (inglês e PT-BR) sobre fluxo sem reflexão e uso do gerador.
+
+### Fixed
+
+- **`DevicePreview`**: **`dispose()`** passa a encerrar o **`StreamController`** de screenshots (`_onScreenshot`), evitando vazamento ao desmontar o widget.
+- **`assert_inherited_media_query`**: compatível com Flutter 3.7+ em que **`useInheritedMediaQuery`** foi descontinuado; o assert não falha mais sem essa flag no `MaterialApp` interno.
+- **`StoryBookComponent`**: descarte correto do **`ValueNotifier`** quando o controller é criado internamente; o controller efetivo é repassado ao estado filho (correção de bug quando `widget.controller` era `null`).
+- **`DSDropdownContainer`**: **`AnimationController.dispose()`**, remoção do listener no dispose e **`dispose` do `DSDropdownController` apenas quando criado pelo container** (não descarta controller injetado pelo app).
+- **`ContentWidget` / `Builders`**: seleção do construtor padrão deixa de usar **`Future.delayed` no `build`**; agendamento único com **`addPostFrameCallback`** + flag.
+- **`Storybook`**: geração do código de preview uma vez por build do bloco; **`breakSpaceLevel`** otimizado; remoção de atribuição confusa ao parâmetro em **`updatePreviewCode`**.
+- **`StoryBookComponentController.getWhereAttribute`**: não lança mais se o nome do atributo não existir (retorna `null`).
+
+### Changed
+
+- **`item_attribute_object`**: usa **`merge`** do **`ObjectInObjectType`**; lança **`StateError`** explícito se **`merge`** ou instância atual estiver ausente.
+- Exemplo no repositório (`example/`): temas de exemplo com **Material 3** (`ColorScheme.fromSeed`), reorganização de stories, nomes mais genéricos e **`builders`** alinhados aos construtores do `CustomCard`.
+
+---
+
 ## 1.2.3+22 - Atualização de versões de bibliotecas e melhor compatibilidade com Flutter 3.38
 - Atualização das versões das bibliotecas de dependências para melhor compatibilidade com Flutter 3.38
 - Removida dependência da biblioteca `collection`, substituída por função local `groupBy` para reduzir dependências externas

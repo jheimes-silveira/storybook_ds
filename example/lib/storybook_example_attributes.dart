@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:storybook_ds/storybook_ds.dart';
 
-class UtilsAttribute {
-  static AttributeDto color({
+/// Atributos de exemplo reutilizáveis nas stories deste app.
+class StorybookExampleAttributes {
+  StorybookExampleAttributes._();
+
+  /// Seletor de [Color] com opções fixas para o painel do storybook.
+  static AttributeDto colorPicker({
     required String name,
     bool canBeNull = false,
+    VariableOption? selectedValue,
+    List<String> builders = const [''],
   }) {
     return AttributeDto(
       type: 'Color${canBeNull ? '?' : ''}',
       name: name,
-      selectedValue: VariableOption(
-        value: Colors.black,
-        textInDisplay: 'Colors.black',
-        textInSelectedOptions: 'black',
-      ),
+      builders: builders,
+      selectedValue: selectedValue ?? VariableOption(value: null),
       variableOptions: [
         VariableOption(
           value: Colors.lime,
@@ -37,13 +40,5 @@ class UtilsAttribute {
         ),
       ],
     );
-  }
-
-  static String getEmail(String email) {
-    return email;
-  }
-
-  static String getPhone(String phone) {
-    return phone;
   }
 }

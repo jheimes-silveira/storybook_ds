@@ -106,14 +106,6 @@ class ContentWidget extends StatelessWidget {
   Widget _buildBuilders(BuildContext context, List<AttributeDto> attributes) {
     final builders = _extractUniqueBuilders(attributes);
 
-    if (builders.isNotEmpty && constructor == null) {
-      Future.delayed(
-        const Duration(
-          milliseconds: _ContentWidgetConstants.delayedConstructorMs,
-        ),
-      ).then((_) => onSelectedConstructor(builders.first));
-    }
-
     return Builders(
       builders: builders,
       attributes: attributes,
@@ -192,11 +184,48 @@ class Builders extends StatefulWidget {
 
 class _BuildersState extends State<Builders> {
   late String? _constructor;
+  bool _defaultConstructorScheduled = false;
 
   @override
   void initState() {
     super.initState();
     _constructor = widget.initConstructor;
+    _scheduleDefaultConstructorIfNeeded();
+  }
+
+  @override
+  void didUpdateWidget(Builders oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initConstructor != oldWidget.initConstructor) {
+      _constructor = widget.initConstructor;
+    }
+    if (oldWidget.builders.isEmpty &&
+        widget.builders.isNotEmpty &&
+        widget.initConstructor == null) {
+      _defaultConstructorScheduled = false;
+    }
+    _scheduleDefaultConstructorIfNeeded();
+  }
+
+  /// Evita agendar em todo [build]: uma vez por ciclo de vida (ou quando surgem builders).
+  void _scheduleDefaultConstructorIfNeeded() {
+    if (_defaultConstructorScheduled) return;
+    if (widget.builders.isEmpty || widget.initConstructor != null) return;
+
+    _defaultConstructorScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Future<void>.delayed(
+        const Duration(
+          milliseconds: _ContentWidgetConstants.delayedConstructorMs,
+        ),
+        () {
+          if (!mounted) return;
+          if (widget.initConstructor != null) return;
+          widget.onSelectedConstructor(widget.builders.first);
+        },
+      );
+    });
   }
 
   @override

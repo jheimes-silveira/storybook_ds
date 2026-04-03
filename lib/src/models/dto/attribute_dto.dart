@@ -88,6 +88,7 @@ class AttributeDto {
     OnChangeValue? onChangeValue,
     List<AttributeDto> children = const [],
     List<VariableOption>? variableOptions,
+    StorybookNestedMerge? merge,
   }) {
     variableOptions ??= [selectedValue];
     return AttributeDto._raw(
@@ -99,7 +100,7 @@ class AttributeDto {
       builders: builders,
       description: description,
       required: required,
-      variableOptionType: ObjectInObjectType(children: children),
+      variableOptionType: ObjectInObjectType(children: children, merge: merge),
       onChangeValue: onChangeValue,
     );
   }
@@ -323,10 +324,23 @@ class WrapType extends VariableOptionType {}
 
 class DefaultType extends VariableOptionType {}
 
+/// Atualiza um filho de [ObjectInObjectType] quando o usuário edita um campo
+/// no painel (substitui reflexão em tempo de execução).
+typedef StorybookNestedMerge = Object? Function(
+  Object instance,
+  String fieldName,
+  dynamic newValue,
+);
+
 class ObjectInObjectType extends VariableOptionType {
   List<AttributeDto> children;
+
+  /// Obrigatório para edição de objetos aninhados no storybook.
+  final StorybookNestedMerge? merge;
+
   ObjectInObjectType({
     required this.children,
+    this.merge,
   });
 }
 
