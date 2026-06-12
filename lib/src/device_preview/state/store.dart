@@ -8,7 +8,6 @@ import 'package:storybook_ds/src/device_preview/storage/storage.dart';
 
 import 'custom_device.dart';
 
-
 /// The store is a container for the current [state] of the device preview.
 ///
 /// Whenever the state changes, it notifies its listener so that they can update themselves.
@@ -20,7 +19,7 @@ class DevicePreviewStore extends ChangeNotifier {
     List<DeviceInfo>? devices,
     required this.storage,
   }) {
-    initialize(
+    _initialize(
       locales: locales,
       devices: devices,
     );
@@ -32,6 +31,9 @@ class DevicePreviewStore extends ChangeNotifier {
 
   /// The storage used to persist the states's data.
   final DevicePreviewStorage storage;
+
+  /// Completer to track initialization completion
+  Completer<void>? _initCompleter;
 
   /// The curren state of the device preview.
   DevicePreviewState get state => _state;
@@ -55,12 +57,40 @@ class DevicePreviewStore extends ChangeNotifier {
     type: DeviceType.tablet,
   );
 
-  /// Initializes the state by loading data from storage (if [useStorage])
+  /// RN-04.1: Timer para debounce de escrita no storage
+  Timer? _saveDebounceTimer;
+  static const _saveDebounceDuration = Duration(milliseconds: 500);
+
+/// Initializes the state by loading data from storage (if [useStorage]).
+  /// Returns a Future that completes when initialization is done.
+  /// Multiple calls will wait for the same initialization.
   Future<void> initialize({
     List<Locale>? locales,
     List<DeviceInfo>? devices,
+  }) {
+    return _initialize(locales: locales, devices: devices);
+  }
+
+  Future<void> _initialize({
+    List<Locale>? locales,
+    List<DeviceInfo>? devices,
   }) async {
-    await state.maybeWhen(
+    // If already initialized, return immediately
+    if (_state.isInitialized) {
+      return;
+    }
+
+    // If initialization is already in progress, wait for it
+    if (_state.isInitializing) {
+      await _initCompleter?.future;
+      return;
+    }
+
+    // Start new initialization
+    final completer = _initCompleter ?? Completer<void>();
+    _initCompleter = completer;
+
+    await _state.maybeWhen(
       notInitialized: () async {
         state = const DevicePreviewState.initializing();
 
@@ -77,20 +107,20 @@ class DevicePreviewStore extends ChangeNotifier {
                 .toList()
             : defaultAvailableLocales;
 
-        final defaultLocale = 
+        final defaultLocale =
             basicLocaleListResolutionDS(
+              // ignore: deprecated_member_use
               WidgetsBinding.instance.window.locales,
               availaiableLocales.map((x) => x!.locale).toList(),
             )
-            .toString();
+                .toString();
 
         devices = devices ?? Devices.all;
         DevicePreviewData? data;
         try {
           data = await storage.load();
         } catch (e) {
-          // ignore: avoid_print
-          print('[device_preview] Error while restoring data: $e');
+          // RN-04: Removido print em produção
         }
 
         data ??= DevicePreviewData(
@@ -108,8 +138,13 @@ class DevicePreviewStore extends ChangeNotifier {
           devices: devices!,
           data: data,
         );
+
+        completer.complete();
       },
-      orElse: () => Future.value(),
+      orElse: () async {
+        // Already initialized or initializing (shouldn't happen with guards above)
+        completer.complete();
+      },
     );
   }
 }
@@ -127,15 +162,24 @@ extension DevicePreviewStateHelperExtensions on DevicePreviewStore {
   /// Defines the current state's data.
   ///
   /// Throws an exception if not initialized.
+  /// RN-04.1: Debounce de 500ms para escrita no storage
   set data(DevicePreviewData data) {
     state = state.maybeMap(
       initialized: (state) {
         final result = state.copyWith(data: data);
-        unawaited(storage.save(data));
+        _debouncedSave(data);
         return result;
       },
       orElse: () => throw Exception('Not initialized'),
     );
+  }
+
+  /// Debounced save to storage - RN-04.1
+  void _debouncedSave(DevicePreviewData data) {
+    _saveDebounceTimer?.cancel();
+    _saveDebounceTimer = Timer(DevicePreviewStore._saveDebounceDuration, () {
+      unawaited(storage.save(data));
+    });
   }
 
   /// Access to all available locales.
@@ -244,6 +288,20 @@ extension DevicePreviewStateHelperExtensions on DevicePreviewStore {
   }
 
   /// Updates the custom device configuration.
-  void updateCustomDevice(CustomDeviceInfoData data) =>
+  /// RN-04.2: Suporta debounce
+  void updateCustomDevice(CustomDeviceInfoData data, {bool debounce = true}) {
+    if (debounce) {
       this.data = this.data.copyWith(customDevice: data);
+    } else {
+      // Escrita imediata para o caso em que debounce é false
+      state = state.maybeMap(
+        initialized: (state) {
+          final result = state.copyWith(data: this.data.copyWith(customDevice: data));
+          unawaited(storage.save(result.data));
+          return result;
+        },
+        orElse: () => throw Exception('Not initialized'),
+      );
+    }
+  }
 }

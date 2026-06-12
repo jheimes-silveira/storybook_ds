@@ -10,8 +10,6 @@ class _AttributesThemeWidgetConstants {
   static const double changeActionTopPadding = 8.0;
   static const double changeActionBottomPadding = 16.0;
   static const double expansionTilePadding = 8.0;
-  static const double borderRadius = 8.0;
-  static const double borderWidth = 1.0;
   static const double chipSpacing = 8.0;
   static const String lightModeLabel = 'light';
   static const String darkModeLabel = 'dark';
@@ -37,6 +35,8 @@ class AttributesThemeWidget extends StatefulWidget {
 class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
   @override
   Widget build(BuildContext context) {
+    final theme = StorybookThemeScope.of(context);
+
     return LayoutBuilder(
       builder: (_, constraints) {
         return Column(
@@ -50,12 +50,10 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                    _AttributesThemeWidgetConstants.borderRadius,
-                  ),
+                  borderRadius: theme.panelBorderRadius,
                   border: Border.all(
-                    width: _AttributesThemeWidgetConstants.borderWidth,
-                    color: Colors.grey,
+                    width: theme.panelBorderWidth,
+                    color: theme.panelBorderColor,
                   ),
                 ),
                 child: ExpansionTile(
@@ -67,6 +65,8 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
                     right: _AttributesThemeWidgetConstants.expansionTilePadding,
                   ),
                   expandedAlignment: Alignment.centerLeft,
+                  iconColor: theme.expansionTileIconColor,
+                  collapsedIconColor: theme.expansionTileIconColor,
                   title: _buildNameTheme(
                     widget.themeSettings.selectedThemes.title,
                     context,
@@ -142,12 +142,15 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
         runAlignment: WrapAlignment.start,
         runSpacing: _AttributesThemeWidgetConstants.chipSpacing,
         children: themeSettings.selectableThemes
+            .asMap()
+            .entries
             .map(
-              (e2) => CustomChipSelected(
-                label: e2.title,
-                selected: themeSettings.selectedThemes.title == e2.title,
+              (entry) => CustomChipSelected(
+                key: ValueKey('theme-${entry.value.title}'),
+                label: entry.value.title,
+                selected: themeSettings.selectedThemes.title == entry.value.title,
                 onTap: () => _handleThemeSelection(
-                  e2,
+                  entry.value,
                   themeSettings,
                   onUpdateTheme,
                 ),
@@ -171,6 +174,7 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
       runSpacing: _AttributesThemeWidgetConstants.chipSpacing,
       children: [
         CustomChipSelected(
+          key: const ValueKey('theme-mode-light'),
           label: _AttributesThemeWidgetConstants.lightModeLabel,
           selected: !themeSettings.selectedThemes.isDarkMode,
           onTap: () => _handleThemeModeChange(
@@ -180,6 +184,7 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
           ),
         ),
         CustomChipSelected(
+          key: const ValueKey('theme-mode-dark'),
           label: _AttributesThemeWidgetConstants.darkModeLabel,
           selected: themeSettings.selectedThemes.isDarkMode,
           onTap: () => _handleThemeModeChange(
@@ -200,9 +205,11 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
   ) {
     theme.setCurrentTheme(themeSettings.selectedThemes.isDarkMode);
     themeSettings.selectedThemes = theme;
-    setState(() {
-      onUpdateTheme(themeSettings);
-    });
+    // `themeSettings` é mutado in-place: precisamos de `setState` para
+    // que o build rode, atualize o `selected` dos chips e mantenha
+    // consistente o `selectedThemes.title` mostrado no `ExpansionTile`.
+    setState(() {});
+    onUpdateTheme(themeSettings);
   }
 
   /// Handles theme mode change (light/dark).
@@ -212,8 +219,9 @@ class _AttributesThemeWidgetState extends State<AttributesThemeWidget> {
     void Function(MultipleThemeSettings) onUpdateTheme,
   ) {
     themeSettings.selectedThemes.setCurrentTheme(isDarkMode);
-    setState(() {
-      onUpdateTheme(themeSettings);
-    });
+    // Mesma justificativa: a mutação é in-place, o widget precisa
+    // reconstruir para refletir o chip "light"/"dark" ativo.
+    setState(() {});
+    onUpdateTheme(themeSettings);
   }
 }

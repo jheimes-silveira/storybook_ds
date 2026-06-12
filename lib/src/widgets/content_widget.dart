@@ -3,8 +3,9 @@ import 'package:storybook_ds/src/models/multiple_theme_settings.dart';
 import 'package:storybook_ds/src/utils/typedef_storybook.dart';
 import 'package:storybook_ds/src/widgets/attributes_variant/attributes_variant_widget.dart';
 
-import '../models/dto/attribute_dto.dart';
+import '../models/model/attribute_model.dart';
 import 'attributes_theme_widget.dart';
+import 'attributes_variant/strategies/attribute_change_bus.dart';
 import 'custom_chip_selected.dart';
 
 /// Constants for spacing and layout
@@ -22,7 +23,7 @@ class ContentWidget extends StatelessWidget {
   final String description;
   final String? constructor;
   final String nameObjectInDisplay;
-  final List<AttributeDto> attributes;
+  final List<AttributeModel> attributes;
   final MultipleThemeSettings? multipleThemeSettings;
 
   final void Function(
@@ -30,13 +31,17 @@ class ContentWidget extends StatelessWidget {
   )? onUpdateTheme;
 
   final Function(
-    List<AttributeDto> attributes,
-    AttributeDto currentAtribute,
+    List<AttributeModel> attributes,
+    AttributeModel currentAtribute,
   )? onAttributes;
 
   final Function(String constructor) onSelectedConstructor;
-  final String Function(List<AttributeDto> attributes) updatePreviewCode;
+  final String Function(List<AttributeModel> attributes) updatePreviewCode;
   final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
+
+  /// Barramento de mudanças da `Storybook` dona deste widget, usado
+  /// para reatividade em tempo real no device preview.
+  final AttributeChangeBus changeBus;
 
   const ContentWidget({
     super.key,
@@ -46,6 +51,7 @@ class ContentWidget extends StatelessWidget {
     required this.nameObjectInDisplay,
     required this.onSelectedConstructor,
     required this.updatePreviewCode,
+    required this.changeBus,
     this.onAttributes,
     this.constructor,
     this.multipleThemeSettings,
@@ -55,6 +61,9 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // RN-03: Memoizar builders
+    final builders = _extractUniqueBuilders(attributes);
+
     return SingleChildScrollView(
       child: Container(
         margin: const EdgeInsets.only(
@@ -68,7 +77,7 @@ class ContentWidget extends StatelessWidget {
           children: [
             _buildTitle(context),
             _buildDescription(context),
-            _buildBuilders(context, attributes),
+            _buildBuilders(context, builders, attributes),
             if (extraAttributesConfigCustom != null) ...[
               const SizedBox(height: _ContentWidgetConstants.extraAttributesSpacing),
               extraAttributesConfigCustom!(context),
@@ -103,9 +112,7 @@ class ContentWidget extends StatelessWidget {
   }
 
   /// Builds the constructors selection widget.
-  Widget _buildBuilders(BuildContext context, List<AttributeDto> attributes) {
-    final builders = _extractUniqueBuilders(attributes);
-
+  Widget _buildBuilders(BuildContext context, List<String> builders, List<AttributeModel> attributes) {
     return Builders(
       builders: builders,
       attributes: attributes,
@@ -116,9 +123,10 @@ class ContentWidget extends StatelessWidget {
   }
 
   /// Extracts unique builders from attributes list.
-  List<String> _extractUniqueBuilders(List<AttributeDto> attributes) {
+  /// RN-03: Memoizado - extraído uma vez na construção
+  List<String> _extractUniqueBuilders(List<AttributeModel> attributes) {
     final builders = <String>{};
-    
+
     for (final attribute in attributes) {
       if (attribute.builders.isNotEmpty) {
         builders.addAll(attribute.builders);
@@ -126,23 +134,25 @@ class ContentWidget extends StatelessWidget {
         builders.add('');
       }
     }
-    
+
     final result = builders.toList();
     if (result.contains('')) {
       result.remove('');
       result.insert(0, '');
     }
-    
+
     return result;
   }
 
   /// Builds the attributes variant widget.
-  Widget _buildAttributesVariant(List<AttributeDto> attributes) {
+  Widget _buildAttributesVariant(List<AttributeModel> attributes) {
     return AttributesVariantWidget(
+      key: const ValueKey('attributes-variant'),
       attributes: attributes,
       onAttributes: onAttributes,
       constructor: constructor,
       title: '',
+      changeBus: changeBus,
     );
   }
 
@@ -173,9 +183,9 @@ class Builders extends StatefulWidget {
 
   final List<String> builders;
   final String? initConstructor;
-  final Function(List<AttributeDto> attributes, AttributeDto currentAtribute)?
+  final Function(List<AttributeModel> attributes, AttributeModel currentAtribute)?
       onAttributes;
-  final List<AttributeDto> attributes;
+  final List<AttributeModel> attributes;
   final Function(String constructor) onSelectedConstructor;
 
   @override
@@ -251,6 +261,7 @@ class _BuildersState extends State<Builders> {
             children: widget.builders
                 .map(
                   (e2) => CustomChipSelected(
+                    key: ValueKey('ctor-$e2'),
                     label: e2.isEmpty ? 'default' : e2,
                     selected: _constructor == e2,
                     onTap: () => _handleConstructorTap(e2),
@@ -264,19 +275,28 @@ class _BuildersState extends State<Builders> {
   }
 
   /// Handles constructor chip tap.
+  ///
+  /// Atualiza o estado local e propaga a seleção para o `Storybook`
+  /// via [onSelectedConstructor]. A reconstrução do device preview
+  /// decorrente da troca de construtor é responsabilidade do
+  /// `Storybook.onUpdateSelectedConstructor` (não usamos o bus aqui
+  /// porque uma troca de construtor **não** é uma mudança de valor
+  /// de atributo — apenas uma reconfiguração de quais atributos
+  /// são editáveis).
   void _handleConstructorTap(String constructor) {
-    if (widget.onAttributes == null) return;
-
     setState(() {
       _constructor = constructor;
-      widget.onSelectedConstructor(constructor);
-
-      final attribute = widget.attributes.firstWhere(
-        (element) => element.builders.contains(constructor),
-        orElse: () => widget.attributes.first,
-      );
-      attribute.onChangeValue?.call(attribute);
-      widget.onAttributes!(widget.attributes, attribute);
     });
+    widget.onSelectedConstructor(constructor);
+
+    // Propaga também via onAttributes para manter compatibilidade com
+    // consumidores que observam esse callback para reagir à troca de
+    // construtor (ex.: atualizar estado derivado nos atributos).
+    widget.onAttributes?.call(
+      widget.attributes,
+      widget.attributes.isEmpty
+          ? AttributeModel(type: '', name: '')
+          : widget.attributes.first,
+    );
   }
 }

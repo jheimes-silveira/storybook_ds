@@ -1,18 +1,18 @@
-import '../models/dto/attribute_dto.dart';
+import '../models/model/attribute_model.dart';
 
-/// Fábricas auxiliares para [AttributeDto] (sem reflexão em tempo de execução).
+/// Fábricas auxiliares para [AttributeModel] (sem reflexão em tempo de execução).
 class StorybookAttributeFactories {
   StorybookAttributeFactories._();
 
-  /// [AttributeDto] para texto longo com opções de exemplo pré-definidas.
-  static AttributeDto factoryAttributeDtoString({
+  /// [AttributeModel] para texto longo com opções de exemplo pré-definidas.
+  static AttributeModel factoryAttributeModelString({
     required String name,
     String? selectedValue,
     bool canBeNull = false,
     bool required = false,
     List<String> builders = const [''],
   }) {
-    return AttributeDto(
+    return AttributeModel(
       name: name,
       type: 'String${canBeNull ? "?" : ""}',
       required: required,
@@ -52,6 +52,24 @@ class StorybookAttributeFactories {
           textInSelectedOptions: '120 palavras',
         ),
       ],
+      builders: builders,
+    );
+  }
+
+  /// [AttributeModel] para texto longo com opções de exemplo pré-definidas.
+  @Deprecated('Use factoryAttributeModelString instead.')
+  static AttributeModel factoryAttributeDtoString({
+    required String name,
+    String? selectedValue,
+    bool canBeNull = false,
+    bool required = false,
+    List<String> builders = const [''],
+  }) {
+    return factoryAttributeModelString(
+      name: name,
+      selectedValue: selectedValue,
+      canBeNull: canBeNull,
+      required: required,
       builders: builders,
     );
   }

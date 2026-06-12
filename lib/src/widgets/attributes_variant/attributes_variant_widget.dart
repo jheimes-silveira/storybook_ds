@@ -3,93 +3,78 @@ import 'package:flutter/material.dart';
 import '../../../storybook_ds.dart';
 import 'attribute_variant.dart';
 
-/// Constants for attributes variant widget styling
-class _AttributesVariantWidgetConstants {
-  static const double topPadding = 16.0;
-  static const double bottomPadding = 16.0;
-  static const double itemTopPadding = 8.0;
-  static const double bottomSpacing = 16.0;
-  static const double borderRadius = 8.0;
-  static const double borderWidth = 1.0;
-}
-
-class AttributesVariantWidget extends StatefulWidget {
-  final List<AttributeDto> attributes;
+class AttributesVariantWidget extends StatelessWidget {
+  final List<AttributeModel> attributes;
   final bool enabledBorder;
   final String? title;
   final Function(
-    List<AttributeDto> attributes,
-    AttributeDto attribute,
+    List<AttributeModel> attributes,
+    AttributeModel attribute,
   )? onAttributes;
   final String? constructor;
+
+  /// Barramento de mudanças da `Storybook` dona deste widget, propagado
+  /// para cada [AttributeVariant] para reatividade em tempo real.
+  final AttributeChangeBus changeBus;
 
   const AttributesVariantWidget({
     super.key,
     required this.attributes,
     required this.onAttributes,
+    required this.changeBus,
     this.enabledBorder = true,
     this.title,
     this.constructor,
   });
 
   @override
-  State<AttributesVariantWidget> createState() =>
-      _AttributesVariantWidgetState();
-}
-
-class _AttributesVariantWidgetState extends State<AttributesVariantWidget> {
-  @override
   Widget build(BuildContext context) {
+    final theme = StorybookThemeScope.of(context);
+    final filteredAttributes = attributes
+        .where(
+          (e) => e.builders.isEmpty || e.builders.contains(constructor ?? ''),
+        )
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        if (widget.title != null) _buildTitle(widget.title!),
-        ...widget.attributes
-            .where(
-              (e) =>
-                  e.builders.isEmpty ||
-                  e.builders.contains(widget.constructor ?? ''),
-            )
-            .map(
-              (e) => Padding(
-                padding: const EdgeInsets.only(
-                  top: _AttributesVariantWidgetConstants.itemTopPadding,
-                ),
+        if (title != null) _buildTitle(context, title!),
+        ...filteredAttributes.asMap().entries.map(
+              (entry) => Padding(
+                key: ValueKey(entry.value.name),
+                padding: const EdgeInsets.only(top: 8),
                 child: Container(
-                  decoration: widget.enabledBorder
+                  decoration: enabledBorder
                       ? BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            _AttributesVariantWidgetConstants.borderRadius,
-                          ),
+                          borderRadius: theme.panelBorderRadius,
                           border: Border.all(
-                            width: _AttributesVariantWidgetConstants.borderWidth,
-                            color: Colors.grey,
+                            width: theme.panelBorderWidth,
+                            color: theme.panelBorderColor,
                           ),
                         )
                       : null,
                   child: AttributeVariant(
-                    attribute: e,
-                    attributes: widget.attributes,
-                    onAttributes: widget.onAttributes,
+                    key: ValueKey('attribute-variant-${entry.value.name}'),
+                    attribute: entry.value,
+                    attributes: attributes,
+                    onAttributes: onAttributes,
+                    constructor: constructor,
+                    changeBus: changeBus,
                   ),
                 ),
               ),
             ),
-        const SizedBox(
-          height: _AttributesVariantWidgetConstants.bottomSpacing,
-        ),
+        const SizedBox(height: 16),
       ],
     );
   }
 
   /// Builds the title widget.
-  Widget _buildTitle(String title) {
+  Widget _buildTitle(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.only(
-        top: _AttributesVariantWidgetConstants.topPadding,
-        bottom: _AttributesVariantWidgetConstants.bottomPadding,
-      ),
+      padding: const EdgeInsets.only(top: 16, bottom: 16),
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge,

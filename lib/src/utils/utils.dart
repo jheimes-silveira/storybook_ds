@@ -11,10 +11,14 @@ class Utils {
   }
 
   static String colorToHex(Color color) {
-    String red = color.red.toRadixString(16).padLeft(2, '0');
-    String green = color.green.toRadixString(16).padLeft(2, '0');
-    String blue = color.blue.toRadixString(16).padLeft(2, '0');
-    String alpha = color.alpha.toRadixString(16).padLeft(2, '0');
+    int r = (color.r * 255.0).round().clamp(0, 255);
+    int g = (color.g * 255.0).round().clamp(0, 255);
+    int b = (color.b * 255.0).round().clamp(0, 255);
+    int a = (color.a * 255.0).round().clamp(0, 255);
+    String red = r.toRadixString(16).padLeft(2, '0');
+    String green = g.toRadixString(16).padLeft(2, '0');
+    String blue = b.toRadixString(16).padLeft(2, '0');
+    String alpha = a.toRadixString(16).padLeft(2, '0');
     return '#$alpha$red$green$blue'.toUpperCase();
   }
 }

@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:storybook_ds/src/device_preview/state/store.dart';
 import 'package:storybook_ds/src/device_preview/views/theme.dart';
+import 'package:storybook_ds/src/theme/storybook_theme_scope.dart';
 
 /// The panel which contains all the tools.
 class ToolPanel extends StatelessWidget {
@@ -74,6 +74,7 @@ class _ToolPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final storybookTheme = StorybookThemeScope.of(context);
     late bool isEnabled;
     if (isRight) {
       isEnabled = context.select(
@@ -87,14 +88,17 @@ class _ToolPanel extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Device preview',
-          style: theme.textTheme.titleLarge?.copyWith(
+          storybookTheme.appBarTitle,
+          style: storybookTheme.appBarTitleStyle.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: (theme.colorScheme.brightness == Brightness.dark
                 ? theme.colorScheme.onSurface
                 : theme.colorScheme.onPrimary),
           ),
+          overflow: TextOverflow.ellipsis,
+          softWrap: false,
+          maxLines: 1,
         ),
         leading: _getLeading(
           context: context,
@@ -104,29 +108,35 @@ class _ToolPanel extends StatelessWidget {
         ),
         actions: [
           if (!isModal && isRight)
-            Switch(
-              value: isEnabled,
-              onChanged: (v) {
-                final state = context.read<DevicePreviewStore>();
-                if (isRight) {
-                  state.data = state.data.copyWith(
-                    isToolbarVisibleRight: v,
-                  );
-                } else {
-                  state.data = state.data.copyWith(
-                    isToolbarVisibleLeft: v,
-                  );
-                }
-              },
+            // Espaçamento simétrico ao do `leading` (mesma `expansionTilePadding`
+            // usada no `AttributesThemeWidget`) para que o switch fique à
+            // mesma distância visual dos demais itens do AppBar.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Center(
+                child: Switch(
+                  value: isEnabled,
+                  onChanged: (v) {
+                    final state = context.read<DevicePreviewStore>();
+                    if (isRight) {
+                      state.data = state.data.copyWith(
+                        isToolbarVisibleRight: v,
+                      );
+                    } else {
+                      state.data = state.data.copyWith(
+                        isToolbarVisibleLeft: v,
+                      );
+                    }
+                  },
+                ),
+              ),
             ),
         ],
       ),
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: sections,
-          ),
-        ],
+      body: RepaintBoundary(
+        child: CustomScrollView(
+          slivers: sections,
+        ),
       ),
     );
   }
@@ -149,20 +159,27 @@ class _ToolPanel extends StatelessWidget {
     }
 
     if (!isRight) {
-      return Switch(
-        value: isEnabled,
-        onChanged: (v) {
-          final state = context.read<DevicePreviewStore>();
-          if (isRight) {
-            state.data = state.data.copyWith(
-              isToolbarVisibleRight: v,
-            );
-          } else {
-            state.data = state.data.copyWith(
-              isToolbarVisibleLeft: v,
-            );
-          }
-        },
+      // Mesmo `padding` horizontal do switch à direita (vide `actions`
+      // acima) para distribuição simétrica dos itens do AppBar.
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Center(
+          child: Switch(
+            value: isEnabled,
+            onChanged: (v) {
+              final state = context.read<DevicePreviewStore>();
+              if (isRight) {
+                state.data = state.data.copyWith(
+                  isToolbarVisibleRight: v,
+                );
+              } else {
+                state.data = state.data.copyWith(
+                  isToolbarVisibleLeft: v,
+                );
+              }
+            },
+          ),
+        ),
       );
     }
     if (isModal) {

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:ui' as ui;
 
@@ -132,6 +134,7 @@ class DevicePreview extends StatefulWidget {
   ];
 
   @override
+  // ignore: library_private_types_in_public_api
   _DevicePreviewState createState() => _DevicePreviewState();
 
   /// The currently selected device.
@@ -230,7 +233,7 @@ class DevicePreview extends StatefulWidget {
           countryCode: countryCode,
         );
       },
-      orElse: () => WidgetsBinding.instance.window.locale,
+      orElse: () => WidgetsBinding.instance.platformDispatcher.locale,
     );
   }
 
@@ -363,6 +366,84 @@ class DevicePreview extends StatefulWidget {
   }
 }
 
+/// Model class to hold preview state for Selector
+class _PreviewModel {
+  final DeviceInfo deviceInfo;
+  final bool isFrameVisible;
+  final Orientation orientation;
+  final bool isVirtualKeyboardVisible;
+  final bool isDarkMode;
+
+  const _PreviewModel({
+    required this.deviceInfo,
+    required this.isFrameVisible,
+    required this.orientation,
+    required this.isVirtualKeyboardVisible,
+    required this.isDarkMode,
+  });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is _PreviewModel &&
+        other.deviceInfo == deviceInfo &&
+        other.isFrameVisible == isFrameVisible &&
+        other.orientation == orientation &&
+        other.isVirtualKeyboardVisible == isVirtualKeyboardVisible &&
+        other.isDarkMode == isDarkMode;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        deviceInfo,
+        isFrameVisible,
+        orientation,
+        isVirtualKeyboardVisible,
+        isDarkMode,
+      );
+}
+
+/// Model class to hold layout state for Selector
+class _LayoutModel {
+  final bool isInitialized;
+  final bool isEnabled;
+  final DevicePreviewToolBarThemeData toolbarTheme;
+  final DevicePreviewBackgroundThemeData backgroundTheme;
+  final bool isToolbarVisibleRight;
+  final bool isToolbarVisibleLeft;
+
+  const _LayoutModel({
+    required this.isInitialized,
+    required this.isEnabled,
+    required this.toolbarTheme,
+    required this.backgroundTheme,
+    required this.isToolbarVisibleRight,
+    required this.isToolbarVisibleLeft,
+  });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is _LayoutModel &&
+        other.isInitialized == isInitialized &&
+        other.isEnabled == isEnabled &&
+        other.toolbarTheme == toolbarTheme &&
+        other.backgroundTheme == backgroundTheme &&
+        other.isToolbarVisibleRight == isToolbarVisibleRight &&
+        other.isToolbarVisibleLeft == isToolbarVisibleLeft;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        isInitialized,
+        isEnabled,
+        toolbarTheme,
+        backgroundTheme,
+        isToolbarVisibleRight,
+        isToolbarVisibleLeft,
+      );
+}
+
 class _DevicePreviewState extends State<DevicePreview> {
   bool _isToolPanelPopOverOpen = false;
 
@@ -403,8 +484,11 @@ class _DevicePreviewState extends State<DevicePreview> {
   @override
   void initState() {
     _onScreenshot = StreamController<DeviceScreenshot>.broadcast();
-    _toolsPanelRight =
-        widget.toolsPanelRight ?? ToolsPanelModel(tools: widget.tools);
+    // `widget.tools` está deprecado mas ainda é mantido para
+    // compatibilidade com consumidores que só passam `tools`.
+    _toolsPanelRight = widget.toolsPanelRight ??
+        // ignore: deprecated_member_use_from_same_package
+        ToolsPanelModel(tools: widget.tools);
     _toolsPanelLeft = widget.toolsPanelLeft ?? ToolsPanelModel(tools: []);
 
     super.initState();
@@ -424,76 +508,90 @@ class _DevicePreviewState extends State<DevicePreview> {
     }
   }
 
+  /// Builds the preview using a single Selector for efficiency.
+  /// RN-02.2: Agrupa 8 context.select em 1 Selector
   Widget _buildPreview(BuildContext context) {
-    final theme = Theme.of(context);
-    final isEnabled = context.select(
-      (DevicePreviewStore store) => store.state.maybeMap(
-        initialized: (state) => state.data.isEnabled,
-        orElse: () => false,
-      ),
-    );
+    return Selector<DevicePreviewStore, _PreviewModel>(
+      selector: (_, store) {
+        final isInitialized = store.state.maybeMap(
+          initialized: (_) => true,
+          orElse: () => false,
+        );
+        if (!isInitialized) {
+          return _PreviewModel(
+            deviceInfo: store.defaultDevice,
+            isFrameVisible: false,
+            orientation: Orientation.portrait,
+            isVirtualKeyboardVisible: false,
+            isDarkMode: false,
+          );
+        }
+        return _PreviewModel(
+          deviceInfo: store.deviceInfo,
+          isFrameVisible: store.data.isFrameVisible,
+          orientation: store.data.orientation,
+          isVirtualKeyboardVisible: store.data.isVirtualKeyboardVisible,
+          isDarkMode: store.data.isDarkMode,
+        );
+      },
+      shouldRebuild: (prev, next) => prev != next,
+      builder: (context, model, _) {
+        final theme = Theme.of(context);
+        final isEnabled = context.select(
+          (DevicePreviewStore store) => store.state.maybeMap(
+            initialized: (state) => state.data.isEnabled,
+            orElse: () => false,
+          ),
+        );
 
-    if (!isEnabled) return widget.builder(context);
+        if (!isEnabled) return widget.builder(context);
 
-    final mediaQuery = MediaQuery.of(context);
-    final device = context.select(
-      (DevicePreviewStore store) => store.deviceInfo,
-    );
-    final isFrameVisible = context.select(
-      (DevicePreviewStore store) => store.data.isFrameVisible,
-    );
-    final orientation = context.select(
-      (DevicePreviewStore store) => store.data.orientation,
-    );
-    final isVirtualKeyboardVisible = context.select(
-      (DevicePreviewStore store) => store.data.isVirtualKeyboardVisible,
-    );
-    final isDarkMode = context.select(
-      (DevicePreviewStore store) => store.data.isDarkMode,
-    );
+        final mediaQuery = MediaQuery.of(context);
 
-    return Container(
-      color: widget.backgroundColor ?? theme.canvasColor,
-      padding: EdgeInsets.only(
-        top: 20 + mediaQuery.viewPadding.top,
-        right: 20 + mediaQuery.viewPadding.right,
-        left: 20 + mediaQuery.viewPadding.left,
-        bottom: 20,
-      ),
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: RepaintBoundary(
-          key: _repaintKey,
-          child: DeviceFrame(
-            device: device,
-            isFrameVisible: isFrameVisible,
-            orientation: orientation,
-            screen: VirtualKeyboard(
-              isEnabled: isVirtualKeyboardVisible,
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  platform: device.identifier.platform,
-                  brightness: isDarkMode ? Brightness.dark : Brightness.light,
-                ),
-                child: MediaQuery(
-                  data: DevicePreview._mediaQuery(context),
-                  child: Builder(
-                    key: _appKey,
-                    builder: (context) {
-                      final app = widget.builder(context);
-                      assert(
-                        isWidgetsAppUsingInheritedMediaQuery(app),
-                        'Your widgets app should have its `useInheritedMediaQuery` property set to `true` in order to use DevicePreview.',
-                      );
-                      return app;
-                    },
+        return Container(
+          color: widget.backgroundColor ?? theme.canvasColor,
+          padding: EdgeInsets.only(
+            top: 20 + mediaQuery.viewPadding.top,
+            right: 20 + mediaQuery.viewPadding.right,
+            left: 20 + mediaQuery.viewPadding.left,
+            bottom: 20,
+          ),
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: RepaintBoundary(
+              key: _repaintKey,
+              child: DeviceFrame(
+                device: model.deviceInfo,
+                isFrameVisible: model.isFrameVisible,
+                orientation: model.orientation,
+                screen: VirtualKeyboard(
+                  isEnabled: model.isVirtualKeyboardVisible,
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      platform: model.deviceInfo.identifier.platform,
+                      brightness: model.isDarkMode ? Brightness.dark : Brightness.light,
+                    ),
+                    child: MediaQuery(
+                      data: DevicePreview._mediaQuery(context),
+                      child: Builder(
+                        key: _appKeyPreview,
+                        builder: (context) {
+                          final app = widget.builder(context);
+                          assert(
+                            isWidgetsAppUsingInheritedMediaQuery(app),
+                            'Your widgets app should have its `useInheritedMediaQuery` property set to `true` in order to use DevicePreview.',
+                          );
+                          return app;
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -501,7 +599,7 @@ class _DevicePreviewState extends State<DevicePreview> {
   Widget build(BuildContext context) {
     if (!widget.enabled) {
       return Builder(
-        key: _appKey,
+        key: _appKeyPreview,
         builder: widget.builder,
       );
     }
@@ -514,172 +612,234 @@ class _DevicePreviewState extends State<DevicePreview> {
         storage: storage,
       ),
       builder: (context, child) {
-        final isInitialized = context.select(
-          (DevicePreviewStore store) => store.state.maybeMap(
-            initialized: (_) => true,
-            orElse: () => false,
-          ),
-        );
-
-        if (!isInitialized) {
-          return Builder(
-            key: _appKey,
-            builder: widget.builder,
-          );
-        }
-
-        final isEnabled = context.select(
-          (DevicePreviewStore store) => store.data.isEnabled,
-        );
-
-        final toolbarTheme = context.select(
-          (DevicePreviewStore store) => store.settings.toolbarTheme,
-        );
-
-        final backgroundTheme = context.select(
-          (DevicePreviewStore store) => store.settings.backgroundTheme,
-        );
-
-        final isToolbarVisibleRight = widget.isToolbarVisible &&
-            context.select(
-              (DevicePreviewStore store) => store.data.isToolbarVisibleRight,
+        // RN-02.2: Agrupa 5 context.select em 1 Selector
+        return Selector<DevicePreviewStore, _LayoutModel>(
+          selector: (_, store) {
+            final isInitialized = store.state.maybeMap(
+              initialized: (_) => true,
+              orElse: () => false,
             );
-        final isToolbarVisibleLeft = widget.isToolbarVisible &&
-            context.select(
-              (DevicePreviewStore store) => store.data.isToolbarVisibleLeft,
+            if (!isInitialized) {
+              return const _LayoutModel(
+                isInitialized: false,
+                isEnabled: false,
+                toolbarTheme: DevicePreviewToolBarThemeData.dark,
+                backgroundTheme: DevicePreviewBackgroundThemeData.dark,
+                isToolbarVisibleRight: false,
+                isToolbarVisibleLeft: false,
+              );
+            }
+            final isEnabled = store.data.isEnabled;
+            final toolbarTheme = store.settings.toolbarTheme;
+            final backgroundTheme = store.settings.backgroundTheme;
+            final isToolbarVisibleRight = widget.isToolbarVisible &&
+                store.data.isToolbarVisibleRight;
+            final isToolbarVisibleLeft = widget.isToolbarVisible &&
+                store.data.isToolbarVisibleLeft;
+            return _LayoutModel(
+              isInitialized: isInitialized,
+              isEnabled: isEnabled,
+              toolbarTheme: toolbarTheme,
+              backgroundTheme: backgroundTheme,
+              isToolbarVisibleRight: isToolbarVisibleRight,
+              isToolbarVisibleLeft: isToolbarVisibleLeft,
             );
+          },
+          shouldRebuild: (prev, next) => prev != next,
+          builder: (context, layoutModel, _) {
+            if (!layoutModel.isInitialized) {
+              return Builder(
+                key: _appKeyPreview,
+                builder: widget.builder,
+              );
+            }
 
-        final toolbar = toolbarTheme.asThemeData();
-        final background = backgroundTheme.asThemeData();
-        return Directionality(
-          textDirection: TextDirection.ltr,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 400),
-            child: MediaQueryObserver(
-              //mediaQuery: DevicePreview._mediaQuery(context),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: toolbar.scaffoldBackgroundColor,
-                ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final mediaQuery = MediaQuery.of(context);
-                    final isSmall = constraints.maxWidth < 700;
+            final toolbar = layoutModel.toolbarTheme.asThemeData();
+            final background = layoutModel.backgroundTheme.asThemeData();
+            return Directionality(
+              textDirection: TextDirection.ltr,
+              child: MediaQueryObserver(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: toolbar.scaffoldBackgroundColor,
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final mediaQuery = MediaQuery.of(context);
+                      final isSmall = constraints.maxWidth < 700;
 
-                    final borderRadius = BorderRadius.zero;
-                    final double rightPanelOffset = !isSmall
-                        ? (isToolbarVisibleRight
-                            ? _toolsPanelRight.panelWidth - 10
-                            : (64 + mediaQuery.padding.right))
-                        : 0;
-                    final double leftPanelOffset = !isSmall
-                        ? (isToolbarVisibleLeft
-                            ? _toolsPanelLeft.panelWidth - 10
-                            : (64 + mediaQuery.padding.right))
-                        : 0;
-                    final double bottomPanelOffset =
-                        isSmall ? mediaQuery.padding.bottom + 52 : 0;
-                    return Stack(
-                      children: <Widget>[
-                        if (isSmall)
-                          Positioned(
-                            key: const Key('Small'),
-                            bottom: 0,
-                            right: 0,
+                      const borderRadius = BorderRadius.zero;
+
+                      // RN-06.1: Corrigido offset - usa padding.left (não .right)
+                      // RN-06.2: Usa collapsiblePanelWidth (64) em vez de mágico
+                      const kCollapsedPanelWidth = 64.0;
+                      final double rightPanelOffset = !isSmall
+                          ? (layoutModel.isToolbarVisibleRight
+                              ? _toolsPanelRight.panelWidth - 10
+                              : (kCollapsedPanelWidth + mediaQuery.padding.left))
+                          : 0;
+                      final double leftPanelOffset = !isSmall
+                          ? (layoutModel.isToolbarVisibleLeft
+                              ? _toolsPanelLeft.panelWidth - 10
+                              : (kCollapsedPanelWidth + mediaQuery.padding.left))
+                          : 0;
+                      final double bottomPanelOffset =
+                          isSmall ? mediaQuery.padding.bottom + 52 : 0;
+                      return Stack(
+                        children: <Widget>[
+                          if (isSmall)
+                            Positioned(
+                              key: const Key('Small'),
+                              bottom: 0,
+                              right: 0,
+                              left: 0,
+                              child: DevicePreviewSmallLayout(
+                                toolsPanelRight: _toolsPanelRight,
+                                toolsPanelLeft: _toolsPanelLeft,
+                                maxMenuHeight: constraints.maxHeight * 0.5,
+                                scaffoldKey: scaffoldKey,
+                                isRight: true,
+                                onMenuVisibleChanged: (isVisible) => setState(() {
+                                  _isToolPanelPopOverOpen = isVisible;
+                                }),
+                              ),
+                            ),
+                          // RN-06.2: Painel esquerdo desmontado quando invisível
+                          if (!isSmall &&
+                              _toolsPanelLeft.tools.isNotEmpty &&
+                              layoutModel.isToolbarVisibleLeft)
+                            Positioned.fill(
+                              key: const Key('Large-toolsPanelLeft'),
+                              child: DevicePreviewLargeLayout(
+                                tools: _toolsPanelLeft,
+                                isRight: false,
+                              ),
+                            ),
+                          if (!isSmall && _toolsPanelRight.tools.isNotEmpty &&
+                              layoutModel.isToolbarVisibleRight)
+                            Positioned.fill(
+                              key: const Key('Large-toolsPanelRight'),
+                              child: DevicePreviewLargeLayout(
+                                tools: _toolsPanelRight,
+                                isRight: true,
+                              ),
+                            ),
+                          AnimatedPositioned(
+                            key: const Key('preview'),
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOutCubic,
+                            left: leftPanelOffset,
+                            right: rightPanelOffset,
+                            top: 0,
+                            bottom: bottomPanelOffset,
+                            child: Theme(
+                              data: background,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: borderRadius,
+                                  color: background.scaffoldBackgroundColor,
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: borderRadius,
+                                  child: layoutModel.isEnabled
+                                      ? _buildPreview(context)
+                                      : Builder(
+                                          key: _appKeyDisabled,
+                                          builder: widget.builder,
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Toggle button for collapsed left panel
+                          if (!isSmall &&
+                              _toolsPanelLeft.tools.isNotEmpty &&
+                              !layoutModel.isToolbarVisibleLeft)
+                            Positioned(
+                              // Fica **dentro** do espaço reservado para o
+                              // menu colapsado (`kCollapsedPanelWidth = 64`),
+                              // alinhado à borda lateral esquerda (canto onde
+                              // o painel costumava ficar), e não solto no
+                              // canto da tela.
+                              left: 0,
+                              top: mediaQuery.padding.top + 8,
+                              width: 64,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: _CollapseToggleButton(
+                                  isRight: false,
+                                  value: false,
+                                  onChanged: (v) {
+                                    final store = context.read<DevicePreviewStore>();
+                                    store.data = store.data.copyWith(
+                                      isToolbarVisibleLeft: v,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          // Toggle button for collapsed right panel
+                          if (!isSmall &&
+                              _toolsPanelRight.tools.isNotEmpty &&
+                              !layoutModel.isToolbarVisibleRight)
+                            Positioned(
+                              // Fica **dentro** do espaço reservado para o
+                              // menu colapsado (`kCollapsedPanelWidth = 64`),
+                              // alinhado à borda lateral direita.
+                              right: 0,
+                              top: mediaQuery.padding.top + 8,
+                              width: 64,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: _CollapseToggleButton(
+                                  isRight: true,
+                                  value: false,
+                                  onChanged: (v) {
+                                    final store = context.read<DevicePreviewStore>();
+                                    store.data = store.data.copyWith(
+                                      isToolbarVisibleRight: v,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            Positioned(
                             left: 0,
-                            child: DevicePreviewSmallLayout(
-                              toolsPanelRight: _toolsPanelRight,
-                              toolsPanelLeft: _toolsPanelLeft,
-                              maxMenuHeight: constraints.maxHeight * 0.5,
-                              scaffoldKey: scaffoldKey,
-                              isRight: true,
-                              onMenuVisibleChanged: (isVisible) => setState(() {
-                                _isToolPanelPopOverOpen = isVisible;
-                              }),
-                            ),
-                          ),
-                        if (!isSmall && _toolsPanelLeft.tools.isNotEmpty)
-                          Positioned.fill(
-                            key: const Key('Large-toolsPanelLeft'),
-                            child: DevicePreviewLargeLayout(
-                              tools: _toolsPanelLeft,
-                              isRight: false,
-                            ),
-                          ),
-                        if (!isSmall && _toolsPanelRight.tools.isNotEmpty)
-                          Positioned.fill(
-                            key: const Key('Large-toolsPanelRight'),
-                            child: DevicePreviewLargeLayout(
-                              tools: _toolsPanelRight,
-                              isRight: true,
-                            ),
-                          ),
-                        AnimatedPositioned(
-                          key: const Key('preview'),
-                          duration: const Duration(milliseconds: 200),
-                          left: leftPanelOffset,
-                          right: rightPanelOffset,
-                          top: 0,
-                          bottom: bottomPanelOffset,
-                          child: Theme(
-                            data: background,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                boxShadow: const [
-                                  BoxShadow(
-                                    blurRadius: 10,
-                                    color: Color(0xAA000000),
-                                  ),
+                            right: 0,
+                            top: 0,
+                            bottom: 0,
+                            child: IgnorePointer(
+                              ignoring: !_isToolPanelPopOverOpen,
+                              child: Localizations(
+                                locale: const Locale('en', 'US'),
+                                delegates: const [
+                                  GlobalMaterialLocalizations.delegate,
+                                  GlobalCupertinoLocalizations.delegate,
+                                  GlobalWidgetsLocalizations.delegate,
                                 ],
-                                borderRadius: borderRadius,
-                                color: background.scaffoldBackgroundColor,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: borderRadius,
-                                child: isEnabled
-                                    ? Builder(
-                                        builder: _buildPreview,
-                                      )
-                                    : Builder(
-                                        key: _appKey,
-                                        builder: widget.builder,
+                                child: Navigator(
+                                  onGenerateInitialRoutes: (navigator, name) {
+                                    return [
+                                      MaterialPageRoute(
+                                        builder: (context) => Scaffold(
+                                          key: scaffoldKey,
+                                          backgroundColor: Colors.transparent,
+                                        ),
                                       ),
+                                    ];
+                                  },
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Positioned.fill(
-                          child: IgnorePointer(
-                            ignoring: !_isToolPanelPopOverOpen,
-                            child: Localizations(
-                              locale: const Locale('en', 'US'),
-                              delegates: const [
-                                GlobalMaterialLocalizations.delegate,
-                                GlobalCupertinoLocalizations.delegate,
-                                GlobalWidgetsLocalizations.delegate,
-                              ],
-                              child: Navigator(
-                                onGenerateInitialRoutes: (navigator, name) {
-                                  return [
-                                    MaterialPageRoute(
-                                      builder: (context) => Scaffold(
-                                        key: scaffoldKey,
-                                        backgroundColor: Colors.transparent,
-                                      ),
-                                    ),
-                                  ];
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
@@ -692,6 +852,53 @@ class _DevicePreviewState extends State<DevicePreview> {
   /// a new screenshot.
   StreamController<DeviceScreenshot>? _onScreenshot;
 
-  /// The current application key.
-  final GlobalKey _appKey = GlobalKey();
+  /// RN-03.3: Keys separadas para cada Builder
+  final GlobalKey _appKeyPreview = GlobalKey();
+  final GlobalKey _appKeyDisabled = GlobalKey();
+}
+
+/// Selector (switch) mostrado no canto da tela quando o painel
+/// lateral está colapsado. Mantém o mesmo "seletor" usado pelo
+/// `ToolPanel` quando expandido (vide `tool_panel.dart`), trocando
+/// apenas o estado `isToolbarVisible*` correspondente: ligado = painel
+/// visível, desligado = painel oculto.
+class _CollapseToggleButton extends StatelessWidget {
+  const _CollapseToggleButton({
+    required this.isRight,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final bool isRight;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    // Cores fixas (não dependem do `Theme.of(context)`) para que a
+    // aparência do switch **nunca mude**, independentemente do estado
+    // (ativado/desativado) ou de qualquer re-renderização do contexto
+    // (expandir/colapsar o painel lateral pode alterar o `Theme`
+    // herdado do app pré-visualizado). Assim o switch apenas alterna
+    // o thumb entre ligado e desligado, sem mudança visual.
+    const trackColor = Color(0xFFB0B0B0);
+    const thumbColor = Color(0xFFE0E0E0);
+    const outlineColor = Color(0xFF8A8A8A);
+    return Material(
+      color: const Color(0xFF2A2A2A),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Switch(
+          value: value,
+          onChanged: onChanged,
+          activeColor: thumbColor,
+          activeTrackColor: trackColor,
+          inactiveThumbColor: thumbColor,
+          inactiveTrackColor: trackColor,
+          trackOutlineColor: const WidgetStatePropertyAll(outlineColor),
+        ),
+      ),
+    );
+  }
 }

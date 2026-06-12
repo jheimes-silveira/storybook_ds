@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:storybook_ds/src/models/dto/attribute_dto.dart';
+import 'package:storybook_ds/src/models/model/attribute_model.dart';
 
 import '../custom_chip_selected.dart';
 
 class ItemAttributeDefault extends StatefulWidget {
-  final AttributeDto attribute;
-  final List<AttributeDto> attributes;
+  final AttributeModel attribute;
+  final List<AttributeModel> attributes;
   final Function(
-    List<AttributeDto> attributes,
-    AttributeDto currentAtribute,
+    List<AttributeModel> attributes,
+    AttributeModel currentAtribute,
   )? onAttributes;
   const ItemAttributeDefault({
     super.key,
@@ -25,24 +25,20 @@ class _ItemAttributeDefaultState extends State<ItemAttributeDefault> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildChangeAction(
-            context,
-            widget.attribute,
-            widget.attributes,
-          ),
-        ),
-        _isVariableNubable(widget.attribute, widget.attributes),
-      ],
+    // O switch de "pode ser null" é renderizado pelo
+    // `_NullableTrailingSwitch` no trailing do `AttributeVariant`
+    // (ao lado do nome e tipo), para evitar duplicação.
+    return _buildChangeAction(
+      context,
+      widget.attribute,
+      widget.attributes,
     );
   }
 
   Widget _buildChangeAction(
     BuildContext context,
-    AttributeDto e,
-    List<AttributeDto> attributes,
+    AttributeModel e,
+    List<AttributeModel> attributes,
   ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16, top: 8),
@@ -71,28 +67,5 @@ class _ItemAttributeDefaultState extends State<ItemAttributeDefault> {
             .toList(),
       ),
     );
-  }
-
-  Widget _isVariableNubable(
-    AttributeDto e,
-    List<AttributeDto> attributes,
-  ) {
-    if (e.variableOptionType is HtmlType) {
-      return const SizedBox();
-    }
-    if (e.type.contains('?')) {
-      return Switch(
-        value: e.selectedValue?.value == null ? false : true,
-        onChanged: (value) {
-          e.selectedValue = value ? (e.variableOptions![0]) : null;
-          setState(() {
-            widget.onAttributes!(attributes, e);
-            e.onChangeValue?.call(e);
-          });
-        },
-      );
-    }
-
-    return const SizedBox();
   }
 }

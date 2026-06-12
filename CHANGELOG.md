@@ -1,3 +1,58 @@
+## [1.3.0] - 2026-06-12
+
+Versão de **refatoração arquitetural e correções de estabilidade**. O pacote foi reorganizado em torno de `AttributeModel` (com `AttributeDto` mantido como `@deprecated` typedef), introduziu um **registry de estratégias** extensível para os editores do painel, expôs uma **`StorybookTheme`** configurável para o chrome do storybook e corrigiu dois crashes de inicialização do `DevicePreview`. **Nenhuma breaking change** — código que rodava em `1.2.5` continua compilando e rodando em `1.3.0` (apenas com avisos de deprecation em `AttributeDto`).
+
+### Added
+
+- **Refatoração `AttributeDto` → `AttributeModel`** com classe canônica em `lib/src/models/model/attribute_model.dart`. `lib/src/models/dto/attribute_dto.dart` agora é apenas um `typedef @deprecated` que aponta para `AttributeModel` — projetos existentes que ainda referenciam `AttributeDto` continuam compilando, mas recebem um aviso de deprecation.
+  - **Impacto:** Nenhum para consumidores que já usavam `AttributeModel` (o nome público recomendado desde `1.2.5`). Consumidores que ainda escrevem `AttributeDto` devem migrar para `AttributeModel`; a lib segue exportando o typedef enquanto o ecossistema se atualiza.
+  - **Migração:** troca textual `AttributeDto` → `AttributeModel` (mesma API).
+- **Registry de estratégias de editor (`AttributeEditorRegistry`)** em `lib/src/widgets/attributes_variant/strategies/`. Substitui a cadeia `if/else is XType` que existia em `attribute_variant.dart` por um **padrão Strategy** com `priority` e fallback configurável.
+  - **Impacto:** extensibilidade — apps que precisarem de um editor customizado (ex.: `DateStrategy`, `LocaleStrategy`) podem registrar via `AttributeEditorRegistry.instance.register(...)` em `main()` sem alterar o core da lib. Estratégias padrão (`String`, `Bool`, `Number`, `Function`, `Object`, `Default`) são registradas uma única vez pelo `Storybook.initState`.
+  - **Fallback seguro (`SafeNoOpFallback`):** quando nenhuma estratégia aceita um atributo, o painel renderiza um hint em vez de lançar exceção — evita crashes em atributos experimentais.
+- **`AttributeValue` (em `lib/src/utils/attribute_value.dart`)** — helpers estáticos (`toDouble`, `toInt`, `toBool`, `valueToString`, `createForType`, `isPresent`) para conversão segura de `VariableOption.value`. Substitui coerções manuais que causavam `TypeError` em sliders (ex.: `bool is not a subtype of double?`).
+- **`StorybookTheme` (ThemeExtension)** em `lib/src/theme/` — tokeniza o chrome do storybook (cor de borda do painel, cores do chip selecionado/não-selecionado, cores da toolbar light/dark, título da `AppBar`, cor do asterisco de campo obrigatório, largura do painel colapsável). Acompanha `StorybookThemePresets.{light, dark, cupertino, material3}`.
+  - **Impacto:** consumidores que querem alinhar o painel do storybook ao DS do produto passam a poder fazer `storybookTheme: StorybookThemePresets.material3` em vez de aceitar os defaults.
+  - **Migração:** nenhum getter novo obrigatório; o getter `StorybookTheme? get storybookTheme => null;` da base `Storybook` continua opcional.
+- **Cobertura de testes em `test/`** — 13 novos arquivos cobrindo `AttributeModel`, `StorybookTheme`, `StorybookThemeScope`, `StorybookToolbarColors`, `DevicePreviewStore`, `ContentWidget`, `FunctionAttributeEditor`, reatividade do painel e regressões conhecidas. Estrutura: `test/src/{models,theme,device_preview,widgets}/`.
+
+### Changed
+
+- **Reorganização interna dos exports** em `lib/storybook_ds.dart` — adicionados `StorybookTheme`, `StorybookThemeScope`, `StorybookToolbarColors`, `AttributeChangeBus`, `AttributeEditorRegistry`, `AttributeEditorStrategies`, `AttributeEditorStrategy`, `AttributeValue`. Consumidores que importam `package:storybook_ds/storybook_ds.dart` ganham acesso direto; quem importava paths internos (`package:storybook_ds/src/...`) deve preferir o barrel.
+- **`item_attribute_*` reescritos como `AttributeEditorStrategy`** — `StringAttributeEditor`, `BoolAttributeEditor`, `NumberAttributeEditor`, `FunctionAttributeEditor`, `ObjectAttributeEditor`, `DefaultAttributeEditor`. Comportamento de UI idêntico ao de `1.2.5`; apenas a estrutura interna mudou.
+- **`item_attribute_object`**: agora delega a atualização do objeto à função `merge` configurada em `ObjectInObjectType`; lança `StateError` explícito se `merge` ou a instância atual estiverem ausentes (mesmo comportamento de `1.2.5`, mensagem de erro mais clara).
+- **`Storybook.initState`**: registra as estratégias padrão via `registerStandardAttributeStrategies(AttributeEditorRegistry.instance)` uma única vez por processo (flag estática `_strategiesRegistered`). Consumidores que precisarem registrar uma estratégia própria devem chamar `AttributeEditorRegistry.instance.register(...)` **após** o `super.initState()`.
+- **`AttributeChangeBus`**: barramento de mudanças por instância de `Storybook` (não é mais singleton), usado para evitar `setState(() {})` cego em `onUpdateAttributes`.
+- **Exemplo em `example/` reescrito** — `CustomCard` agora usa a API `AttributeModel`, declara `@StorybookModel() class CustomCardSettings`, gera `mergeCustomCardSettings` via `build_runner` (configurado em `example/build.yaml`), e o app de exemplo separa temas em `example/lib/sample_themes.dart` (Material 3 via `ColorScheme.fromSeed` para `sage`, `ocean`, `plum`).
+- **READMEs (EN e PT-BR)** reescritos para refletir a API `AttributeModel`, o fluxo sem reflexão, o uso do `storybook_ds_builder` para `merge*` e receitas rápidas para os principais tipos de knob.
+
+### Fixed
+
+- **`DevicePreviewStore` "Not initialized"** — crash que ocorria no primeiro frame quando a UI do `DevicePreview` (seção `Device` / `Accessibility` / `Settings` do tool panel) lia seletores (`selectedDevice`, `selectedLocale`, `selectedBrightness`, `selectedOrientation`, etc.) antes do `initialize()` resolver. Os seletores agora têm **fallbacks seguros** para o estado `notInitialized` em vez de lançar `Exception('Not initialized')`. **Impacto:** elimina o crash vermelho no log ao abrir uma story pela primeira vez.
+- **`ToolPanel` `ParentDataWidget` no título da `AppBar`** — removido um `Flexible` indevido em torno do título da `AppBar` de ferramentas que disparava assert `A RenderFlex overflowed by N pixels` / `ParentDataWidget` quando o título era longo (ex.: nome de story longo + `ThemeSettings` ativo). **Impacto:** corrige crash visual em telas estreitas / títulos longos.
+- **Performance geral do `Storybook`**: `updatePreviewCode` é gerado uma vez por build do bloco, `breakSpaceLevel` otimizado, e a atribuição confusa ao parâmetro de mesmo nome em `updatePreviewCode` foi removida (não muda comportamento observável; só limpeza interna).
+
+### Compatibility
+
+| API | 1.2.5 | 1.3.0 |
+|-----|-------|-------|
+| `AttributeDto` (typedef) | público | `@deprecated` → aponta para `AttributeModel` (continua exportado, compila com warning) |
+| `AttributeModel` | público | público, **classe canônica** |
+| `StorybookAttributeFactories` | público | público, sem mudanças |
+| `@StorybookModel()` | público | público, sem mudanças |
+| `MultipleThemeSettings` / `ThemeSettings` | público | público, sem mudanças |
+| `StorybookTheme` | (não existia) | público, opcional |
+| `AttributeEditorRegistry` | (interno, sem export) | **público** (para registro de estratégias customizadas) |
+| `AttributeValue` | (não existia) | público, utilitário |
+| `lib/src/...` paths internos | exportados por conveniência | continuam funcionando, mas prefira `package:storybook_ds/storybook_ds.dart` |
+
+### Migration guide (1.2.5 → 1.3.0)
+
+1. **Opcional (recomendado):** troque `AttributeDto` por `AttributeModel` no seu código. É rename puro.
+2. **Sem ação:** se você só usa `AttributeModel`, `StorybookAttributeFactories`, `@StorybookModel()`, `MultipleThemeSettings` e `ThemeSettings`, **não precisa mudar nada**.
+3. **Opcional:** se quiser customizar cores do chrome, sobrescreva `storybookTheme` na sua `State extends Storybook<T>`.
+4. **Opcional:** se quiser registrar um editor customizado, faça `AttributeEditorRegistry.instance.register(MinhaEstrategia())` no `initState` da sua story, **após** `super.initState()`.
+
 ## [1.2.5] - 2026-04-03
 
 ### Breaking changes

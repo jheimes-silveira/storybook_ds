@@ -47,15 +47,18 @@ class StorybookModelGenerator extends GeneratorForAnnotation<StorybookModel> {
     buffer.writeln(') {');
     buffer.writeln('  switch (fieldName) {');
 
-    for (final f in fields) {
+    for (int i = 0; i < fields.length; i++) {
+      final f = fields[i];
       final typeStr = f.type.getDisplayString(withNullability: true);
       buffer.writeln("    case '${f.name}':");
       buffer.writeln('      return $className(');
-      for (final g in fields) {
+      for (int j = 0; j < fields.length; j++) {
+        final g = fields[j];
+        final comma = j < fields.length - 1 ? ',' : '';
         if (g.name == f.name) {
-          buffer.writeln('        ${g.name}: newValue as $typeStr,');
+          buffer.writeln('        ${g.name}: newValue as $typeStr$comma');
         } else {
-          buffer.writeln('        ${g.name}: current.${g.name},');
+          buffer.writeln('        ${g.name}: current.${g.name}$comma');
         }
       }
       buffer.writeln('      );');

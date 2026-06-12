@@ -16,12 +16,13 @@ class StoryBookComponentState extends StatefulWidget {
     this.onUpdateTheme,
     this.extraAttributesConfigCustom,
     this.onSelectedConstructor,
+    this.storybookTheme,
   }) : assert(child != null || builder != null, 'child or builder is required');
   final Widget? child;
   final WidgetBuilder? builder;
   final String title;
   final String description;
-  final List<AttributeDto> attributes;
+  final List<AttributeModel> attributes;
   final String nameObjectInDisplay;
   final StoryBookComponentController? controller;
   final MultipleThemeSettings? multipleThemeSettings;
@@ -31,6 +32,11 @@ class StoryBookComponentState extends StatefulWidget {
   )? onUpdateTheme;
   final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
   final Function(String constructor)? onSelectedConstructor;
+
+  /// Tema customizável do storybook.
+  /// Se null, usa [StorybookTheme.defaults].
+  final StorybookTheme? storybookTheme;
+
   @override
   Storybook<StoryBookComponentState> createState() =>
       // ignore: no_logic_in_create_state
@@ -46,6 +52,7 @@ class StoryBookComponentState extends StatefulWidget {
         extraAttributesConfigCustom: extraAttributesConfigCustom,
         builder: builder,
         onSelectedConstructor: onSelectedConstructor,
+        storybookTheme: storybookTheme,
       );
 }
 
@@ -58,7 +65,7 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
   @override
   final String description;
   @override
-  final List<AttributeDto> attributes;
+  final List<AttributeModel> attributes;
   @override
   final String nameObjectInDisplay;
 
@@ -70,21 +77,26 @@ class _StoryBookComponentStateState extends Storybook<StoryBookComponentState> {
   OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
 
   final Color? backgroundColor;
-  final StoryBookComponentController? controller;
   final Function(String constructor)? onSelectedConstructor;
+  @override
+  final StorybookTheme? storybookTheme;
+
   _StoryBookComponentStateState({
     required this.title,
     required this.description,
     required this.attributes,
     required this.nameObjectInDisplay,
-    required this.controller,
+    required StoryBookComponentController? controller,
     required this.multipleThemeSettings,
     required this.backgroundColor,
     this.child,
     this.builder,
     this.extraAttributesConfigCustom,
     this.onSelectedConstructor,
-  });
+    this.storybookTheme,
+  }) {
+    internalController = controller;
+  }
 
   @override
   void onUpdateSelectedConstructor(String constructor) {

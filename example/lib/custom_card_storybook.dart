@@ -5,14 +5,20 @@ import 'custom_card.dart';
 import 'sample_themes.dart';
 import 'storybook_example_attributes.dart';
 
-/// Nomes dos construtores expostos no storybook, alinhados a [CustomCard]:
-/// - `''` → `CustomCard(...)` (construtor padrão)
-/// - `'inline'` → `CustomCard.inline(...)`
-/// - `'outline'` → `CustomCard.outline(...)`
+/// `imageDisplay` é mapeado no construtor padrão (todos os `builders`),
+/// enquanto `variant` é exclusivo do construtor padrão.
 const _cardBuildersAll = <String>['', 'inline', 'outline'];
 
 /// Só o construtor padrão (ex.: parâmetro ausente nas fábricas `inline` / `outline`).
 const _cardBuilderDefaultOnly = <String>[''];
+
+/// `builders` aceitos para o enum `imageDisplay` — todos os construtores
+/// precisam dessa opção de imagem.
+const _cardImageBuildersAll = <String>['', 'inline', 'outline'];
+
+/// URL de imagem padrão para o atributo `imageUrl` (placeholder público e
+/// estável, sem necessidade de chave de API).
+const _kDefaultImageUrl = 'https://picsum.photos/seed/storybook/600/300';
 
 /// Página de story do [CustomCard].
 class CustomCardStorybook extends StatefulWidget {
@@ -74,23 +80,35 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
   T? _knob<T>(String name) => getWhereAttribut(name) as T?;
 
   @override
-  late final List<AttributeDto> attributes = [
+  late final List<AttributeModel> attributes = [
     StorybookAttributeFactories.factoryAttributeDtoString(
       name: 'title',
       selectedValue: 'Lorem justo clita tempor labore',
       required: true,
       builders: _cardBuildersAll,
     ),
-    AttributeDto(
+    AttributeModel(
       name: 'hidden',
       type: 'bool',
       selectedValue: VariableOption(value: false),
       builders: _cardBuildersAll,
     ),
-    AttributeDto(
+    AttributeModel(
       name: 'enabled',
       type: 'bool',
       selectedValue: VariableOption(value: true),
+      builders: _cardBuildersAll,
+    ),
+    AttributeModel.enumType(
+      name: 'imageDisplay',
+      selectedValue: CardImageDisplay.image,
+      values: CardImageDisplay.values,
+      builders: _cardImageBuildersAll,
+    ),
+    AttributeModel(
+      name: 'borderEnabled',
+      type: 'bool',
+      selectedValue: VariableOption(value: false),
       builders: _cardBuildersAll,
     ),
     StorybookAttributeFactories.factoryAttributeDtoString(
@@ -100,19 +118,19 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       canBeNull: true,
       builders: _cardBuildersAll,
     ),
-    AttributeDto.enumType(
+    AttributeModel.enumType(
       name: 'variant',
       selectedValue: CustomCardVariant.inline,
       values: CustomCardVariant.values,
       builders: _cardBuilderDefaultOnly,
     ),
-    AttributeDto(
+    AttributeModel(
       name: 'onPositive',
       type: 'Function()?',
       selectedValue: VariableOption(value: '(){}'),
       builders: _cardBuildersAll,
     ),
-    AttributeDto(
+    AttributeModel(
       name: 'textPositive',
       type: 'String?',
       variableOptions: [
@@ -120,13 +138,13 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       ],
       builders: _cardBuildersAll,
     ),
-    AttributeDto(
+    AttributeModel(
       name: 'onNegative',
       type: 'Function()?',
       selectedValue: VariableOption(value: '(){}'),
       builders: _cardBuildersAll,
     ),
-    AttributeDto.objectInObject(
+    AttributeModel.objectInObject(
       name: 'settings',
       type: 'CustomCardSettings?',
       merge: (instance, fieldName, newValue) => mergeCustomCardSettings(
@@ -140,8 +158,17 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
           canBeNull: true,
           builders: _cardBuildersAll,
         ),
+        // `textColor` agora é `null` por padrão para que o tema
+        // (light/dark) defina a cor automaticamente — evitando texto
+        // preto sobre fundo escuro.
         StorybookExampleAttributes.colorPicker(
           name: 'textColor',
+          canBeNull: true,
+          builders: _cardBuildersAll,
+        ),
+        StorybookExampleAttributes.colorPicker(
+          name: 'borderColor',
+          canBeNull: true,
           builders: _cardBuildersAll,
         ),
       ],
@@ -149,11 +176,12 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       selectedValue: VariableOption(
         value: const CustomCardSettings(
           backgroundColor: null,
-          textColor: Colors.black,
+          textColor: null,
+          borderColor: null,
         ),
       ),
     ),
-    AttributeDto(
+    AttributeModel(
       name: 'textNegative',
       type: 'String?',
       variableOptions: [
@@ -161,7 +189,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       ],
       builders: _cardBuildersAll,
     ),
-    AttributeDto.rangeDoubleInterval(
+    AttributeModel.rangeDoubleInterval(
       name: 'width',
       begin: 220,
       end: 400,
@@ -169,7 +197,7 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       selectedValue: null,
       builders: _cardBuildersAll,
     ),
-    AttributeDto.rangeDoubleInterval(
+    AttributeModel.rangeDoubleInterval(
       name: 'height',
       begin: 160,
       end: 600,
@@ -211,6 +239,10 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       width: _knob<double>('width'),
       hidden: _knob<bool>('hidden') ?? false,
       enabled: _knob<bool>('enabled') ?? true,
+      imageDisplay:
+          _knob<CardImageDisplay>('imageDisplay') ?? CardImageDisplay.image,
+      imageUrl: _kDefaultImageUrl,
+      borderEnabled: _knob<bool>('borderEnabled') ?? false,
     );
   }
 
@@ -227,6 +259,10 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       width: _knob<double>('width'),
       hidden: _knob<bool>('hidden') ?? false,
       enabled: _knob<bool>('enabled') ?? true,
+      imageDisplay:
+          _knob<CardImageDisplay>('imageDisplay') ?? CardImageDisplay.image,
+      imageUrl: _knob<String>('imageUrl'),
+      borderEnabled: _knob<bool>('borderEnabled') ?? false,
     );
   }
 
@@ -243,6 +279,10 @@ class _CustomCardStorybookState extends Storybook<CustomCardStorybook> {
       width: _knob<double>('width'),
       hidden: _knob<bool>('hidden') ?? false,
       enabled: _knob<bool>('enabled') ?? true,
+      imageDisplay:
+          _knob<CardImageDisplay>('imageDisplay') ?? CardImageDisplay.image,
+      imageUrl: _knob<String>('imageUrl'),
+      borderEnabled: _knob<bool>('borderEnabled') ?? false,
     );
   }
 

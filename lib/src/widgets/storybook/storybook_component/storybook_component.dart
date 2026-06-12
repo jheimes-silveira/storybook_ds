@@ -9,8 +9,48 @@ class StoryBookComponentProperties {
     this.selectedConstructor,
   });
 
-  final List<AttributeDto> attributes;
+  final List<AttributeModel> attributes;
   String? selectedConstructor;
+
+  /// Comparação por conteúdo para que o [ValueListenableBuilder] da
+  /// `Storybook` reconstrua quando o usuário alterar um atributo.
+  ///
+  /// Os atributos são mutados in-place pelos editores (ex.: um `bool`
+  /// toggle muda `attribute.selectedValue!.value`). Sem este `==`, o
+  /// `ValueListenableBuilder` veria a mesma referência de `attributes`
+  /// no `properties`, compararia por identidade (que é `true` para o
+  /// mesmo objeto) e **não** reconstruiria — o device preview ficaria
+  /// congelado.
+  ///
+  /// A comparação é delegada para [AttributeModel.==], que cobre todos
+  /// os campos relevantes (incluindo `selectedValue`).
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! StoryBookComponentProperties) return false;
+    if (other.selectedConstructor != selectedConstructor) return false;
+    if (other.attributes.length != attributes.length) return false;
+    for (var i = 0; i < attributes.length; i++) {
+      if (attributes[i] != other.attributes[i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode {
+    // Consistente com `==`: hash do conteúdo para satisfazer o
+    // contrato `a == b ⇒ a.hashCode == b.hashCode` do `Object`.
+    // O conteúdo é mutável (em particular `selectedValue`), então
+    // o hash pode mudar ao longo da vida do objeto — isso é
+    // aceitável para o caso de uso atual (`ValueListenableBuilder`
+    // só usa `==` para decidir se reconstrói). Se esta classe for
+    // usada como chave em `Set`/`Map` *após* uma mutação, a busca
+    // pode falhar — o caller é responsável por evitar isso.
+    return Object.hash(
+      selectedConstructor,
+      Object.hashAll(attributes),
+    );
+  }
 }
 
 class StoryBookComponentController
@@ -18,9 +58,9 @@ class StoryBookComponentController
   StoryBookComponentController(this.properties) : super(properties);
   final StoryBookComponentProperties properties;
 
-  List<AttributeDto> get attributes => properties.attributes;
+  List<AttributeModel> get attributes => properties.attributes;
 
-  set attributes(List<AttributeDto> value) {
+  set attributes(List<AttributeModel> value) {
     properties.attributes.clear();
     properties.attributes.addAll(value);
     onUpdateAttributes(value);
@@ -40,7 +80,7 @@ class StoryBookComponentController
     return null;
   }
 
-  void onUpdateAttributes(List<AttributeDto> attributes) {
+  void onUpdateAttributes(List<AttributeModel> attributes) {
     notifyListeners();
   }
 }
@@ -60,13 +100,14 @@ class StoryBookComponent extends StatefulWidget {
     this.onUpdateTheme,
     this.extraAttributesConfigCustom,
     this.onSelectedConstructor,
+    this.storybookTheme,
   }) : assert(child != null || builder != null, 'child or builder is required');
 
   final Widget? child;
   final WidgetBuilder? builder;
   final String title;
   final String description;
-  final List<AttributeDto> attributes;
+  final List<AttributeModel> attributes;
   final String nameObjectInDisplay;
   final StoryBookComponentController? controller;
   final MultipleThemeSettings? multipleThemeSettings;
@@ -76,6 +117,11 @@ class StoryBookComponent extends StatefulWidget {
   )? onUpdateTheme;
   final OnBuildExtraAttributesConfigCustom? extraAttributesConfigCustom;
   final Function(String constructor)? onSelectedConstructor;
+
+  /// Tema customizável do storybook.
+  /// Se null, usa [StorybookTheme.defaults].
+  final StorybookTheme? storybookTheme;
+
   @override
   State<StoryBookComponent> createState() => _StoryBookComponenState();
 }
@@ -121,6 +167,7 @@ class _StoryBookComponenState extends State<StoryBookComponent> {
         extraAttributesConfigCustom: widget.extraAttributesConfigCustom,
         builder: widget.builder,
         onSelectedConstructor: widget.onSelectedConstructor,
+        storybookTheme: widget.storybookTheme,
         child: widget.child,
       );
 }

@@ -225,6 +225,7 @@ const _allPlatforms = <TargetPlatform>[
 const _allDeviceTypes = <DeviceType>[
   DeviceType.phone,
   DeviceType.tablet,
+  DeviceType.tv,
   DeviceType.desktop,
   DeviceType.laptop,
 ];

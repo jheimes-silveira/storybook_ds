@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/widgets.dart';
 
 /// Observes the window changes and provides a [MediaQuery]
@@ -6,11 +8,12 @@ class MediaQueryObserver extends StatefulWidget {
   final Widget child;
 
   const MediaQueryObserver({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
+  // ignore: library_private_types_in_public_api
   _MediaQueryObserverState createState() => _MediaQueryObserverState();
 }
 
@@ -37,7 +40,7 @@ class _MediaQueryObserverState extends State<MediaQueryObserver>
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: MediaQueryData.fromWindow(WidgetsBinding.instance.window),
+      data: MediaQueryData.fromView(View.of(context)),
       child: widget.child,
     );
   }

@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,12 +13,11 @@ class AccessibilitySection extends StatelessWidget {
   /// The items can be hidden with [accessibleNavigation], [invertColors],
   /// [textScalingFactor] parameters.
   const AccessibilitySection({
-    Key? key,
     this.accessibleNavigation = true,
     this.invertColors = true,
     this.textScalingFactor = true,
     this.boldText = true,
-  }) : super(key: key);
+  }) : super(key: null);
 
   /// Allow to enable accessible navigation mode.
   final bool accessibleNavigation;
@@ -113,12 +113,12 @@ class AccessibilitySection extends StatelessWidget {
             subtitle: Text(textScalingFactor.toString()),
             trailing: Transform(
               alignment: Alignment.center,
-              transform: (Matrix4.identity()
+              transform: Matrix4.identity()
                 ..scale(
                   textScalingFactor >= 2
                       ? 1.0
                       : (textScalingFactor < 1 ? 0.25 : 0.6),
-                )),
+                ),
               child: const Icon(Icons.text_format),
             ),
           ),

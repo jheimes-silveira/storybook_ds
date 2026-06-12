@@ -27,7 +27,15 @@ RoundedRectangleBorder get _storyCardShape => RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(_kStoryCornerRadius),
     );
 
-/// [ThemeData] Material 3 a partir de [seedColor], com cartões e botões alinhados ao exemplo.
+/// [ThemeData] Material 3 a partir de [seedColor], com cartões e botões
+/// alinhados ao exemplo.
+///
+/// Importante: usamos **superfícies tonais** do `ColorScheme` (`surface`,
+/// `surfaceContainer*`) em vez de cores fixas, para que texto e fundo
+/// mantenham contraste tanto em **light** quanto em **dark**.
+/// - `scaffoldBackgroundColor` → `colorScheme.surface` (base neutra)
+/// - `cardTheme.color` → `colorScheme.surfaceContainerHigh` (destaca do fundo)
+/// - `cardTheme.shape`/`cardTheme.side` → suporta border opcional
 ThemeData buildSampleM3Theme({
   required Color seedColor,
   required Brightness brightness,
@@ -40,25 +48,29 @@ ThemeData buildSampleM3Theme({
   return ThemeData(
     useMaterial3: true,
     colorScheme: colorScheme,
-    scaffoldBackgroundColor: colorScheme.surfaceContainerLowest,
+    // `surface` é a cor-base do scheme e já possui `onSurface` com contraste
+    // suficiente para textos em ambos os modos (light/dark).
+    scaffoldBackgroundColor: colorScheme.surface,
     appBarTheme: AppBarTheme(
       centerTitle: false,
-      backgroundColor: colorScheme.surfaceContainerLow,
+      backgroundColor: colorScheme.surfaceContainer,
       foregroundColor: colorScheme.onSurface,
       elevation: 0,
-      scrolledUnderElevation: 1,
+      scrolledUnderElevation: 0,
     ),
     cardTheme: CardThemeData(
-      color: colorScheme.surfaceContainerLow,
-      elevation: brightness == Brightness.light ? 0.5 : 1.5,
-      surfaceTintColor: colorScheme.surfaceTint.withValues(alpha: 0.35),
-      shadowColor: Colors.black.withValues(alpha: 0.12),
+      // `surfaceContainerHigh` garante que o card "suba" um tom em relação
+      // ao scaffold (`surface`) — bom contraste visual sem perder harmonia.
+      color: colorScheme.surfaceContainerHigh,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      shadowColor: Colors.transparent,
       shape: _storyCardShape,
       clipBehavior: Clip.antiAlias,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        elevation: brightness == Brightness.light ? 0 : 1,
+        elevation: 0,
         padding: _kStoryButtonPadding,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_kStoryButtonCornerRadius),

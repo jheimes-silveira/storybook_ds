@@ -24,9 +24,17 @@ abstract class DevicePreviewState {
     /// The list of all available locales.
     required List<NamedLocale> locales,
 
-    /// The user settings of the preview.
     required DevicePreviewData data,
   }) = _InitializedDevicePreviewState;
+
+  /// Whether the state is not initialized.
+  bool get isNotInitialized => this is _NotInitializedDevicePreviewState;
+
+  /// Whether the state is currently initializing.
+  bool get isInitializing => this is _InitializingDevicePreviewState;
+
+  /// Whether the state is initialized.
+  bool get isInitialized => this is _InitializedDevicePreviewState;
 
   /// Pattern matching with optional handlers
   T maybeWhen<T>({
@@ -53,8 +61,11 @@ abstract class DevicePreviewState {
 
   /// Pattern matching with optional handlers returning DevicePreviewState
   T maybeMap<T>({
+    // ignore: library_private_types_in_public_api
     T Function(_NotInitializedDevicePreviewState)? notInitialized,
+    // ignore: library_private_types_in_public_api
     T Function(_InitializingDevicePreviewState)? initializing,
+    // ignore: library_private_types_in_public_api
     T Function(_InitializedDevicePreviewState)? initialized,
     required T Function() orElse,
   }) {

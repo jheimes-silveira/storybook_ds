@@ -16,11 +16,19 @@ CustomCardSettings mergeCustomCardSettings(
       return CustomCardSettings(
         backgroundColor: newValue as Color?,
         textColor: current.textColor,
+        borderColor: current.borderColor,
       );
     case 'textColor':
       return CustomCardSettings(
         backgroundColor: current.backgroundColor,
         textColor: newValue as Color?,
+        borderColor: current.borderColor,
+      );
+    case 'borderColor':
+      return CustomCardSettings(
+        backgroundColor: current.backgroundColor,
+        textColor: current.textColor,
+        borderColor: newValue as Color?,
       );
     default:
       return current;

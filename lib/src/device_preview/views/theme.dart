@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../state/state.dart';
+import 'package:storybook_ds/src/device_preview/state/state.dart';
+import 'package:storybook_ds/src/theme/storybook_toolbar_colors.dart';
 
 extension ThemeBackgroundExtension on DevicePreviewBackgroundThemeData {
   /// Converts a [DevicePreviewBackgroundThemeData] to a [ThemeData].
@@ -16,52 +16,62 @@ extension ThemeBackgroundExtension on DevicePreviewBackgroundThemeData {
 
 extension ThemeToolbarExtension on DevicePreviewToolBarThemeData {
   /// Converts a [DevicePreviewToolBarThemeData] to a [ThemeData].
+  ///
+  /// Uses [StorybookToolbarColors] when available, otherwise falls back to defaults.
   ThemeData asThemeData() {
     switch (this) {
       case DevicePreviewToolBarThemeData.dark:
         final base = ThemeData.dark();
-        const accentColor = Colors.white;
+        const colors = StorybookToolbarColors(
+          color: Colors.white,
+          onColor: Colors.black,
+          surface: Color(0xFF303030),
+          onSurface: Colors.white,
+        );
         return base.copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: accentColor,
-            secondary: accentColor,
+          colorScheme: ColorScheme.dark(
+            primary: colors.color,
+            secondary: colors.color,
           ),
-          primaryColor: accentColor,
-          primaryColorDark: accentColor,
-          indicatorColor: accentColor,
-          highlightColor: accentColor.withOpacity(0.1),
+          primaryColor: colors.color,
+          primaryColorDark: colors.color,
+          highlightColor: colors.color.withValues(alpha: 0.1),
           sliderTheme: base.sliderTheme.copyWith(
-            thumbColor: accentColor,
-            activeTrackColor: accentColor.withOpacity(0.7),
-            inactiveTrackColor: accentColor.withOpacity(0.12),
-            activeTickMarkColor: accentColor,
-            inactiveTickMarkColor: accentColor,
-            overlayColor: accentColor.withOpacity(0.12),
+            thumbColor: colors.color,
+            activeTrackColor: colors.color.withValues(alpha: 0.7),
+            inactiveTrackColor: colors.color.withValues(alpha: 0.12),
+            activeTickMarkColor: colors.color,
+            inactiveTickMarkColor: colors.color,
+            overlayColor: colors.color.withValues(alpha: 0.12),
           ),
         );
       case DevicePreviewToolBarThemeData.light:
         final base = ThemeData.light();
-        const accentColor = Colors.black;
+        const colors = StorybookToolbarColors(
+          color: Colors.black,
+          onColor: Colors.white,
+          surface: Color(0xFFF5F5F5),
+          onSurface: Color(0xFF212121),
+        );
         const barColor = Color(0xFF303030);
         return base.copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: accentColor,
-            secondary: accentColor,
+          colorScheme: ColorScheme.light(
+            primary: colors.color,
+            secondary: colors.color,
           ),
-          primaryColor: accentColor,
-          primaryColorDark: accentColor,
-          indicatorColor: accentColor,
-          highlightColor: accentColor,
+          primaryColor: colors.color,
+          primaryColorDark: colors.color,
+          highlightColor: colors.color,
           appBarTheme: base.appBarTheme.copyWith(
-            color: barColor,
+            backgroundColor: barColor,
           ),
           sliderTheme: base.sliderTheme.copyWith(
-            thumbColor: accentColor,
-            activeTrackColor: accentColor.withOpacity(0.7),
-            inactiveTrackColor: accentColor.withOpacity(0.12),
-            activeTickMarkColor: accentColor,
-            inactiveTickMarkColor: accentColor,
-            overlayColor: accentColor.withOpacity(0.12),
+            thumbColor: colors.color,
+            activeTrackColor: colors.color.withValues(alpha: 0.7),
+            inactiveTrackColor: colors.color.withValues(alpha: 0.12),
+            activeTickMarkColor: colors.color,
+            inactiveTickMarkColor: colors.color,
+            overlayColor: colors.color.withValues(alpha: 0.12),
           ),
         );
     }

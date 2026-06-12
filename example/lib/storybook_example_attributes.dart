@@ -6,13 +6,13 @@ class StorybookExampleAttributes {
   StorybookExampleAttributes._();
 
   /// Seletor de [Color] com opções fixas para o painel do storybook.
-  static AttributeDto colorPicker({
+  static AttributeModel colorPicker({
     required String name,
     bool canBeNull = false,
     VariableOption? selectedValue,
     List<String> builders = const [''],
   }) {
-    return AttributeDto(
+    return AttributeModel(
       type: 'Color${canBeNull ? '?' : ''}',
       name: name,
       builders: builders,
